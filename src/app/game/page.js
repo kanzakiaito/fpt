@@ -1324,6 +1324,7 @@ export default function Home() {
       }
       return {
         ...qa,
+        audio: qa.audio && String(qa.audio).trim() !== "" && String(qa.audio).trim().toLowerCase() !== "null" ? String(qa.audio).trim() : null,
         eliminateMode: qa.eliminateMode || "random",
         eliminateOrder: Array.isArray(order) ? order : [],
       };
@@ -6606,8 +6607,9 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
 
   const cfg = qaConfig || GAME_CONFIG.qa;
   const letters = ["1", "2", "3", "4", "5"];
-  const qaAudioSrc = cfg.audio || cfg.media || cfg.sound || "";
-  const hasAudio = Boolean(qaAudioSrc && String(qaAudioSrc).trim() !== "");
+  const rawAudio = cfg.audio ?? cfg.media ?? cfg.sound ?? null;
+  const qaAudioSrc = (rawAudio && typeof rawAudio === "string" && rawAudio.trim().toLowerCase() !== "null" && rawAudio.trim().toLowerCase() !== "undefined") ? rawAudio.trim() : "";
+  const hasAudio = Boolean(qaAudioSrc);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const stopQuestionAudio = () => {
