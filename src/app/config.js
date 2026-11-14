@@ -10,220 +10,221 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
-        "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-        "Identity ต่อไปนี้เป็นของตัวละครใดใน Limbus Company?"
+        "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+        "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+        "ตัวละคร Touhou Project ต่อไปนี้ปรากฏตัวครั้งแรกในภาคใด?"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "Faust"
+            "answer": "Kirisame Marisa"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "Gregor"
+            "answer": "Yakumo Yukari"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "Hohenheim"
+            "answer": "Koumeiji Satori"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "Moses"
+            "answer": "Kazami Yuuka"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "Alfonso"
+            "answer": "Murasa Minamitsu"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "Don Quixote"
+            "answer": "Usami Sumireko"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "(La Manchaland's) Don Quixote"
+            "answer": "Hata no Kokoro"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "Émile Benoît"
+            "answer": "Toyosatomimi no Miko"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "Lady of the Fount"
+            "answer": "Kirishima Yuuta"
         },
         {
-            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "Mephistopheles"
+            "answer": "Hakurei Reimu"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/11.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/11.mp3",
             "video": null,
-            "answer": "Ebony Queen's Apple"
+            "answer": "Cirno"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/12.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/12.mp3",
             "video": null,
-            "answer": "Red Shoes"
+            "answer": "Ibuki Suika"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/13.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/13.mp3",
             "video": null,
-            "answer": "Drifting Fox"
+            "answer": "Kagiyama Hina"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/14.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/14.mp3",
             "video": null,
-            "answer": "Forsaken Murderer"
+            "answer": "Aki Minoriko"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/15.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/15.mp3",
             "video": null,
-            "answer": "Dreaming Electric Sheep"
+            "answer": "Shameimaru Aya"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/16.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/16.mp3",
             "video": null,
-            "answer": "Sunset Wayfarer"
+            "answer": "Mizuhashi Parsee"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/17.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/17.mp3",
             "video": null,
-            "answer": "1.76 MHz"
+            "answer": "Horikawa Raiko"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/18.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/18.mp3",
             "video": null,
-            "answer": "Funeral of the Dead Butterflies"
+            "answer": "Toramaru Shou"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/19.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/19.mp3",
             "video": null,
-            "answer": "kqe-1j-23"
+            "answer": "Sariel"
         },
         {
-            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
-            "image": "public/img/20.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
+            "image": null,
+            "audio": "public/audio/20.mp3",
             "video": null,
-            "answer": "My Form Empties"
+            "answer": "Flandre Scarlet"
         },
         {
-            "question": "Shi Assoc. South Section 5",
+            "question": "Houraisan Kaguya",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Ishmael"
+            "answer": "Imperishable Night (8)"
         },
         {
-            "question": "Blade Lineage Mentor",
+            "question": "Niwatari Kutaka",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Mersault"
+            "answer": "Wily Beast and Weakest Creature (17)"
         },
         {
-            "question": "Tingtang Gang Gangleader",
+            "question": "Yorigami Jo-on",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Hong Lu"
+            "answer": "Antinomy of Common Flowers (15.5)"
         },
         {
-            "question": "Lobotomy E.G.O::Magic Bullet",
+            "question": "Ibaraki Kasen",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Outis"
+            "answer": "Wild and Horned Hermit"
         },
         {
-            "question": "Haute Couture::The Crimson God of Le Rouge",
+            "question": "Hakurei Reimu",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Sinclair"
+            "answer": "the Highly Responsive to Prayers (1)"
         }
     ],
     "qa": {
-        "question": "นับจนถึง Banner ล่าสุดของ Season 7 ตัวละครที่ปรากฏบน Banner มากที่สุดเป็นอันดับที่ 3 คือใคร / ปรากฏตัวทั้งหมดกี่ครั้ง? (นับรวมทุก Identity และ E.G.O)",
-        "answer": "Ryōshū / 15 ครั้ง",
+        "question": "เงาตัวละคร Touhou Project ที่ปรากฏใน PV เพลง Bad Apple เป็นลำดับที่ 22 คือใคร?",
+        "answer": "Inubashiri Momiji",
+        "audio": "public/sound/qa-audio.mp3",
         "choices": [
-            "Rodion / 17 ครั้ง",
-            "Hong Lu / 16 ครั้ง",
-            "Ryōshū / 15 ครั้ง",
-            "Yi Sang / 14 ครั้ง",
-            "Don Quixote / 13 ครั้ง"
+            "Chen",
+            "Inubashiri Momiji",
+            "Inaba Tewi",
+            "Reisen Udongein Inaba",
+            "Yakumo Ran"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
-            1,
             5,
-            4
+            1,
+            3
         ]
     },
     "jigsaw": {
-        "mode": "portrait",
+        "mode": "square",
         "image": "public/img/jigsaw.png",
-        "answer": "Faust",
-        "question": "หลังจิ๊กซอว์นี้คือตัวละคร Limbus Company ที่มีชื่อว่าอะไร?"
+        "answer": "Patchouli Knowledge",
+        "question": "หลังจิ๊กซอว์นี้คือตัวละคร Touhou Project ที่มีชื่อว่าอะไร?"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+        "question": "นี่คือคุณสมบัติของตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
         "clues": [
-            "ทำงานอยู่ในหน่วย LCD",
-            "ชื่อมี 2 พยางค์",
-            "ไม่เคยมีตำแหน่งหัวหน้าทีมหรือหัวหน้ากลุ่ม",
-            "อายุไม่ถึง 40 ปี",
-            "ปรากฏตัวให้เห็นกายครั้งแรกใน The Distortion Detective"
+            "เป็นศัตรูในภาค The Embodiment of Scarlet Devil",
+            "ใช้ชีวิตในเก็นโซเคียวเป็นหลักร้อยปี",
+            "เพลงประจำตัวของตัวละครเคยถูก IOSYS นำมา Remix แล้ว",
+            "ผมสีทอง ตาสีแดง",
+            "ไม่เป็นโยวไค ไม่ใช่มนุษย์หูสัตว์ ไม่จัดว่าเป็นเทพธิดา"
         ],
-        "answer": "Ezra"
+        "answer": "Flandre Scarlet"
     },
     "battle": {
         "player1": {

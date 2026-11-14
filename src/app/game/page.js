@@ -3050,6 +3050,15 @@ export default function Home() {
                       />
                     </div>
                     <div className="q-input-group">
+                      <label>🔊 ไฟล์เสียงประกอบ (เว้นว่างได้ถ้าไม่มีเสียง)</label>
+                      <input
+                        type="text"
+                        value={qaState.audio || qaState.media || ""}
+                        onChange={(e) => setQA({ ...qaState, audio: e.target.value })}
+                        placeholder="เช่น public/sound/qa-audio.mp3"
+                      />
+                    </div>
+                    <div className="q-input-group">
                       <label>🔑 คำตอบ</label>
                       <input
                         type="text"
@@ -6592,15 +6601,75 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
   const bgmRef = useRef(null);
   const sfxRef = useRef(null);
   const suspenseRef = useRef(null);
+  const questionAudioRef = useRef(null);
+  const wasBgmPlayingRef = useRef(false);
 
   const cfg = qaConfig || GAME_CONFIG.qa;
   const letters = ["1", "2", "3", "4", "5"];
+  const qaAudioSrc = cfg.audio || cfg.media || cfg.sound || "";
+  const hasAudio = Boolean(qaAudioSrc && String(qaAudioSrc).trim() !== "");
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+
+  const stopQuestionAudio = () => {
+    if (questionAudioRef.current) {
+      unregisterMediaElement(questionAudioRef.current);
+      questionAudioRef.current.pause();
+      questionAudioRef.current = null;
+    }
+    setIsAudioPlaying(false);
+  };
+
+  const handleTogglePlayAudio = () => {
+    if (!hasAudio) return;
+
+    if (isAudioPlaying && questionAudioRef.current) {
+      questionAudioRef.current.pause();
+      setIsAudioPlaying(false);
+      if (bgmRef.current && wasBgmPlayingRef.current) {
+        bgmRef.current.play().catch(() => {});
+      }
+      return;
+    }
+
+    stopQuestionAudio();
+
+    const wasBgmPlaying = Boolean(bgmRef.current && !bgmRef.current.paused);
+    wasBgmPlayingRef.current = wasBgmPlaying;
+    if (wasBgmPlaying) {
+      bgmRef.current.pause();
+    }
+
+    const resolved = resolveImagePath(qaAudioSrc);
+    const audio = new Audio(resolved);
+    registerMediaElement(audio);
+    questionAudioRef.current = audio;
+
+    audio.onplay = () => setIsAudioPlaying(true);
+    audio.onpause = () => setIsAudioPlaying(false);
+    audio.onended = () => {
+      unregisterMediaElement(audio);
+      setIsAudioPlaying(false);
+      questionAudioRef.current = null;
+      if (bgmRef.current && wasBgmPlayingRef.current) {
+        bgmRef.current.play().catch(() => {});
+      }
+    };
+
+    audio.play().catch((err) => {
+      console.warn("QA question audio play failed:", err);
+      setIsAudioPlaying(false);
+      if (bgmRef.current && wasBgmPlayingRef.current) {
+        bgmRef.current.play().catch(() => {});
+      }
+    });
+  };
 
   useEffect(() => {
     return () => {
       stopAudio(bgmRef);
       stopAudio(sfxRef);
       stopAudio(suspenseRef);
+      stopQuestionAudio();
     };
   }, []);
 
@@ -6638,6 +6707,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
   };
 
   const handleSuspenseClick = () => {
+    stopQuestionAudio();
     if (suspenseStep === 0) {
       stopAudio(bgmRef);
       stopAudio(suspenseRef);
@@ -6708,6 +6778,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
     stopAudio(bgmRef);
     stopAudio(suspenseRef);
     stopAudio(sfxRef);
+    stopQuestionAudio();
 
     const score = correct ? currentPoints : 0;
     if (judgeMode) {
@@ -6747,6 +6818,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
     if (answered) return;
     stopAudio(bgmRef);
     stopAudio(suspenseRef);
+    stopQuestionAudio();
     const state = { score: currentPoints, choicesVisible: revealedCount >= cfg.choices.length, revealedCount, eliminatedIndices };
     setAnswered(true);
     onLock(state);
@@ -6756,6 +6828,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
     stopAudio(bgmRef);
     stopAudio(sfxRef);
     stopAudio(suspenseRef);
+    stopQuestionAudio();
     onBack();
   };
 
@@ -6771,6 +6844,26 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
         </div>
         <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
           <button className="btn-game btn-start-round" onClick={handleStart}>เริ่มเกม</button>
+          {hasAudio && (
+            <button
+              type="button"
+              className="btn-game btn-reveal"
+              onClick={handleTogglePlayAudio}
+              style={{
+                background: isAudioPlaying
+                  ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                  : "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
+                boxShadow: isAudioPlaying ? "0 0 15px rgba(16, 185, 129, 0.5)" : "",
+                color: "#ffffff",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <span>{isAudioPlaying ? "⏸️" : "🔊"}</span>
+              <span>{isAudioPlaying ? "หยุดเสียง" : "ฟังเสียง"}</span>
+            </button>
+          )}
           <button className="btn-game btn-reveal" onClick={handleIntroSoundClick}>
             {introSoundStep === 0 ? "🎵 เล่นเสียงประกอบ" : introSoundStep === 1 ? "💥 เล่นเสียง ทึ้ม" : "💥 เล่นเสียง ทึ้ม (ซ้ำ)"}
           </button>
@@ -6786,7 +6879,37 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
     <div className="qa-container">
       {/* 📺 Broadcast Question Bar */}
       <BroadcastQuestionBar
-        question={cfg.question || "เลือกคำตอบที่ถูกต้อง"}
+        question={
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", justifyContent: "space-between", width: "100%" }}>
+            <span>{cfg.question || "เลือกคำตอบที่ถูกต้อง"}</span>
+            {hasAudio && (
+              <button
+                type="button"
+                onClick={handleTogglePlayAudio}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "4px 14px",
+                  borderRadius: "999px",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  border: isAudioPlaying ? "1.5px solid #10b981" : "1.5px solid rgba(56, 189, 248, 0.7)",
+                  background: isAudioPlaying ? "rgba(16, 185, 129, 0.3)" : "rgba(2, 132, 199, 0.35)",
+                  color: isAudioPlaying ? "#6ee7b7" : "#e0f2fe",
+                  cursor: "pointer",
+                  boxShadow: isAudioPlaying ? "0 0 12px rgba(16, 185, 129, 0.5)" : "0 2px 8px rgba(0,0,0,0.4)",
+                  transition: "all 0.2s ease",
+                  flexShrink: 0,
+                }}
+                title="คลิกเพื่อฟังเสียงคำถาม"
+              >
+                <span>{isAudioPlaying ? "⏸️" : "🔊"}</span>
+                <span>{isAudioPlaying ? "หยุดเสียง" : "ฟังเสียง"}</span>
+              </button>
+            )}
+          </div>
+        }
         accumulatedScore={accumulatedScore ?? 0}
         topRightSlot={<ScoreToGetPill points={currentPoints} id="qaPointsDisplay" isLocked={isScoreLocked} />}
       />
@@ -6842,6 +6965,27 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
             )}
           </>
         ) : null}
+
+        {hasAudio && !judgeMode && (
+          <button
+            type="button"
+            className="btn-game btn-reveal"
+            onClick={handleTogglePlayAudio}
+            style={{
+              background: isAudioPlaying
+                ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                : "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
+              boxShadow: isAudioPlaying ? "0 0 15px rgba(16, 185, 129, 0.5)" : "none",
+              color: "#ffffff",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <span>{isAudioPlaying ? "⏸️" : "🔊"}</span>
+            <span>{isAudioPlaying ? "หยุดเสียง" : "ฟังเสียง"}</span>
+          </button>
+        )}
 
         {!judgeMode && revealedCount < cfg.choices.length ? (
           <button className="btn-game btn-reveal" onClick={handleRevealNextChoice}>

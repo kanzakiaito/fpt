@@ -485,13 +485,14 @@
     "nickname": "วิน",
     "topic": "Limbus Company",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 10,
+      "qa": 0,
+      "jigsaw": 20,
+      "attribute": 0
     },
-    "totalScore": 0,
+    "totalScore": 30,
     "image": "",
-    "createdAt": "2026-11-14T15:42:07.010Z"
+    "createdAt": "2026-11-14T15:42:07.010Z",
+    "updatedAt": "2026-11-14T16:41:24.551Z"
   }
 ]
