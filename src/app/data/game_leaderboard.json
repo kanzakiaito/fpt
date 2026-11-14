@@ -462,5 +462,36 @@
     "image": "",
     "createdAt": "2026-11-13T15:56:47.776Z",
     "updatedAt": "2026-11-13T16:41:38.606Z"
+  },
+  {
+    "id": "1794667408691",
+    "name": "ณัฐวุฒิ ชิมาชิน",
+    "nickname": "น็อต",
+    "topic": "เกม Bully",
+    "scores": {
+      "3sec": 16,
+      "qa": 15,
+      "jigsaw": 15,
+      "attribute": 0
+    },
+    "totalScore": 46,
+    "image": "",
+    "createdAt": "2026-11-14T14:43:29.117Z",
+    "updatedAt": "2026-11-14T15:28:28.919Z"
+  },
+  {
+    "id": "1794670926896",
+    "name": "อภิภู ศุขเศงี่ยม",
+    "nickname": "วิน",
+    "topic": "Limbus Company",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "image": "",
+    "createdAt": "2026-11-14T15:42:07.010Z"
   }
 ]

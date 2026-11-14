@@ -10,220 +10,220 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
-        "นี่คือสโลแกนของโฆษณาผลิตภัณฑ์ใด?",
-        "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?"
+        "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
+        "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+        "Identity ต่อไปนี้เป็นของตัวละครใดใน Limbus Company?"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "ฮาตาริ"
+            "answer": "Faust"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "ซีมอน"
+            "answer": "Gregor"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "ไทยประกันชีวิต"
+            "answer": "Hohenheim"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "ฟาร์มเฮ้าส์"
+            "answer": "Moses"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "สมาร์ทฮาร์ท"
+            "answer": "Alfonso"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "ซันวา"
+            "answer": "Don Quixote"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "Thai Eng Ink"
+            "answer": "(La Manchaland's) Don Quixote"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "MK Restaurant"
+            "answer": "Émile Benoît"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "7-Eleven"
+            "answer": "Lady of the Fount"
         },
         {
-            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+            "question": "นี่คือภาพตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "AIA"
+            "answer": "Mephistopheles"
         },
         {
-            "question": "ทุกหยดซ่า",
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/11.png",
+            "audio": null,
+            "video": null,
+            "answer": "Ebony Queen's Apple"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/12.png",
+            "audio": null,
+            "video": null,
+            "answer": "Red Shoes"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/13.png",
+            "audio": null,
+            "video": null,
+            "answer": "Drifting Fox"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/14.png",
+            "audio": null,
+            "video": null,
+            "answer": "Forsaken Murderer"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/15.png",
+            "audio": null,
+            "video": null,
+            "answer": "Dreaming Electric Sheep"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/16.png",
+            "audio": null,
+            "video": null,
+            "answer": "Sunset Wayfarer"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/17.png",
+            "audio": null,
+            "video": null,
+            "answer": "1.76 MHz"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/18.png",
+            "audio": null,
+            "video": null,
+            "answer": "Funeral of the Dead Butterflies"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/19.png",
+            "audio": null,
+            "video": null,
+            "answer": "kqe-1j-23"
+        },
+        {
+            "question": "นี่คือภาพ Abnormality ที่มีชื่อว่าอะไร?",
+            "image": "public/img/20.png",
+            "audio": null,
+            "video": null,
+            "answer": "My Form Empties"
+        },
+        {
+            "question": "Shi Assoc. South Section 5",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "โซดาสิงห์"
+            "answer": "Ishmael"
         },
         {
-            "question": "เพราะชีวิตขาดหวานไม่ได้",
+            "question": "Blade Lineage Mentor",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "ปาร์ตี้"
+            "answer": "Mersault"
         },
         {
-            "question": "กรอบเกลียว เคี้ยว...",
+            "question": "Tingtang Gang Gangleader",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "โปเต้"
+            "answer": "Hong Lu"
         },
         {
-            "question": "ไร้กลิ่นติดจาน ไร้สารตกค้าง",
+            "question": "Lobotomy E.G.O::Magic Bullet",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "น้ำยาล้างจานไลปอน เอฟ"
+            "answer": "Outis"
         },
         {
-            "question": "พระเอก ตัวจริง",
+            "question": "Haute Couture::The Crimson God of Le Rouge",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "AJ DVD"
-        },
-        {
-            "question": "ใช้ดม ใช้ทาในหลอดเดียวกัน",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "ยาดมโป๊ยเซียน"
-        },
-        {
-            "question": "ตัดก่อนตาย เตือนก่อนวายวอด",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "เซฟ-ที-คัท"
-        },
-        {
-            "question": "ดีไซน์สวยงาม ทนทาน แข็งแกร่ง",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "ประตู ตู้แขวน บานซิงค์ KING"
-        },
-        {
-            "question": "อร่อย",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "มาม่า"
-        },
-        {
-            "question": "เค็มแต่ดี",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "ยาสีฟันซอลส์"
-        },
-        {
-            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
-            "image": null,
-            "audio": "public/audio/21.mp3",
-            "video": null,
-            "answer": "สมหวัง เงินสั่งได้"
-        },
-        {
-            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
-            "image": null,
-            "audio": "public/audio/22.mp3",
-            "video": null,
-            "answer": "เมืองไทยประกันชีวิต"
-        },
-        {
-            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
-            "image": null,
-            "audio": "public/audio/23.mp3",
-            "video": null,
-            "answer": "ยัวซ่าแบตเตอรี่"
-        },
-        {
-            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
-            "image": null,
-            "audio": "public/audio/24.mp3",
-            "video": null,
-            "answer": "ม่องเล่ย๊ะ"
-        },
-        {
-            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
-            "image": null,
-            "audio": "public/audio/25.mp3",
-            "video": null,
-            "answer": "แอคแทค"
+            "answer": "Sinclair"
         }
     ],
     "qa": {
-        "question": "จากโฆษณากาแฟแบล็กอัพ ชุด เจ้านายขายหนังสือพิมพ์ นำแสดงโดยชาลี คดีเด็ด รถที่เจ้านายนั่งต้องรอไฟแดงเป็นเวลากี่วินาทีจนกว่าจะขึ้นไฟเขียว?",
-        "answer": "236 วินาที",
+        "question": "นับจนถึง Banner ล่าสุดของ Season 7 ตัวละครที่ปรากฏบน Banner มากที่สุดเป็นอันดับที่ 3 คือใคร / ปรากฏตัวทั้งหมดกี่ครั้ง? (นับรวมทุก Identity และ E.G.O)",
+        "answer": "Ryōshū / 15 ครั้ง",
         "choices": [
-            "217 วินาที",
-            "236 วินาที",
-            "255 วินาที",
-            "274 วินาที",
-            "เป็นไฟแดงที่ไม่มีตัวเลขระบุ"
+            "Rodion / 17 ครั้ง",
+            "Hong Lu / 16 ครั้ง",
+            "Ryōshū / 15 ครั้ง",
+            "Yi Sang / 14 ครั้ง",
+            "Don Quixote / 13 ครั้ง"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
-            5,
             1,
+            5,
             4
         ]
     },
     "jigsaw": {
-        "mode": "square",
+        "mode": "portrait",
         "image": "public/img/jigsaw.png",
-        "answer": "โทนาฟ",
-        "question": "หลังจิ๊กซอว์นี้คือโฆษณาผลิตภัณฑ์ใด?"
+        "answer": "Faust",
+        "question": "หลังจิ๊กซอว์นี้คือตัวละคร Limbus Company ที่มีชื่อว่าอะไร?"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของแบรนด์ / ยี่ห้ออะไร?",
+        "question": "นี่คือคุณสมบัติของตัวละคร Limbus Company ที่มีชื่อว่าอะไร?",
         "clues": [
-            "เคยเป็นสปอนเซอร์ในรายการเกมโชว์",
-            "เป็นเครือข่ายอินเตอร์เน็ตที่ยังมีให้บริการอยู่ในปัจจุบัน",
-            "ชื่อมี 3 ตัวอักษร",
-            "ชื่อแบรนด์ไม่ใช่ภาษาไทย",
-            "เคยมีการเปลี่ยนโลโก้ของแบรนด์ / ยี่ห้อมาแล้ว"
+            "ทำงานอยู่ในหน่วย LCD",
+            "ชื่อมี 2 พยางค์",
+            "ไม่เคยมีตำแหน่งหัวหน้าทีมหรือหัวหน้ากลุ่ม",
+            "อายุไม่ถึง 40 ปี",
+            "ปรากฏตัวให้เห็นกายครั้งแรกใน The Distortion Detective"
         ],
-        "answer": "AIS"
+        "answer": "Ezra"
     },
     "battle": {
         "player1": {

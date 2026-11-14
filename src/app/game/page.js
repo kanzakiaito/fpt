@@ -5281,7 +5281,7 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
 // ==========================================
 // 📺 FANPANTAE SCORE TO GET PILL (คะแนนที่จะได้)
 // ==========================================
-function ScoreToGetPill({ points, id }) {
+function ScoreToGetPill({ points, id, isLocked }) {
   return (
     <div
       style={{
@@ -5290,13 +5290,24 @@ function ScoreToGetPill({ points, id }) {
         alignItems: "center",
         padding: "4px 18px",
         borderRadius: "8px",
-        border: "1.5px solid rgba(255, 215, 0, 0.6)",
-        background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
-        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+        border: isLocked ? "1.5px solid #ffd700" : "1.5px solid rgba(255, 215, 0, 0.6)",
+        background: isLocked
+          ? "linear-gradient(135deg, rgba(30, 45, 160, 0.9) 0%, rgba(20, 30, 90, 0.95) 100%)"
+          : "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
+        boxShadow: isLocked ? "0 0 14px rgba(255, 215, 0, 0.5)" : "0 2px 10px rgba(0, 0, 0, 0.5)",
+        transition: "all 0.3s ease",
       }}
     >
       <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px" }}>
-        <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
+        <span
+          style={{
+            fontSize: "13px",
+            fontWeight: "700",
+            color: isLocked ? "#ffd700" : "#e0f2fe",
+            fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+            transition: "color 0.3s ease",
+          }}
+        >
           คะแนนที่จะได้
         </span>
         <span
@@ -5308,6 +5319,8 @@ function ScoreToGetPill({ points, id }) {
             fontSize: "24px",
             color: "#ffd700",
             lineHeight: 1,
+            textShadow: isLocked ? "0 0 10px rgba(255, 215, 0, 0.8)" : "none",
+            transition: "all 0.3s ease",
           }}
         >
           {points}
@@ -6574,6 +6587,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [introSoundStep, setIntroSoundStep] = useState(0); // 0 = none, 1 = BGFAN2012, 2 = ทึ้ม
   const [suspenseStep, setSuspenseStep] = useState(0); // 0 = none, 1 = suspense1, 2 = suspense2
+  const [isScoreLocked, setIsScoreLocked] = useState(false);
 
   const bgmRef = useRef(null);
   const sfxRef = useRef(null);
@@ -6614,6 +6628,13 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
     setEliminatedIndices([]);
     setAnswered(false);
     setSuspenseStep(0);
+    setIsScoreLocked(false);
+  };
+
+  const handleLockAnswer = () => {
+    stopAudio(sfxRef);
+    sfxRef.current = playAudio(SOUND_PATHS.lockAnswer);
+    setIsScoreLocked(true);
   };
 
   const handleSuspenseClick = () => {
@@ -6767,7 +6788,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
       <BroadcastQuestionBar
         question={cfg.question || "เลือกคำตอบที่ถูกต้อง"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={<ScoreToGetPill points={currentPoints} id="qaPointsDisplay" />}
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="qaPointsDisplay" isLocked={isScoreLocked} />}
       />
 
       <div className="qa-choices-grid" id="qaChoicesGrid">
@@ -6833,9 +6854,25 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
         ) : null}
 
         {!answered && !judgeMode && (
-          <button className="btn-game btn-action" onClick={handleSuspenseClick} style={{ background: suspenseStep > 0 ? "var(--accent)" : "" }}>
-            {suspenseStep === 0 ? "🎵 เสียงลุ้น" : suspenseStep === 1 ? "🎵 เสียงเฉลยจบ" : "🎵 เล่นเสียงเฉลยจบ (ซ้ำ)"}
-          </button>
+          <>
+            <button
+              className="btn-game btn-action"
+              onClick={handleLockAnswer}
+              style={{
+                background: isScoreLocked
+                  ? "linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 145, 0, 0.35) 100%)"
+                  : "",
+                borderColor: isScoreLocked ? "#ffd700" : "",
+                color: isScoreLocked ? "#ffd700" : "",
+                boxShadow: isScoreLocked ? "0 0 12px rgba(255, 215, 0, 0.4)" : "",
+              }}
+            >
+              🔒 ล็อคคำตอบ
+            </button>
+            <button className="btn-game btn-action" onClick={handleSuspenseClick} style={{ background: suspenseStep > 0 ? "var(--accent)" : "" }}>
+              {suspenseStep === 0 ? "🎵 เสียงลุ้น" : suspenseStep === 1 ? "🎵 เสียงเฉลยจบ" : "🎵 เล่นเสียงเฉลยจบ (ซ้ำ)"}
+            </button>
+          </>
         )}
 
         {answered && isCorrectAnswer && onOpenRankClimb && (
@@ -6877,6 +6914,7 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
   const [firstOpen, setFirstOpen] = useState(judgeMode && lockedState ? lockedState.firstOpen : true);
   const [introSoundStep, setIntroSoundStep] = useState(0); // 0 = none, 1 = BGFAN2012, 2 = ทึ้ม
   const [suspenseStep, setSuspenseStep] = useState(0); // 0 = none, 1 = suspense1, 2 = suspense2
+  const [isScoreLocked, setIsScoreLocked] = useState(false);
 
   const bgmRef = useRef(null);
   const sfxRef = useRef(null);
@@ -6919,6 +6957,13 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
     setAnswered(false);
     setFirstOpen(true);
     setSuspenseStep(0);
+    setIsScoreLocked(false);
+  };
+
+  const handleLockAnswer = () => {
+    stopAudio(sfxRef);
+    sfxRef.current = playAudio(SOUND_PATHS.lockAnswer);
+    setIsScoreLocked(true);
   };
 
   const handleSuspenseClick = () => {
@@ -7035,7 +7080,7 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
       <BroadcastQuestionBar
         question={jigsawQuestion && jigsawQuestion.trim() !== "" ? jigsawQuestion : "นี่คือภาพของอะไร?"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={<ScoreToGetPill points={currentPoints} id="jigsawPointsDisplay" />}
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="jigsawPointsDisplay" isLocked={isScoreLocked} />}
       />
 
       {/* Jigsaw Board Centered (เหมือนถาม-ตอบ) */}
@@ -7107,9 +7152,25 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
         ) : null}
 
         {!answered && !judgeMode && (
-          <button className="btn-game btn-action" onClick={handleSuspenseClick} style={{ background: suspenseStep > 0 ? "var(--accent)" : "" }}>
-            {suspenseStep === 0 ? "🎵 เสียงลุ้น" : suspenseStep === 1 ? "🎵 เสียงเฉลยจบ" : "🎵 เล่นเสียงเฉลยจบ (ซ้ำ)"}
-          </button>
+          <>
+            <button
+              className="btn-game btn-action"
+              onClick={handleLockAnswer}
+              style={{
+                background: isScoreLocked
+                  ? "linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 145, 0, 0.35) 100%)"
+                  : "",
+                borderColor: isScoreLocked ? "#ffd700" : "",
+                color: isScoreLocked ? "#ffd700" : "",
+                boxShadow: isScoreLocked ? "0 0 12px rgba(255, 215, 0, 0.4)" : "",
+              }}
+            >
+              🔒 ล็อคคำตอบ
+            </button>
+            <button className="btn-game btn-action" onClick={handleSuspenseClick} style={{ background: suspenseStep > 0 ? "var(--accent)" : "" }}>
+              {suspenseStep === 0 ? "🎵 เสียงลุ้น" : suspenseStep === 1 ? "🎵 เสียงเฉลยจบ" : "🎵 เล่นเสียงเฉลยจบ (ซ้ำ)"}
+            </button>
+          </>
         )}
 
         {answered && isCorrectAnswer && onOpenRankClimb && (
@@ -7162,6 +7223,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [introSoundStep, setIntroSoundStep] = useState(0); // 0 = none, 1 = BGFAN2012, 2 = ทึ้ม
   const [suspenseStep, setSuspenseStep] = useState(0); // 0 = none, 1 = suspense1, 2 = suspense2
+  const [isScoreLocked, setIsScoreLocked] = useState(false);
 
   const bgmRef = useRef(null);
   const sfxRef = useRef(null);
@@ -7203,6 +7265,13 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
     setClueSteps([0, 0, 0, 0, 0, 0]);
     setAnswered(false);
     setSuspenseStep(0);
+    setIsScoreLocked(false);
+  };
+
+  const handleLockAnswer = () => {
+    stopAudio(sfxRef);
+    sfxRef.current = playAudio(SOUND_PATHS.lockAnswer);
+    setIsScoreLocked(true);
   };
 
   const handleSuspenseClick = () => {
@@ -7379,7 +7448,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
       <BroadcastQuestionBar
         question={cfg.question || "จากคุณสมบัติต่อไปนี้คือใคร หรืออะไร?"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={<ScoreToGetPill points={currentPoints} id="attrPointsDisplay" />}
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="attrPointsDisplay" isLocked={isScoreLocked} />}
       />
 
       <div className="attr-clues-list" id="attrCluesList">
@@ -7483,9 +7552,25 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
         ) : null}
 
         {!answered && !judgeMode && (
-          <button className="btn-game btn-action" onClick={handleSuspenseClick} style={{ background: suspenseStep > 0 ? "var(--accent)" : "" }}>
-            {suspenseStep === 0 ? "🎵 เสียงลุ้น" : suspenseStep === 1 ? "🎵 เสียงเฉลยจบ" : "🎵 เล่นเสียงเฉลยจบ (ซ้ำ)"}
-          </button>
+          <>
+            <button
+              className="btn-game btn-action"
+              onClick={handleLockAnswer}
+              style={{
+                background: isScoreLocked
+                  ? "linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 145, 0, 0.35) 100%)"
+                  : "",
+                borderColor: isScoreLocked ? "#ffd700" : "",
+                color: isScoreLocked ? "#ffd700" : "",
+                boxShadow: isScoreLocked ? "0 0 12px rgba(255, 215, 0, 0.4)" : "",
+              }}
+            >
+              🔒 ล็อคคำตอบ
+            </button>
+            <button className="btn-game btn-action" onClick={handleSuspenseClick} style={{ background: suspenseStep > 0 ? "var(--accent)" : "" }}>
+              {suspenseStep === 0 ? "🎵 เสียงลุ้น" : suspenseStep === 1 ? "🎵 เสียงเฉลยจบ" : "🎵 เล่นเสียงเฉลยจบ (ซ้ำ)"}
+            </button>
+          </>
         )}
 
         {answered && isCorrectAnswer && onOpenRankClimb && (

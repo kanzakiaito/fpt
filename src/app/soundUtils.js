@@ -16,6 +16,7 @@ export const SOUND_PATHS = {
   shuffle: "/sound/Shuffle (Score) (2012-14).wav",
   shuffleQA: "/sound/Shuffle (Q_A , Characteristic) (2012-14).wav",
   setupIntro: "/sound/Intro.mp3",
+  lockAnswer: "/sound/คำตอบ.mp3",
 };
 
 let masterVolume = 1.0;
