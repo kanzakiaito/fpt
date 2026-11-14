@@ -7223,7 +7223,13 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
     const currentStep = clueSteps[idx] || 0;
     if (currentStep >= 3) return;
 
-    const nextStep = currentStep + 1;
+    // For bonus clue '?' (idx === 5): แง้ม 1/4 (step 1) แล้วเปิดเลย (step 3)
+    let nextStep;
+    if (idx === 5) {
+      nextStep = currentStep === 0 ? 1 : 3;
+    } else {
+      nextStep = currentStep + 1;
+    }
 
     // Deduct points only when starting to reveal normal clues (0..4) and only from step 0 to step 1
     if (idx !== 5 && currentStep === 0 && !answered && suspenseStep === 0) {
@@ -7234,12 +7240,10 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
       }
     }
 
-    // Sound logic: "เสียงจะทำงานเมื่อเปิดหมดทุกส่วนแล้ว" (on step 3)
-    if (nextStep === 3) {
-      stopAudio(sfxRef);
+    // Sound logic: สำหรับ '?' (idx === 5) เอาเสียงออก, ส่วนข้อทั่วไปเปิดหมด (step 3) เล่นเสียง textIn
+    stopAudio(sfxRef);
+    if (idx !== 5 && nextStep === 3) {
       sfxRef.current = playAudio(SOUND_PATHS.textIn);
-    } else {
-      stopAudio(sfxRef);
     }
 
     setClueSteps((prev) => {
@@ -7262,7 +7266,9 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
     }
 
     stopAudio(sfxRef);
-    sfxRef.current = playAudio(SOUND_PATHS.textIn);
+    if (idx !== 5) {
+      sfxRef.current = playAudio(SOUND_PATHS.textIn);
+    }
 
     setClueSteps((prev) => {
       const next = [...prev];
@@ -7406,12 +7412,12 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
                   ? ""
                   : isFullyRevealed
                   ? (isBonus ? "เปิดคำตอบเต็มแล้ว" : "เปิดเต็มแล้ว")
+                  : isBonus
+                  ? (step === 1 ? "เปิดคำตอบเต็ม" : "แง้มคำตอบ (1/4)")
                   : step === 1
                   ? "แง้มต่อ (2/4)"
                   : step === 2
-                  ? (isBonus ? "เปิดคำตอบเต็ม" : "เปิดเต็ม")
-                  : isBonus
-                  ? "แง้มคำตอบ (1/4)"
+                  ? "เปิดเต็ม"
                   : `ข้อที่ ${i + 1}`
               }
             >
