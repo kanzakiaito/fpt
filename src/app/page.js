@@ -213,12 +213,21 @@ export default function MainPage() {
     });
   }, [historyState, fotyAirUpToEpisode, fotyUpcomingEpisode, fotyBroadcastCustoms]);
 
-  // Episodes shown on Homepage: only completed/aired episodes up to fotyAirUpToEpisode (no upcoming episode)
+  // Episodes shown on Homepage: completed/aired episodes up to fotyAirUpToEpisode + upcoming episode
   const visibleWeeklyMatches = useMemo(() => {
     if (!dataLoaded) return [];
     const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
-    return fotyWeeklyEpisodes.filter((ep) => ep.episodeNum <= maxEp);
-  }, [fotyWeeklyEpisodes, fotyAirUpToEpisode, dataLoaded]);
+    const upcomingEpNum = (fotyAirUpToEpisode === "all" || fotyUpcomingEpisode === "none")
+      ? null
+      : (fotyUpcomingEpisode && fotyUpcomingEpisode !== "auto")
+      ? Number(fotyUpcomingEpisode)
+      : (maxEp + 1 <= 14 ? maxEp + 1 : null);
+
+    return fotyWeeklyEpisodes.filter((ep) => {
+      const epNum = ep.episodeNum;
+      return epNum <= maxEp || (upcomingEpNum !== null && epNum === upcomingEpNum);
+    });
+  }, [fotyWeeklyEpisodes, fotyAirUpToEpisode, fotyUpcomingEpisode, dataLoaded]);
 
   // Avatar map for lookup by name/nickname
   const avatarMap = useMemo(() => {
@@ -1067,7 +1076,7 @@ export default function MainPage() {
                   key={m.id || idx}
                   style={{
                     background: "linear-gradient(135deg, rgba(13, 27, 54, 0.9) 0%, rgba(5, 12, 24, 0.95) 100%)",
-                    border: "1.5px solid rgba(0, 229, 255, 0.3)",
+                    border: m.isNext ? "1.5px solid rgba(250, 173, 20, 0.55)" : "1.5px solid rgba(0, 229, 255, 0.3)",
                     borderRadius: "18px",
                     padding: "24px 28px",
                     display: "flex",
@@ -1075,7 +1084,7 @@ export default function MainPage() {
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: "20px",
-                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.5)",
+                    boxShadow: m.isNext ? "0 8px 24px rgba(250, 173, 20, 0.15)" : "0 8px 24px rgba(0, 0, 0, 0.5)",
                     position: "relative",
                   }}
                 >
@@ -1084,7 +1093,9 @@ export default function MainPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
                       <span
                         style={{
-                          background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                          background: m.isNext
+                            ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)"
+                            : "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
                           color: "#030812",
                           fontSize: "12px",
                           fontWeight: "900",
@@ -1109,6 +1120,22 @@ export default function MainPage() {
                           }}
                         >
                           ✓ ออกอากาศแล้ว
+                        </span>
+                      )}
+
+                      {m.isNext && (
+                        <span
+                          style={{
+                            background: "rgba(250, 173, 20, 0.2)",
+                            border: "1px solid #faad14",
+                            color: "#ffd700",
+                            fontSize: "11px",
+                            fontWeight: "800",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          ⏳ กำลังจะออกอากาศ
                         </span>
                       )}
                     </div>
@@ -1324,14 +1351,14 @@ export default function MainPage() {
                         style={{
                           padding: "8px 16px",
                           borderRadius: "8px",
-                          background: "rgba(255, 255, 255, 0.05)",
-                          border: "1px dashed rgba(255, 255, 255, 0.2)",
-                          color: "rgba(255, 255, 255, 0.5)",
+                          background: m.isNext ? "rgba(250, 173, 20, 0.1)" : "rgba(255, 255, 255, 0.05)",
+                          border: m.isNext ? "1px solid rgba(250, 173, 20, 0.4)" : "1px dashed rgba(255, 255, 255, 0.2)",
+                          color: m.isNext ? "#ffd700" : "rgba(255, 255, 255, 0.5)",
                           fontSize: "13px",
-                          fontWeight: "600",
+                          fontWeight: "700",
                         }}
                       >
-                        รออัปเดตลิงก์ย้อนหลัง
+                        {m.isNext ? "⏳ รอออกอากาศ" : "รออัปเดตลิงก์ย้อนหลัง"}
                       </div>
                     )}
                   </div>
