@@ -16,9 +16,9 @@ const DEFAULT_USERS = [
     passwordHash: "6657c87a0c1f72f01a708f86b5107170fc92fe3d83edcb69f56727c8266a3731",
     name: "Super Admin (ผู้ดูแลหลัก)",
     permissions: {
-      main: { access: true, isMainAdmin: true },
-      tournament: { access: true, isMainAdmin: true },
-      trial_foty: { access: true, isMainAdmin: true },
+      main: { access: true, isMainAdmin: true, role: "main_admin" },
+      tournament: { access: true, isMainAdmin: true, role: "main_admin" },
+      trial_foty: { access: true, isMainAdmin: true, role: "main_admin" },
     },
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
@@ -29,9 +29,9 @@ const DEFAULT_USERS = [
     passwordHash: "898404275ffc550a73936e9bdb2e19d33ef7a79f19bd553ca74d981b95f9917b",
     name: "Trial Admin (แอดมินงุ่นง่าน)",
     permissions: {
-      main: { access: false, isMainAdmin: false },
-      tournament: { access: false, isMainAdmin: false },
-      trial_foty: { access: true, isMainAdmin: true },
+      main: { access: false, isMainAdmin: false, role: "admin" },
+      tournament: { access: false, isMainAdmin: false, role: "admin" },
+      trial_foty: { access: true, isMainAdmin: true, role: "main_admin" },
     },
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
@@ -143,11 +143,13 @@ export async function authenticateUser(username, password, section) {
   }
 
   const isMainAdmin = Boolean(perm?.isMainAdmin || (user.username === "admin"));
+  const role = isMainAdmin ? "main_admin" : (perm?.role || "admin");
   const token = createToken({
     id: user.id,
     username: user.username,
     name: user.name || user.username,
     section,
+    role,
     isMainAdmin,
   });
 
@@ -159,6 +161,7 @@ export async function authenticateUser(username, password, section) {
       username: user.username,
       name: user.name || user.username,
       section,
+      role,
       isMainAdmin,
       permissions: user.permissions,
     },

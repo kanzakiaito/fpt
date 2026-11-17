@@ -49,7 +49,22 @@ export default function AdminPage() {
     handleLogout: handleAdminLogout,
   } = useAdminSession("main");
 
-  // Settings State
+  const isMaintainer = user?.role === "maintainer";
+
+  // Tab State: 'scoring', 'contestants', 'applications', 'poll', 'weekly', 'settings', 'users', 'history'
+  const [activeTab, setActiveTab] = useState("scoring");
+
+  // Audition Applications Mock State (Placeholder)
+  const [applications, setApplications] = useState([
+    { id: "APP-2026-001", name: "วรเมธ เกียรติไพบูลย์", nickname: "เมธ", topic: "ประวัติศาสตร์สงครามโลกครั้งที่ 2", phone: "081-234-5678", email: "worameth.k@gmail.com", province: "กรุงเทพมหานคร", date: "2026-10-12", status: "passed", notes: "ความรู้แน่นมาก ผ่านรอบสัมภาษณ์เบื้องต้น" },
+    { id: "APP-2026-002", name: "ศศิธร เจริญสุข", nickname: "ออม", topic: "Ghibli Animation & Hayao Miyazaki", phone: "089-876-5432", email: "sasithorn.aom@yahoo.com", province: "เชียงใหม่", date: "2026-10-15", status: "pending", notes: "รอตรวจสอบวิดีโอแนะนำตัว" },
+    { id: "APP-2026-003", name: "ชนาธิป ปัญญาวงศ์", nickname: "เจ", topic: "ฟุตบอลพรีเมียร์ลีกอังกฤษ (1992-ปัจจุบัน)", phone: "092-345-6789", email: "chanathip.pl@gmail.com", province: "ชลบุรี", date: "2026-10-18", status: "passed", notes: "ตอบคำถาม 3 วิได้คล่องแคล่ว" },
+    { id: "APP-2026-004", name: "พงศกร สุวรรณโชติ", nickname: "โบ๊ท", topic: "จักรวาลภาพยนตร์ Marvel (MCU)", phone: "084-555-1234", email: "boat.mcu@outlook.com", province: "นนทบุรี", date: "2026-10-22", status: "rejected", notes: "ความรู้ยังไม่ลึกพอสำหรับรอบเวทีใหญ่" },
+    { id: "APP-2026-005", name: "กมลวรรณ เด่นดวง", nickname: "แพรว", topic: "วรรณกรรมสืบสวนสอบสวน อกาธา คริสตี้", phone: "086-789-0123", email: "kamonwan.praew@gmail.com", province: "ขอนแก่น", date: "2026-10-25", status: "pending", notes: "นัดหมายทดสอบคัดเลือกออนไลน์" },
+  ]);
+  const [appSearch, setAppSearch] = useState("");
+  const [appStatusFilter, setAppStatusFilter] = useState("all");
+  const [pollSubTab, setPollSubTab] = useState("poll"); // 'poll' | 'fav_fan'
   const [gamePassword, setGamePassword] = useState("fanpantae_2026");
   const [adminPassword, setAdminPassword] = useState("admin_fan_2026");
   const [trialAdminPassword, setTrialAdminPassword] = useState("trial_admin_2026");
@@ -148,9 +163,6 @@ export default function AdminPage() {
   const [finalsInputScore, setFinalsInputScore] = useState("");
   const [finalsSavingNotice, setFinalsSavingNotice] = useState("");
   const [showFinalsRules, setShowFinalsRules] = useState(false);
-
-  // Tab State: 'scoring', 'contestants', 'settings'
-  const [activeTab, setActiveTab] = useState("scoring");
 
   // Leaderboard / Contestants State
   const [contestants, setContestants] = useState([]);
@@ -1668,21 +1680,35 @@ export default function AdminPage() {
     }
 
     try {
-      const formattedScores = {
+      let finalName = formData.name;
+      let finalNickname = formData.nickname;
+      let finalTopic = formData.topic;
+      let formattedScores = {
         "3sec": formData.scores["3sec"] === "" ? null : Number(formData.scores["3sec"]),
         qa: formData.scores.qa === "" ? null : Number(formData.scores.qa),
         jigsaw: formData.scores.jigsaw === "" ? null : Number(formData.scores.jigsaw),
         attribute: formData.scores.attribute === "" ? null : Number(formData.scores.attribute),
       };
 
+      // Maintainer can ONLY update image
+      if (isMaintainer) {
+        const orig = contestants.find((c) => String(c.id) === String(formData.id));
+        if (orig) {
+          finalName = orig.name;
+          finalNickname = orig.nickname;
+          finalTopic = orig.topic;
+          formattedScores = orig.scores || formattedScores;
+        }
+      }
+
       const res = await fetch("/api/scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: modalMode === "edit" ? formData.id : undefined,
-          name: formData.name,
-          nickname: formData.nickname,
-          topic: formData.topic,
+          name: finalName,
+          nickname: finalNickname,
+          topic: finalTopic,
           image: formData.image,
           scores: formattedScores,
         }),
@@ -1878,6 +1904,25 @@ export default function AdminPage() {
             👥 รายชื่อผู้เข้าแข่งขัน & ผูกรูป ({contestants.length})
           </button>
           <button
+            onClick={() => setActiveTab("applications")}
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: activeTab === "applications" ? "rgba(168, 85, 247, 0.15)" : "transparent",
+              color: activeTab === "applications" ? "#c084fc" : "rgba(255,255,255,0.6)",
+              border: "none",
+              borderBottom: activeTab === "applications" ? "2px solid #c084fc" : "2px solid transparent",
+              cursor: "pointer",
+              borderRadius: "6px 6px 0 0",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px"
+            }}
+          >
+            <span>📝</span> ใบสมัครผู้เข้าแข่งขัน ({isMaintainer ? "🔒" : applications.length})
+          </button>
+          <button
             onClick={() => setActiveTab("poll")}
             style={{
               padding: "12px 20px",
@@ -1891,7 +1936,7 @@ export default function AdminPage() {
               borderRadius: "6px 6px 0 0"
             }}
           >
-            📊 จัดการอันดับโพลล์ ({pollItems.length})
+            📊 จัดการอันดับโพลล์ & ผลโหวต ({isMaintainer ? "🔒" : pollItems.length})
           </button>
           <button
             onClick={() => setActiveTab("weekly")}
@@ -4108,6 +4153,24 @@ export default function AdminPage() {
           return (
             <div>
               {/* Header & Add Button */}
+              {isMaintainer && (
+                <div style={{
+                  marginBottom: "16px",
+                  padding: "12px 18px",
+                  borderRadius: "10px",
+                  background: "rgba(168, 85, 247, 0.15)",
+                  border: "1px solid rgba(168, 85, 247, 0.45)",
+                  color: "#e9d5ff",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px"
+                }}>
+                  <span style={{ fontSize: "18px" }}>🛠️</span>
+                  <span><strong>สิทธิ์ Maintainer:</strong> สามารถเปลี่ยน URL รูปภาพหรืออัปโหลดรูปผู้เข้าแข่งขันได้ แต่ไม่สามารถเพิ่ม/ลบ หรือแก้ไขชื่อ หัวข้อ หรือคะแนนได้</span>
+                </div>
+              )}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "18px" }}>
                 <div>
                   <h2 style={{ fontSize: "18px", fontWeight: "700", color: "#80d0ff", margin: "0 0 4px 0" }}>
@@ -4117,23 +4180,25 @@ export default function AdminPage() {
                     ผูกรูปโปรไฟล์ อัปเดตข้อมูล และตรวจสอบคะแนนรวมของผู้เข้าแข่งขัน
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={openAddModal}
-                  style={{
-                    padding: "10px 18px",
-                    borderRadius: "8px",
-                    background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                    color: "#030812",
-                    fontWeight: "800",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)"
-                  }}
-                >
-                  ➕ เพิ่มผู้เข้าแข่งขันใหม่
-                </button>
+                {!isMaintainer && (
+                  <button
+                    type="button"
+                    onClick={openAddModal}
+                    style={{
+                      padding: "10px 18px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                      color: "#030812",
+                      fontWeight: "800",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)"
+                    }}
+                  >
+                    ➕ เพิ่มผู้เข้าแข่งขันใหม่
+                  </button>
+                )}
               </div>
 
               {/* Search & Filter Toolbar */}
@@ -4341,32 +4406,35 @@ export default function AdminPage() {
                               style={{
                                 padding: "4px 8px",
                                 borderRadius: "6px",
-                                background: "rgba(0, 180, 216, 0.2)",
-                                border: "1px solid rgba(0, 229, 255, 0.4)",
-                                color: "#00e5ff",
+                                background: isMaintainer ? "rgba(168, 85, 247, 0.2)" : "rgba(0, 180, 216, 0.2)",
+                                border: isMaintainer ? "1px solid rgba(168, 85, 247, 0.5)" : "1px solid rgba(0, 229, 255, 0.4)",
+                                color: isMaintainer ? "#e9d5ff" : "#00e5ff",
                                 fontSize: "12px",
+                                fontWeight: isMaintainer ? "700" : "500",
                                 cursor: "pointer"
                               }}
-                              title="แก้ไขข้อมูล / ผูกรูป"
+                              title={isMaintainer ? "เปลี่ยนรูปภาพผู้เข้าแข่งขัน" : "แก้ไขข้อมูล / ผูกรูป"}
                             >
-                              ✏️ แก้ไข
+                              {isMaintainer ? "📷 เปลี่ยนรูป" : "✏️ แก้ไข"}
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteContestant(c.id, c.name)}
-                              style={{
-                                padding: "4px 8px",
-                                borderRadius: "6px",
-                                background: "rgba(255, 77, 79, 0.15)",
-                                border: "1px solid rgba(255, 77, 79, 0.4)",
-                                color: "#ff7875",
-                                fontSize: "12px",
-                                cursor: "pointer"
-                              }}
-                              title="ลบผู้เข้าแข่งขัน"
-                            >
-                              🗑️ ลบ
-                            </button>
+                            {!isMaintainer && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteContestant(c.id, c.name)}
+                                style={{
+                                  padding: "4px 8px",
+                                  borderRadius: "6px",
+                                  background: "rgba(255, 77, 79, 0.15)",
+                                  border: "1px solid rgba(255, 77, 79, 0.4)",
+                                  color: "#ff7875",
+                                  fontSize: "12px",
+                                  cursor: "pointer"
+                                }}
+                                title="ลบผู้เข้าแข่งขัน"
+                              >
+                                🗑️ ลบ
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -4388,10 +4456,395 @@ export default function AdminPage() {
         })()}
 
         {/* ========================================================
-            TAB 3: POLL RANKINGS MANAGEMENT
+            TAB: APPLICATIONS (AUDITION CANDIDATES PLACEHOLDER)
+           ======================================================== */}
+        {activeTab === "applications" && (
+          <div>
+            {isMaintainer ? (
+              <div
+                style={{
+                  background: "linear-gradient(145deg, rgba(30, 20, 50, 0.9) 0%, rgba(15, 10, 30, 0.95) 100%)",
+                  border: "1.5px solid rgba(168, 85, 247, 0.4)",
+                  borderRadius: "16px",
+                  padding: "48px 24px",
+                  textAlign: "center",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                }}
+              >
+                <div style={{ fontSize: "56px", marginBottom: "16px" }}>🔒</div>
+                <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#e9d5ff", marginBottom: "8px" }}>
+                  สิทธิ์การเข้าถึงถูกจำกัด (Restricted Access)
+                </h3>
+                <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.7)", maxWidth: "540px", margin: "0 auto 16px auto", lineHeight: "1.6" }}>
+                  หน้าฟอร์มรับสมัครและข้อมูลใบสมัครของผู้เข้าแข่งขัน สามารถเข้าถึงได้เฉพาะ <strong>Admin</strong> หรือ <strong>Main Admin</strong> ของฝั่งนี้เท่านั้น
+                  <br />
+                  <span style={{ color: "#c084fc", fontSize: "13px" }}>บทบาท Maintainer ไม่มีสิทธิ์เปิดดูข้อมูลส่วนตัวหรือใบสมัครของผู้เข้าแข่งขัน</span>
+                </p>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 16px", borderRadius: "20px", background: "rgba(168, 85, 247, 0.15)", border: "1px solid rgba(168, 85, 247, 0.4)", color: "#e9d5ff", fontSize: "12px", fontWeight: "700" }}>
+                  🛠️ สถานะบัญชีของคุณ: Maintainer (ผู้ดูแลข้อมูลการแข่งขัน)
+                </div>
+              </div>
+            ) : (
+              <div>
+                {/* Header & Controls */}
+                <div
+                  style={{
+                    background: "linear-gradient(145deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 16, 32, 0.95) 100%)",
+                    border: "1px solid rgba(168, 85, 247, 0.3)",
+                    borderRadius: "16px",
+                    padding: "24px",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
+                    <div>
+                      <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#c084fc", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span>📝</span> ระบบจัดการใบสมัครผู้เข้าแข่งขัน (Audition Applications 2026)
+                      </h2>
+                      <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: 0, lineHeight: "1.6" }}>
+                        ตรวจสอบใบสมัคร ประวัติ และสถานะการพิจารณาคัดเลือกผู้เข้าแข่งขันรอบ Audition ของรายการแฟนพันธุ์แท้แห่งปี 2026<br />
+                        <span style={{ color: "#86efac", fontSize: "12px" }}>🔒 เฉพาะระดับ Admin และ Main Admin เท่านั้นที่สามารถเข้าถึงข้อมูลส่วนตัวของผู้สมัครได้</span>
+                      </p>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                      <button
+                        type="button"
+                        onClick={() => alert("ระบบกำลังส่งออกข้อมูลใบสมัครทั้งหมดเป็นไฟล์ CSV...")}
+                        style={{
+                          padding: "9px 16px",
+                          borderRadius: "8px",
+                          background: "rgba(168, 85, 247, 0.15)",
+                          border: "1px solid rgba(168, 85, 247, 0.5)",
+                          color: "#c084fc",
+                          fontSize: "13px",
+                          fontWeight: "700",
+                          cursor: "pointer",
+                        }}
+                      >
+                        📥 ส่งออก CSV
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => showToast("รีเฟรชข้อมูลใบสมัครล่าสุดเรียบร้อยแล้ว")}
+                        style={{
+                          padding: "9px 16px",
+                          borderRadius: "8px",
+                          background: "rgba(0, 229, 255, 0.15)",
+                          border: "1px solid rgba(0, 229, 255, 0.5)",
+                          color: "#00e5ff",
+                          fontSize: "13px",
+                          fontWeight: "700",
+                          cursor: "pointer",
+                        }}
+                      >
+                        🔄 รีเฟรชข้อมูล
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Filter & Search Bar */}
+                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+                    <input
+                      type="text"
+                      value={appSearch}
+                      onChange={(e) => setAppSearch(e.target.value)}
+                      placeholder="🔍 ค้นหาชื่อผู้สมัคร, หัวข้อแฟนพันธุ์แท้, เบอร์โทร..."
+                      style={{
+                        flex: 1,
+                        minWidth: "240px",
+                        padding: "9px 14px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(168, 85, 247, 0.3)",
+                        color: "#fff",
+                        fontSize: "13px",
+                      }}
+                    />
+                    <select
+                      value={appStatusFilter}
+                      onChange={(e) => setAppStatusFilter(e.target.value)}
+                      style={{
+                        padding: "9px 14px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(168, 85, 247, 0.3)",
+                        color: "#e9d5ff",
+                        fontSize: "13px",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="all">สถานะทั้งหมด</option>
+                      <option value="passed">✅ ผ่านรอบสัมภาษณ์</option>
+                      <option value="pending">⏳ รอพิจารณา</option>
+                      <option value="rejected">❌ ไม่ผ่าน</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Applications Table */}
+                <div style={{ background: "rgba(10, 20, 38, 0.95)", border: "1px solid rgba(168, 85, 247, 0.25)", borderRadius: "14px", overflow: "hidden" }}>
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                      <thead>
+                        <tr style={{ background: "rgba(168, 85, 247, 0.15)", borderBottom: "1px solid rgba(168, 85, 247, 0.3)" }}>
+                          <th style={{ padding: "12px 14px", textAlign: "left", color: "#c084fc", width: "120px" }}>รหัสใบสมัคร</th>
+                          <th style={{ padding: "12px 14px", textAlign: "left", color: "#ffffff" }}>ชื่อผู้สมัคร</th>
+                          <th style={{ padding: "12px 14px", textAlign: "left", color: "#ffd700" }}>หัวข้อแฟนพันธุ์แท้</th>
+                          <th style={{ padding: "12px 14px", textAlign: "left", color: "#80d0ff" }}>ข้อมูลติดต่อ</th>
+                          <th style={{ padding: "12px 14px", textAlign: "center", color: "#e9d5ff", width: "110px" }}>วันที่ส่ง</th>
+                          <th style={{ padding: "12px 14px", textAlign: "center", color: "#ffffff", width: "140px" }}>สถานะ</th>
+                          <th style={{ padding: "12px 14px", textAlign: "left", color: "rgba(255,255,255,0.7)" }}>บันทึกเพิ่มเติม</th>
+                          <th style={{ padding: "12px 14px", textAlign: "center", width: "90px" }}>จัดการ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {applications
+                          .filter((app) => {
+                            if (appStatusFilter !== "all" && app.status !== appStatusFilter) return false;
+                            if (appSearch.trim()) {
+                              const q = appSearch.toLowerCase().trim();
+                              return (
+                                app.name.toLowerCase().includes(q) ||
+                                app.nickname.toLowerCase().includes(q) ||
+                                app.topic.toLowerCase().includes(q) ||
+                                app.phone.includes(q)
+                              );
+                            }
+                            return true;
+                          })
+                          .map((app, idx) => (
+                            <tr
+                              key={app.id}
+                              style={{
+                                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                background: idx % 2 === 0 ? "rgba(0,0,0,0.15)" : "transparent",
+                              }}
+                            >
+                              <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.6)", fontFamily: "monospace" }}>{app.id}</td>
+                              <td style={{ padding: "12px 14px" }}>
+                                <div style={{ fontWeight: "700", color: "#ffffff" }}>{app.name}</div>
+                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ชื่อเล่น: {app.nickname} ({app.province})</div>
+                              </td>
+                              <td style={{ padding: "12px 14px", fontWeight: "700", color: "#ffd700" }}>{app.topic}</td>
+                              <td style={{ padding: "12px 14px" }}>
+                                <div style={{ color: "#80d0ff", fontSize: "12px" }}>📞 {app.phone}</div>
+                                <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "11px" }}>✉️ {app.email}</div>
+                              </td>
+                              <td style={{ padding: "12px 14px", textAlign: "center", color: "rgba(255,255,255,0.7)", fontSize: "12px" }}>{app.date}</td>
+                              <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                                <span
+                                  style={{
+                                    display: "inline-block",
+                                    padding: "4px 10px",
+                                    borderRadius: "12px",
+                                    fontSize: "11px",
+                                    fontWeight: "800",
+                                    background:
+                                      app.status === "passed"
+                                        ? "rgba(34, 197, 94, 0.2)"
+                                        : app.status === "rejected"
+                                        ? "rgba(239, 68, 68, 0.2)"
+                                        : "rgba(234, 179, 8, 0.2)",
+                                    border:
+                                      app.status === "passed"
+                                        ? "1px solid #4ade80"
+                                        : app.status === "rejected"
+                                        ? "1px solid #f87171"
+                                        : "1px solid #facc15",
+                                    color:
+                                      app.status === "passed"
+                                        ? "#86efac"
+                                        : app.status === "rejected"
+                                        ? "#fca5a5"
+                                        : "#fde047",
+                                  }}
+                                >
+                                  {app.status === "passed" ? "✅ ผ่านสัมภาษณ์" : app.status === "rejected" ? "❌ ไม่ผ่าน" : "⏳ รอพิจารณา"}
+                                </span>
+                              </td>
+                              <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.65)", fontSize: "12px" }}>{app.notes}</td>
+                              <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                                <button
+                                  type="button"
+                                  onClick={() => alert(`ดูรายละเอียดใบสมัคร: ${app.name} (${app.topic})\nเบอร์โทร: ${app.phone}\nอีเมล: ${app.email}\nบันทึก: ${app.notes}`)}
+                                  style={{
+                                    padding: "5px 10px",
+                                    borderRadius: "6px",
+                                    background: "rgba(168, 85, 247, 0.2)",
+                                    border: "1px solid rgba(168, 85, 247, 0.5)",
+                                    color: "#e9d5ff",
+                                    fontSize: "11px",
+                                    fontWeight: "700",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  ดูข้อมูล
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style={{ padding: "12px 18px", borderTop: "1px solid rgba(255,255,255,0.08)", fontSize: "12px", color: "rgba(255,255,255,0.5)", display: "flex", justifyContent: "space-between" }}>
+                    <span>แสดง {applications.length} รายการ (เชื่อมต่อฐานข้อมูลจำลองสำหรับเปิดรับสมัคร)</span>
+                    <span>ระบบรองรับการเปิดรับสมัครซีซั่นใหม่</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 3: POLL RANKINGS & VOTING MANAGEMENT
            ======================================================== */}
         {activeTab === "poll" && (
           <div>
+            {isMaintainer ? (
+              <div
+                style={{
+                  background: "linear-gradient(145deg, rgba(30, 20, 50, 0.9) 0%, rgba(15, 10, 30, 0.95) 100%)",
+                  border: "1.5px solid rgba(255, 77, 79, 0.4)",
+                  borderRadius: "16px",
+                  padding: "48px 24px",
+                  textAlign: "center",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                }}
+              >
+                <div style={{ fontSize: "56px", marginBottom: "16px" }}>🔒</div>
+                <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#fca5a5", marginBottom: "8px" }}>
+                  สิทธิ์การเข้าถึงถูกจำกัด (Restricted Access)
+                </h3>
+                <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.7)", maxWidth: "540px", margin: "0 auto 16px auto", lineHeight: "1.6" }}>
+                  การตรวจสอบผลคะแนนโหวตสดจาก <strong>/vote</strong> (โพลล์แห่งปี) และ <strong>/fav-fan</strong> (เครื่องสำอาง Tellme) สามารถดูได้เฉพาะ <strong>Admin</strong> หรือ <strong>Main Admin</strong> เท่านั้น
+                  <br />
+                  <span style={{ color: "#fca5a5", fontSize: "13px" }}>บทบาท Maintainer ไม่สามารถกดดูผลคะแนนโหวตได้เพื่อความปลอดภัยและป้องกันสปอยล์</span>
+                </p>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 16px", borderRadius: "20px", background: "rgba(255, 77, 79, 0.15)", border: "1px solid rgba(255, 77, 79, 0.4)", color: "#fca5a5", fontSize: "12px", fontWeight: "700" }}>
+                  🛠️ สถานะบัญชีของคุณ: Maintainer (ผู้ดูแลข้อมูลการแข่งขัน)
+                </div>
+              </div>
+            ) : (
+              <div>
+                {/* Sub-tabs: 1. โพลล์แห่งปี (/poll) | 2. โหวตความนิยม Tellme (/fav-fan) */}
+                <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid rgba(255,255,255,0.12)", marginBottom: "20px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setPollSubTab("poll")}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px 8px 0 0",
+                      background: pollSubTab === "poll" ? "rgba(255, 215, 0, 0.18)" : "transparent",
+                      border: "none",
+                      borderBottom: pollSubTab === "poll" ? "2px solid #ffd700" : "2px solid transparent",
+                      color: pollSubTab === "poll" ? "#ffd700" : "rgba(255,255,255,0.6)",
+                      fontWeight: "800",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    <span>🗳️</span> โพลล์แห่งปี FAN OF THE YEAR (/poll)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPollSubTab("fav_fan")}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px 8px 0 0",
+                      background: pollSubTab === "fav_fan" ? "rgba(255, 117, 143, 0.18)" : "transparent",
+                      border: "none",
+                      borderBottom: pollSubTab === "fav_fan" ? "2px solid #ff758f" : "2px solid transparent",
+                      color: pollSubTab === "fav_fan" ? "#ff758f" : "rgba(255,255,255,0.6)",
+                      fontWeight: "800",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    <span>💄</span> โหวตความนิยม Tellme (/fav-fan) ({favFanVotes.length} รายการ)
+                  </button>
+                </div>
+
+                {pollSubTab === "poll" && (
+                  <div>
+                    {/* Poll (/poll) Quick Settings Card */}
+                    <div style={{
+                      background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                      border: "1.5px solid rgba(255, 215, 0, 0.35)",
+                      borderRadius: "16px",
+                      padding: "20px",
+                      marginBottom: "20px"
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
+                        <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#ffd700", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span>🗳️</span> การตั้งค่าโพลล์แห่งปี (/poll)
+                        </h3>
+                        <a
+                          href="/poll"
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            padding: "5px 12px",
+                            borderRadius: "6px",
+                            background: "rgba(255, 215, 0, 0.15)",
+                            border: "1px solid rgba(255, 215, 0, 0.4)",
+                            color: "#ffd700",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            textDecoration: "none",
+                          }}
+                        >
+                          เปิดหน้า /poll ↗
+                        </a>
+                      </div>
+                      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", alignItems: "center", marginBottom: "14px" }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: pollVotingOpen ? "#ffd700" : "rgba(255,255,255,0.6)" }}>
+                          <input
+                            type="checkbox"
+                            checked={pollVotingOpen}
+                            onChange={(e) => handleTogglePollVoting(e.target.checked)}
+                            style={{ width: "16px", height: "16px", accentColor: "#ffd700", cursor: "pointer" }}
+                          />
+                          <span>เปิดรับการโหวตโพลล์แห่งปี: {pollVotingOpen ? "🟢 เปิดอยู่" : "🔴 ปิดโหวต"}</span>
+                        </label>
+                        <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: showPollInNav ? "#ffd700" : "rgba(255,255,255,0.6)" }}>
+                          <input
+                            type="checkbox"
+                            checked={showPollInNav}
+                            onChange={(e) => handleTogglePollNav(e.target.checked)}
+                            style={{ width: "16px", height: "16px", accentColor: "#ffd700", cursor: "pointer" }}
+                          />
+                          <span>แสดงเมนู /poll บนแถบนำทาง (Navbar): {showPollInNav ? "👁️ แสดง" : "🙈 ซ่อน"}</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleResetPollVotes}
+                          style={{
+                            padding: "7px 14px",
+                            borderRadius: "8px",
+                            background: "rgba(255, 77, 79, 0.15)",
+                            border: "1px solid rgba(255, 77, 79, 0.4)",
+                            color: "#ff7875",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            cursor: "pointer",
+                            marginLeft: "auto"
+                          }}
+                        >
+                          🔄 รีเซ็ตผลโพลล์แห่งปีทั้งหมด
+                        </button>
+                      </div>
+                    </div>
             {/* Header & Action Bar */}
             <div style={{
               background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
@@ -4756,132 +5209,68 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
 
-            {/* Quick Settings & Actions for /poll and /fav-fan */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "20px", marginTop: "24px" }}>
-              {/* Poll (/poll) Card */}
-              <div style={{
-                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
-                border: "1.5px solid rgba(255, 215, 0, 0.35)",
-                borderRadius: "16px",
-                padding: "20px",
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-                  <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#ffd700", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span>🗳️</span> โพลล์แห่งปี FAN OF THE YEAR (/poll)
-                  </h3>
-                  <a
-                    href="/poll"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      padding: "4px 10px",
-                      borderRadius: "6px",
-                      background: "rgba(255, 215, 0, 0.15)",
-                      border: "1px solid rgba(255, 215, 0, 0.4)",
-                      color: "#ffd700",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      textDecoration: "none",
-                    }}
-                  >
-                    เปิดหน้า /poll ↗
-                  </a>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: pollVotingOpen ? "#ffd700" : "rgba(255,255,255,0.6)" }}>
-                    <input
-                      type="checkbox"
-                      checked={pollVotingOpen}
-                      onChange={(e) => handleTogglePollVoting(e.target.checked)}
-                      style={{ width: "16px", height: "16px", accentColor: "#ffd700", cursor: "pointer" }}
-                    />
-                    <span>เปิดรับการโหวตโพลล์แห่งปี: {pollVotingOpen ? "🟢 เปิดอยู่" : "🔴 ปิดโหวต"}</span>
-                  </label>
-                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: showPollInNav ? "#ffd700" : "rgba(255,255,255,0.6)" }}>
-                    <input
-                      type="checkbox"
-                      checked={showPollInNav}
-                      onChange={(e) => handleTogglePollNav(e.target.checked)}
-                      style={{ width: "16px", height: "16px", accentColor: "#ffd700", cursor: "pointer" }}
-                    />
-                    <span>แสดงเมนู /poll บนแถบนำทาง (Navbar): {showPollInNav ? "👁️ แสดง" : "🙈 ซ่อน"}</span>
-                  </label>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleResetPollVotes}
+        {/* Subtab 2: Fav Fan Tellme (/fav-fan) */}
+        {pollSubTab === "fav_fan" && (
+          <div>
+            {/* Fav Fan (/fav-fan) Tellme Card */}
+            <div style={{
+              background: "linear-gradient(145deg, rgba(20, 20, 45, 0.85) 0%, rgba(12, 10, 30, 0.95) 100%)",
+              border: "1.5px solid rgba(255, 117, 143, 0.35)",
+              borderRadius: "16px",
+              padding: "20px",
+              marginBottom: "20px"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#ff758f", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span>💄</span> โหวต Tellme Popular Vote (/fav-fan)
+                </h3>
+                <a
+                  href="/fav-fan"
+                  target="_blank"
+                  rel="noreferrer"
                   style={{
-                    padding: "8px 14px",
-                    borderRadius: "8px",
-                    background: "rgba(255, 77, 79, 0.15)",
-                    border: "1px solid rgba(255, 77, 79, 0.4)",
-                    color: "#ff7875",
+                    padding: "5px 12px",
+                    borderRadius: "6px",
+                    background: "rgba(255, 117, 143, 0.15)",
+                    border: "1px solid rgba(255, 117, 143, 0.4)",
+                    color: "#ff758f",
                     fontSize: "12px",
                     fontWeight: "700",
-                    cursor: "pointer",
+                    textDecoration: "none",
                   }}
                 >
-                  🔄 รีเซ็ตผลโพลล์แห่งปีทั้งหมด
-                </button>
+                  เปิดหน้า /fav-fan ↗
+                </a>
               </div>
-
-              {/* Fav Fan (/fav-fan) Tellme Card */}
-              <div style={{
-                background: "linear-gradient(145deg, rgba(20, 20, 45, 0.85) 0%, rgba(12, 10, 30, 0.95) 100%)",
-                border: "1.5px solid rgba(255, 117, 143, 0.35)",
-                borderRadius: "16px",
-                padding: "20px",
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-                  <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#ff758f", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span>💄</span> โหวต Tellme Popular Vote (/fav-fan)
-                  </h3>
-                  <a
-                    href="/fav-fan"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      padding: "4px 10px",
-                      borderRadius: "6px",
-                      background: "rgba(255, 117, 143, 0.15)",
-                      border: "1px solid rgba(255, 117, 143, 0.4)",
-                      color: "#ff758f",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      textDecoration: "none",
-                    }}
-                  >
-                    เปิดหน้า /fav-fan ↗
-                  </a>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: favFanVotingOpen ? "#ff758f" : "rgba(255,255,255,0.6)" }}>
-                    <input
-                      type="checkbox"
-                      checked={favFanVotingOpen}
-                      onChange={(e) => handleToggleFavFanVoting(e.target.checked)}
-                      style={{ width: "16px", height: "16px", accentColor: "#ff758f", cursor: "pointer" }}
-                    />
-                    <span>เปิดรับการโหวต Tellme: {favFanVotingOpen ? "🟢 เปิดอยู่" : "🔴 ปิดโหวต"}</span>
-                  </label>
-                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: showFavFanInNav ? "#ff758f" : "rgba(255,255,255,0.6)" }}>
-                    <input
-                      type="checkbox"
-                      checked={showFavFanInNav}
-                      onChange={(e) => handleToggleFavFanNav(e.target.checked)}
-                      style={{ width: "16px", height: "16px", accentColor: "#ff758f", cursor: "pointer" }}
-                    />
-                    <span>แสดงเมนู /fav-fan บนแถบนำทาง (Navbar): {showFavFanInNav ? "👁️ แสดง" : "🙈 ซ่อน"}</span>
-                  </label>
-                </div>
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", alignItems: "center", marginBottom: "16px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: favFanVotingOpen ? "#ff758f" : "rgba(255,255,255,0.6)" }}>
+                  <input
+                    type="checkbox"
+                    checked={favFanVotingOpen}
+                    onChange={(e) => handleToggleFavFanVoting(e.target.checked)}
+                    style={{ width: "16px", height: "16px", accentColor: "#ff758f", cursor: "pointer" }}
+                  />
+                  <span>เปิดรับการโหวต Tellme: {favFanVotingOpen ? "🟢 เปิดอยู่" : "🔴 ปิดโหวต"}</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: showFavFanInNav ? "#ff758f" : "rgba(255,255,255,0.6)" }}>
+                  <input
+                    type="checkbox"
+                    checked={showFavFanInNav}
+                    onChange={(e) => handleToggleFavFanNav(e.target.checked)}
+                    style={{ width: "16px", height: "16px", accentColor: "#ff758f", cursor: "pointer" }}
+                  />
+                  <span>แสดงเมนู /fav-fan บนแถบนำทาง (Navbar): {showFavFanInNav ? "👁️ แสดง" : "🙈 ซ่อน"}</span>
+                </label>
+                <div style={{ display: "flex", gap: "10px", marginLeft: "auto", flexWrap: "wrap" }}>
                   <button
                     type="button"
                     onClick={loadFavFanVotes}
                     disabled={loadingFavFan}
                     style={{
-                      padding: "8px 14px",
+                      padding: "7px 14px",
                       borderRadius: "8px",
                       background: "rgba(0, 229, 255, 0.15)",
                       border: "1px solid rgba(0, 229, 255, 0.4)",
@@ -4891,13 +5280,13 @@ export default function AdminPage() {
                       cursor: "pointer",
                     }}
                   >
-                    🔄 รีเฟรชรายชื่อโหวต ({favFanStats.total} คน)
+                    🔄 รีเฟรชรายชื่อ ({favFanStats.total} คน)
                   </button>
                   <button
                     type="button"
                     onClick={handleResetFavFanVotes}
                     style={{
-                      padding: "8px 14px",
+                      padding: "7px 14px",
                       borderRadius: "8px",
                       background: "rgba(255, 77, 79, 0.15)",
                       border: "1px solid rgba(255, 77, 79, 0.4)",
@@ -4907,7 +5296,7 @@ export default function AdminPage() {
                       cursor: "pointer",
                     }}
                   >
-                    🗑️ ล้างคะแนนโหวตทั้งหมด
+                    🗑️ ล้างคะแนนทั้งหมด
                   </button>
                 </div>
               </div>
@@ -4929,7 +5318,7 @@ export default function AdminPage() {
 
             {/* Tellme Votes Viewer Table */}
             <div style={{
-              marginTop: "24px",
+              marginTop: "20px",
               background: "linear-gradient(145deg, rgba(16, 24, 45, 0.85) 0%, rgba(10, 16, 32, 0.95) 100%)",
               border: "1px solid rgba(255, 117, 143, 0.25)",
               borderRadius: "16px",
@@ -5032,9 +5421,13 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+      </div>
+    )}
+  </div>
+)}
 
         {/* ========================================================
-            TAB: WEEKLY BROADCAST MATCHES (หน้าแรก & ทัวร์นาเมนต์)
+            TAB: WEEKLY BROADCAST MATCHES (หน้าแรกแฟนพันธุ์แท้ 2026)
            ======================================================== */}
         {activeTab === "weekly" && (
           <div
@@ -5048,50 +5441,31 @@ export default function AdminPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
               <div>
                 <h2 style={{ fontSize: "22px", fontWeight: "800", color: "#00e5ff", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span>🗓️</span> จัดการตารางแข่งขันรอบประจำสัปดาห์
+                  <span>🗓️</span> จัดการตารางแข่งขันรอบประจำสัปดาห์ (แฟนพันธุ์แท้ 2026)
                 </h2>
                 <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", margin: 0 }}>
-                  กำหนดแมตช์ที่จะแสดงในหน้าแรกและหน้าทัวร์นาเมนต์ พร้อมระบุวันเวลาออกอากาศและลิงก์รับชมย้อนหลัง
+                  กำหนดแมตช์และตอนที่จะแสดงในหน้าแรก พร้อมระบุวันเวลาออกอากาศ ลิงก์รับชมย้อนหลัง และสถานะการแข่งขัน
                 </p>
               </div>
 
-              {/* Sub-tab Switcher */}
-              <div style={{ display: "flex", background: "rgba(0, 15, 30, 0.8)", border: "1px solid rgba(0, 229, 255, 0.3)", borderRadius: "10px", padding: "4px" }}>
-                <button
-                  type="button"
-                  onClick={() => setWeeklySubTab("foty")}
-                  style={{
-                    padding: "8px 18px",
-                    borderRadius: "8px",
-                    background: weeklySubTab === "foty" ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)" : "transparent",
-                    color: weeklySubTab === "foty" ? "#030812" : "#e0f2fe",
-                    fontWeight: "800",
-                    fontSize: "14px",
-                    border: "none",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  🏠 หน้าแรก (แฟนพันธุ์แท้ 2026) (14 ตอน)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setWeeklySubTab("tournament")}
-                  style={{
-                    padding: "8px 18px",
-                    borderRadius: "8px",
-                    background: weeklySubTab === "tournament" ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)" : "transparent",
-                    color: weeklySubTab === "tournament" ? "#030812" : "#e0f2fe",
-                    fontWeight: "800",
-                    fontSize: "14px",
-                    border: "none",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  ⚔️ ทัวร์นาเมนต์ (Tournament) ({tournamentWeeklyMatches.length})
-                </button>
-              </div>
+              <Link
+                href="/admin/tournament"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  background: "rgba(0, 229, 255, 0.12)",
+                  border: "1px solid rgba(0, 229, 255, 0.35)",
+                  color: "#00e5ff",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  textDecoration: "none",
+                }}
+              >
+                ⚔️ จัดการตารางออกอากาศทัวร์นาเมนต์ ที่ห้อง Tournament ↗
+              </Link>
             </div>
 
             {weeklyNotice && (
@@ -5100,9 +5474,8 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* List and Form */}
-            {weeklySubTab === "foty" ? (
-              <div>
+            {/* List and Form for FOTY */}
+            <div>
                 {/* FOTY Cutoff Control */}
                 <div
                   style={{
@@ -5568,420 +5941,6 @@ export default function AdminPage() {
                   </button>
                 </div>
               </div>
-            ) : (() => {
-              const currentList = tournamentWeeklyMatches;
-              const type = "tournament";
-
-              return (
-                <div>
-                  {/* Tournament Cutoff Control (shown when tournament sub-tab is active) */}
-                  <div
-                      style={{
-                        background: "rgba(0, 229, 255, 0.08)",
-                        border: "1.5px solid rgba(0, 229, 255, 0.4)",
-                        borderRadius: "12px",
-                        padding: "16px 20px",
-                        marginBottom: "20px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        flexWrap: "wrap",
-                        gap: "14px",
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontSize: "15px", fontWeight: "800", color: "#ffd700", display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span>📺</span> เลือกว่าจะให้อัปเดตตารางข้อมูลการแข่งทัวร์นาเมนต์ถึงแมตช์ไหน (/tournament)
-                        </div>
-                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
-                          แมตช์เดย์และคู่แข่งขันหลังจากคู่ที่เลือกจะไม่ถูกแสดงบนหน้า <code>/tournament</code> เพื่อป้องกันสปอยล์ (หน้า <code>/tournament/current</code> จะยังเห็นข้อมูลสดทั้งหมด)
-                        </div>
-                      </div>
-
-                      <select
-                        value={tournamentUpdateUpToMatch}
-                        onChange={(e) => setTournamentUpdateUpToMatch(e.target.value)}
-                        style={{
-                          padding: "10px 14px",
-                          borderRadius: "8px",
-                          background: "#050b14",
-                          border: "1.5px solid #00e5ff",
-                          color: "#ffd700",
-                          fontSize: "14px",
-                          fontWeight: "700",
-                          minWidth: "260px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <option value="all">🌐 แสดงผลทั้งหมด (ทุกคู่ / ทุก Matchday)</option>
-                        {allTournamentMatches.map((m) => (
-                          <option key={m.id || m.matchNumber} value={m.matchNumber}>
-                            คู่ที่ {m.matchNumber} ({m.matchdayName || `กลุ่ม ${m.group}`}): {m.player1?.nickname || m.player1?.name} vs {m.player2?.nickname || m.player2?.name}
-                          </option>
-                        ))}
-                      </select>
-
-                      {/* รางวัลพิเศษและบทลงโทษประจำลีก */}
-                      <div
-                        style={{
-                          width: "100%",
-                          display: "grid",
-                          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                          gap: "14px",
-                          marginTop: "12px",
-                          paddingTop: "14px",
-                          borderTop: "1px dashed rgba(0, 229, 255, 0.25)",
-                        }}
-                      >
-                        <div>
-                          <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#38bdf8", marginBottom: "4px" }}>
-                            🎁 รางวัลพิเศษประจำลีก (+1 LP) บนหน้า /tournament:
-                          </label>
-                          <select
-                            value={tournamentAwardOverride}
-                            onChange={(e) => setTournamentAwardOverride(e.target.value)}
-                            style={{
-                              width: "100%",
-                              padding: "8px 12px",
-                              borderRadius: "8px",
-                              background: "#081020",
-                              border: "1px solid #38bdf8",
-                              color: "#ffffff",
-                              fontSize: "13px",
-                              fontWeight: "700",
-                              cursor: "pointer",
-                            }}
-                          >
-                            <option value="auto">🤖 คำนวณอัตโนมัติตามคู่ล่าสุดที่เปิดแสดง</option>
-                            <option value="ปาร์ค">🎁 รางวัลปาร์ค (พศวัต พุ่มเงิน) - ตั้งต้นลีก (ก่อนคู่ที่ 38)</option>
-                            <option value="กร">🎁 รางวัลกร (วรงกร แจ่มปัญญา) - คู่ที่ 38 เป็นต้นไป</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#ff7875", marginBottom: "4px" }}>
-                            ⚠️ บทลงโทษประจำลีก (-1 LP) บนหน้า /tournament:
-                          </label>
-                          <select
-                            value={tournamentPenaltyOverride}
-                            onChange={(e) => setTournamentPenaltyOverride(e.target.value)}
-                            style={{
-                              width: "100%",
-                              padding: "8px 12px",
-                              borderRadius: "8px",
-                              background: "#081020",
-                              border: "1px solid #ff4d4f",
-                              color: "#ffffff",
-                              fontSize: "13px",
-                              fontWeight: "700",
-                              cursor: "pointer",
-                            }}
-                          >
-                            <option value="auto">🤖 คำนวณอัตโนมัติตามคู่ล่าสุดที่เปิดแสดง</option>
-                            <option value="ริท">⚠️ หักค่าริท (ฤทธิชัย ภูสิญามณี) - คู่ที่ 21-31</option>
-                            <option value="ปัน">⚠️ หักค่าปัน (ปฏิปัน อัศวภูไชย) - คู่ที่ 32 เป็นต้นไป</option>
-                            <option value="แมน">⚠️ หักค่าแมน (ปกรณ์ สถิตอยู่คู่ไทย) - คู่ที่ 13-20</option>
-                            <option value="ออมสิน">⚠️ หักค่าออมสิน (เจษฎาพร ศรีมาตย์) - คู่ที่ 2-12</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
-                    <div style={{ fontSize: "15px", fontWeight: "700", color: "#ffd700" }}>
-                      รายการแมตช์ออกอากาศทั้งหมด ({currentList.length} แมตช์)
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleAddWeeklyMatch(type)}
-                      style={{
-                        padding: "8px 16px",
-                        borderRadius: "8px",
-                        background: "rgba(0, 229, 255, 0.15)",
-                        border: "1.5px solid #00e5ff",
-                        color: "#00e5ff",
-                        fontSize: "13px",
-                        fontWeight: "800",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                      }}
-                    >
-                      ➕ เพิ่มแมตช์ออกอากาศ
-                    </button>
-                  </div>
-
-                  {currentList.length === 0 ? (
-                    <div style={{ padding: "40px 20px", textAlign: "center", border: "1.5px dashed rgba(0, 229, 255, 0.3)", borderRadius: "12px", color: "rgba(255,255,255,0.5)" }}>
-                      ยังไม่มีรายการแมตช์ประจำสัปดาห์ กดปุ่ม <b>"➕ เพิ่มแมตช์ออกอากาศ"</b> เพื่อเริ่มต้น
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginBottom: "24px" }}>
-                      {currentList.map((m, idx) => {
-                        const p1 = m.contestant1 || m.player1 || {};
-                        const p2 = m.contestant2 || m.player2 || {};
-
-                        return (
-                          <div
-                            key={m.id || idx}
-                            style={{
-                              background: "rgba(0, 15, 30, 0.75)",
-                              border: m.isShown !== false ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255,255,255,0.15)",
-                              borderRadius: "14px",
-                              padding: "20px",
-                              opacity: m.isShown !== false ? 1 : 0.6,
-                            }}
-                          >
-                            {/* Card Header */}
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                                <span style={{ background: "#00e5ff", color: "#030812", fontSize: "12px", fontWeight: "900", padding: "2px 8px", borderRadius: "4px" }}>
-                                  แมตช์ #{idx + 1}
-                                </span>
-                                <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "14px", fontWeight: "700", color: m.isShown !== false ? "#52c41a" : "#faad14" }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={m.isShown !== false}
-                                    onChange={(e) => handleUpdateWeeklyMatch(type, idx, "isShown", e.target.checked)}
-                                    style={{ width: "16px", height: "16px", accentColor: "#52c41a", cursor: "pointer" }}
-                                  />
-                                  {m.isShown !== false ? "👁️ แสดงในหน้าเว็บ" : "🚫 ซ่อนจากหน้าเว็บ"}
-                                </label>
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteWeeklyMatch(type, idx)}
-                                style={{
-                                  padding: "4px 12px",
-                                  borderRadius: "6px",
-                                  background: "rgba(255, 77, 79, 0.15)",
-                                  border: "1px solid #ff4d4f",
-                                  color: "#ff7875",
-                                  fontSize: "12px",
-                                  fontWeight: "700",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                🗑️ ลบแมตช์นี้
-                              </button>
-                            </div>
-
-                            {/* Main Inputs Grid */}
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px", marginBottom: "16px" }}>
-                              <div>
-                                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#80d0ff", marginBottom: "4px" }}>
-                                  คู่ที่ / ตอน (Episode)
-                                </label>
-                                <input
-                                  type="text"
-                                  value={m.episode || ""}
-                                  onChange={(e) => handleUpdateWeeklyMatch(type, idx, "episode", e.target.value)}
-                                  placeholder="เช่น คู่ที่ 1 หรือ สัปดาห์ที่ 1"
-                                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(0, 229, 255, 0.3)", color: "#fff", fontSize: "13px" }}
-                                />
-                              </div>
-
-                              <div>
-                                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#80d0ff", marginBottom: "4px" }}>
-                                  ชื่อแมตช์ / หัวข้อรายการ (Title)
-                                </label>
-                                <input
-                                  type="text"
-                                  value={m.title || ""}
-                                  onChange={(e) => handleUpdateWeeklyMatch(type, idx, "title", e.target.value)}
-                                  placeholder="เช่น เปิดสนามรอบอุ่นเครื่อง หรือ แมน vs หมี"
-                                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(0, 229, 255, 0.3)", color: "#fff", fontSize: "13px" }}
-                                />
-                              </div>
-
-                              <div>
-                                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#ffd700", marginBottom: "4px" }}>
-                                  🗓️ วัน-เวลาออกอากาศ (Air Date & Time)
-                                </label>
-                                <input
-                                  type="text"
-                                  value={m.airDate || ""}
-                                  onChange={(e) => handleUpdateWeeklyMatch(type, idx, "airDate", e.target.value)}
-                                  placeholder="เช่น เสาร์ 15 พ.ย. เวลา 20:00 น."
-                                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255, 215, 0, 0.4)", color: "#ffd700", fontSize: "13px" }}
-                                />
-                              </div>
-
-                              <div>
-                                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#ff7875", marginBottom: "4px" }}>
-                                  🎬 ลิงก์รับชมย้อนหลัง (Replay / YouTube URL)
-                                </label>
-                                <input
-                                  type="text"
-                                  value={m.replayUrl || m.youtubeUrl || ""}
-                                  onChange={(e) => handleUpdateWeeklyMatch(type, idx, "replayUrl", e.target.value)}
-                                  placeholder="https://www.youtube.com/watch?v=..."
-                                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255, 77, 79, 0.4)", color: "#fff", fontSize: "13px" }}
-                                />
-                              </div>
-
-                              <div>
-                                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#80d0ff", marginBottom: "4px" }}>
-                                  สถานะการออกอากาศ (Status)
-                                </label>
-                                <select
-                                  value={m.status || "upcoming"}
-                                  onChange={(e) => handleUpdateWeeklyMatch(type, idx, "status", e.target.value)}
-                                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(0, 229, 255, 0.3)", color: "#fff", fontSize: "13px" }}
-                                >
-                                  <option value="upcoming">⏳ เร็วๆ นี้ (Upcoming)</option>
-                                  <option value="live">🔴 กำลังออกอากาศ (Live)</option>
-                                  <option value="completed">✓ ออกอากาศแล้ว (Completed)</option>
-                                </select>
-                              </div>
-                            </div>
-
-                            {/* Contestant 1 & Contestant 2 Section */}
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px", background: "rgba(0, 0, 0, 0.35)", padding: "14px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.08)" }}>
-                              {/* Contestant 1 */}
-                              <div>
-                                <div style={{ fontSize: "13px", fontWeight: "700", color: "#00e5ff", marginBottom: "8px" }}>
-                                  👤 ผู้เข้าแข่งขันคนที่ 1
-                                </div>
-                                {/* Quick auto-fill from contestants dropdown */}
-                                <select
-                                  onChange={(e) => {
-                                    const c = contestants.find((x) => x.name === e.target.value);
-                                    if (c) {
-                                      handleUpdateWeeklyPlayer(type, idx, "contestant1", "name", c.name || "");
-                                      handleUpdateWeeklyPlayer(type, idx, "contestant1", "nickname", c.nickname || "");
-                                      handleUpdateWeeklyPlayer(type, idx, "contestant1", "topic", c.topic || "");
-                                      handleUpdateWeeklyPlayer(type, idx, "contestant1", "photo", c.image || "");
-                                    }
-                                  }}
-                                  style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "#0a1324", border: "1px solid rgba(0, 229, 255, 0.3)", color: "#80d0ff", fontSize: "12px", marginBottom: "8px" }}
-                                >
-                                  <option value="">-- เลือกจากรายชื่อผู้เข้าแข่งขัน --</option>
-                                  {contestants.map((c) => (
-                                    <option key={c.id || c.name} value={c.name}>
-                                      {c.nickname ? `${c.nickname} (${c.name})` : c.name} - {c.topic}
-                                    </option>
-                                  ))}
-                                </select>
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "6px" }}>
-                                  <input
-                                    type="text"
-                                    value={p1.nickname || ""}
-                                    onChange={(e) => handleUpdateWeeklyPlayer(type, idx, "contestant1", "nickname", e.target.value)}
-                                    placeholder="ชื่อเล่น (เช่น หมี)"
-                                    style={{ padding: "6px 10px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "12px" }}
-                                  />
-                                  <input
-                                    type="text"
-                                    value={p1.name || ""}
-                                    onChange={(e) => handleUpdateWeeklyPlayer(type, idx, "contestant1", "name", e.target.value)}
-                                    placeholder="ชื่อ-นามสกุลจริง"
-                                    style={{ padding: "6px 10px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "12px" }}
-                                  />
-                                </div>
-                                <input
-                                  type="text"
-                                  value={p1.topic || ""}
-                                  onChange={(e) => handleUpdateWeeklyPlayer(type, idx, "contestant1", "topic", e.target.value)}
-                                  placeholder="หัวข้อ (เช่น บุคคลสำคัญของโลก)"
-                                  style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "12px", marginBottom: "6px" }}
-                                />
-                                <input
-                                  type="text"
-                                  value={p1.photo || ""}
-                                  onChange={(e) => handleUpdateWeeklyPlayer(type, idx, "contestant1", "photo", e.target.value)}
-                                  placeholder="ลิงก์รูปภาพ (Google Photos / URL)"
-                                  style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "12px" }}
-                                />
-                              </div>
-
-                              {/* Contestant 2 */}
-                              <div>
-                                <div style={{ fontSize: "13px", fontWeight: "700", color: "#ff4d4f", marginBottom: "8px" }}>
-                                  👤 ผู้เข้าแข่งขันคนที่ 2 (ถ้ามี / แมตช์ดวล)
-                                </div>
-                                <select
-                                  onChange={(e) => {
-                                    const c = contestants.find((x) => x.name === e.target.value);
-                                    if (c) {
-                                      handleUpdateWeeklyPlayer(type, idx, "contestant2", "name", c.name || "");
-                                      handleUpdateWeeklyPlayer(type, idx, "contestant2", "nickname", c.nickname || "");
-                                      handleUpdateWeeklyPlayer(type, idx, "contestant2", "topic", c.topic || "");
-                                      handleUpdateWeeklyPlayer(type, idx, "contestant2", "photo", c.image || "");
-                                    }
-                                  }}
-                                  style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "#0a1324", border: "1px solid rgba(255, 77, 79, 0.3)", color: "#ff7875", fontSize: "12px", marginBottom: "8px" }}
-                                >
-                                  <option value="">-- เลือกจากรายชื่อผู้เข้าแข่งขัน --</option>
-                                  {contestants.map((c) => (
-                                    <option key={c.id || c.name} value={c.name}>
-                                      {c.nickname ? `${c.nickname} (${c.name})` : c.name} - {c.topic}
-                                    </option>
-                                  ))}
-                                </select>
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "6px" }}>
-                                  <input
-                                    type="text"
-                                    value={p2.nickname || ""}
-                                    onChange={(e) => handleUpdateWeeklyPlayer(type, idx, "contestant2", "nickname", e.target.value)}
-                                    placeholder="ชื่อเล่น (ถ้ามี)"
-                                    style={{ padding: "6px 10px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "12px" }}
-                                  />
-                                  <input
-                                    type="text"
-                                    value={p2.name || ""}
-                                    onChange={(e) => handleUpdateWeeklyPlayer(type, idx, "contestant2", "name", e.target.value)}
-                                    placeholder="ชื่อ-นามสกุลจริง"
-                                    style={{ padding: "6px 10px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "12px" }}
-                                  />
-                                </div>
-                                <input
-                                  type="text"
-                                  value={p2.topic || ""}
-                                  onChange={(e) => handleUpdateWeeklyPlayer(type, idx, "contestant2", "topic", e.target.value)}
-                                  placeholder="หัวข้อ"
-                                  style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "12px", marginBottom: "6px" }}
-                                />
-                                <input
-                                  type="text"
-                                  value={p2.photo || ""}
-                                  onChange={(e) => handleUpdateWeeklyPlayer(type, idx, "contestant2", "photo", e.target.value)}
-                                  placeholder="ลิงก์รูปภาพ (Google Photos / URL)"
-                                  style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "12px" }}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* Save Button */}
-                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
-                    <button
-                      type="button"
-                      onClick={() => handleSaveWeeklyMatches(type)}
-                      style={{
-                        padding: "12px 28px",
-                        borderRadius: "10px",
-                        background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                        color: "#030812",
-                        fontWeight: "900",
-                        fontSize: "15px",
-                        border: "none",
-                        cursor: "pointer",
-                        boxShadow: "0 0 16px rgba(0, 229, 255, 0.4)",
-                      }}
-                    >
-                      💾 บันทึกตารางแข่งขันประจำสัปดาห์ทั้งหมด
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
           </div>
         )}
 
@@ -6051,30 +6010,7 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* Trial Admin Password */}
-              <div style={{ marginBottom: "18px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#ffd700", marginBottom: "6px" }}>
-                  ⚙️ รหัสผ่านห้อง Admin ของ Trial FoTY (/trial-foty/admin)
-                </label>
-                <input
-                  type="text"
-                  value={trialAdminPassword}
-                  onChange={(e) => setTrialAdminPassword(e.target.value)}
-                  placeholder="เช่น trial_admin_2026"
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "8px",
-                    background: "rgba(0, 15, 30, 0.9)",
-                    border: "1px solid rgba(255, 215, 0, 0.4)",
-                    color: "#ffd700",
-                    fontSize: "15px"
-                  }}
-                />
-                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginTop: "4px", display: "block" }}>
-                  ผู้ดูแลระบบจะต้องใส่รหัสนี้เพื่อเข้าสู่หน้าจัดการแข่งขัน <code>/trial-foty/admin</code>
-                </span>
-              </div>
+
 
               {/* Total Contestants */}
               <div style={{ marginBottom: "22px" }}>
@@ -6204,136 +6140,6 @@ export default function AdminPage() {
                   🔒 หน้าลับ: เข้าถึงผ่าน URL <code>/fan-of-the-year</code> โดยตรง (ไม่มีปุ่มหรือ Hyperlink บนหน้าเว็บ เพื่อป้องกันสปอยล์)
                 </div>
               </div>
-
-              {/* Tournament Current (/tournament/current) Protection */}
-              <div style={{
-                background: "rgba(0, 15, 30, 0.6)",
-                border: "1px solid rgba(0, 229, 255, 0.3)",
-                borderRadius: "10px",
-                padding: "16px",
-                marginBottom: "22px"
-              }}>
-                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: "#00e5ff" }}>
-                  <input
-                    type="checkbox"
-                    checked={protectCurrent}
-                    onChange={(e) => setProtectCurrent(e.target.checked)}
-                    style={{ width: "18px", height: "18px", accentColor: "#00e5ff", cursor: "pointer" }}
-                  />
-                  ⚔️ เปิดระบบรหัสผ่านสำหรับหน้าตารางปัจจุบันทัวร์นาเมนต์ (/tournament/current)
-                </label>
-                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 10px 28px" }}>
-                  เมื่อเปิดใช้งาน ผู้เข้าชมหน้า /tournament/current จะต้องกรอกรหัสผ่านก่อนเข้าดูตารางคะแนนและผลการแข่งทัวร์นาเมนต์สดทั้งหมด (กันสปอยล์)
-                </p>
-                {protectCurrent && (
-                  <div style={{ marginLeft: "28px", marginBottom: "12px" }}>
-                    <input
-                      type="text"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="กำหนดรหัสผ่านสำหรับหน้าตารางปัจจุบันทัวร์นาเมนต์ (/tournament/current)..."
-                      style={{
-                        width: "100%",
-                        padding: "10px 12px",
-                        borderRadius: "8px",
-                        background: "#050b14",
-                        border: "1px solid rgba(0, 229, 255, 0.4)",
-                        color: "#ffd700",
-                        fontSize: "14px"
-                      }}
-                    />
-                  </div>
-                )}
-                <div style={{ marginLeft: "28px", paddingTop: "8px", borderTop: "1px dashed rgba(255,255,255,0.1)", fontSize: "12px", color: "rgba(0, 229, 255, 0.8)", marginBottom: "10px" }}>
-                  🔒 หน้าลับ: เข้าถึงผ่าน URL <code>/tournament/current</code> โดยตรง (ไม่มีปุ่มหรือ Hyperlink บนหน้าเว็บ เพื่อป้องกันสปอยล์)
-                </div>
-
-                {/* Cutoff Selector */}
-                <div style={{ background: "rgba(0, 0, 0, 0.4)", padding: "10px 12px", borderRadius: "8px", border: "1px solid rgba(0, 229, 255, 0.25)" }}>
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#ffd700", marginBottom: "4px" }}>
-                    📺 เลือกอัปเดตข้อมูลการแข่งทัวร์นาเมนต์ถึงแมตช์ไหน (/tournament):
-                    </label>
-                    <select
-                      value={tournamentUpdateUpToMatch}
-                      onChange={(e) => setTournamentUpdateUpToMatch(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "8px 10px",
-                        borderRadius: "6px",
-                        background: "#050b14",
-                        border: "1px solid #00e5ff",
-                        color: "#ffd700",
-                        fontSize: "13px",
-                        fontWeight: "700",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <option value="all">🌐 แสดงผลทั้งหมด (ทุกคู่ / ทุก Matchday)</option>
-                      {allTournamentMatches.map((m) => (
-                        <option key={m.id || m.matchNumber} value={m.matchNumber}>
-                          คู่ที่ {m.matchNumber} ({m.matchdayName || `กลุ่ม ${m.group}`}): {m.player1?.nickname || m.player1?.name} vs {m.player2?.nickname || m.player2?.name}
-                        </option>
-                      ))}
-                    </select>
-                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "4px", display: "block" }}>
-                      แมตช์หลังจากคู่ที่เลือกจะถูกซ่อนผลและคะแนนบนหน้า <code>/tournament</code>
-                    </span>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "10px", paddingTop: "10px", borderTop: "1px dashed rgba(255,255,255,0.1)" }}>
-                      <div>
-                        <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#38bdf8", marginBottom: "3px" }}>
-                          🎁 รางวัลพิเศษ (+1 LP):
-                        </label>
-                        <select
-                          value={tournamentAwardOverride}
-                          onChange={(e) => setTournamentAwardOverride(e.target.value)}
-                          style={{
-                            width: "100%",
-                            padding: "6px 8px",
-                            borderRadius: "6px",
-                            background: "#081020",
-                            border: "1px solid #38bdf8",
-                            color: "#ffffff",
-                            fontSize: "12px",
-                            fontWeight: "700",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <option value="auto">🤖 อัตโนมัติ (ตามคู่ที่เลือก)</option>
-                          <option value="ปาร์ค">🎁 รางวัลปาร์ค (ก่อนคู่ที่ 38)</option>
-                          <option value="กร">🎁 รางวัลกร (คู่ที่ 38+)</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#ff7875", marginBottom: "3px" }}>
-                          ⚠️ บทลงโทษ (-1 LP):
-                        </label>
-                        <select
-                          value={tournamentPenaltyOverride}
-                          onChange={(e) => setTournamentPenaltyOverride(e.target.value)}
-                          style={{
-                            width: "100%",
-                            padding: "6px 8px",
-                            borderRadius: "6px",
-                            background: "#081020",
-                            border: "1px solid #ff4d4f",
-                            color: "#ffffff",
-                            fontSize: "12px",
-                            fontWeight: "700",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <option value="auto">🤖 อัตโนมัติ (ตามคู่ที่เลือก)</option>
-                          <option value="ริท">⚠️ หักค่าริท (คู่ 21-31)</option>
-                          <option value="ปัน">⚠️ หักค่าปัน (คู่ 32+)</option>
-                          <option value="แมน">⚠️ หักค่าแมน (คู่ 13-20)</option>
-                          <option value="ออมสิน">⚠️ หักค่าออมสิน (คู่ 2-12)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
               {/* Ball Draw (/draw) Password Protection */}
               <div style={{
@@ -8411,8 +8217,8 @@ export default function AdminPage() {
             boxShadow: "0 0 40px rgba(0, 229, 255, 0.25)"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
-              <h3 style={{ fontSize: "18px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
-                {modalMode === "edit" ? "✏️ แก้ไขข้อมูล / ผูกรูปผู้เข้าแข่งขัน" : "➕ เพิ่มผู้เข้าแข่งขันใหม่"}
+              <h3 style={{ fontSize: "18px", fontWeight: "800", color: isMaintainer ? "#c084fc" : "#00e5ff", margin: 0 }}>
+                {isMaintainer ? "📷 เปลี่ยนรูปภาพผู้เข้าแข่งขัน (Maintainer)" : (modalMode === "edit" ? "✏️ แก้ไขข้อมูล / ผูกรูปผู้เข้าแข่งขัน" : "➕ เพิ่มผู้เข้าแข่งขันใหม่")}
               </h3>
               <button
                 onClick={() => setShowContestantModal(false)}
@@ -8422,6 +8228,21 @@ export default function AdminPage() {
               </button>
             </div>
 
+            {isMaintainer && (
+              <div style={{
+                marginBottom: "14px",
+                padding: "8px 12px",
+                borderRadius: "8px",
+                background: "rgba(168, 85, 247, 0.15)",
+                border: "1px solid rgba(168, 85, 247, 0.4)",
+                color: "#e9d5ff",
+                fontSize: "12px",
+                lineHeight: "1.5"
+              }}>
+                ℹ️ <strong>สิทธิ์ Maintainer:</strong> สามารถเปลี่ยน URL รูปภาพหรืออัปโหลดรูปภาพใหม่ได้เท่านั้น (ช่องชื่อ หัวข้อ และคะแนนถูกล็อกไว้)
+              </div>
+            )}
+
             <form onSubmit={handleSaveContestant}>
               <div style={{ marginBottom: "14px" }}>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
@@ -8430,10 +8251,19 @@ export default function AdminPage() {
                 <input
                   type="text"
                   required
+                  disabled={isMaintainer}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="เช่น นัทธภพ ธนวัฒนาเจริญ"
-                  style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#050b14", border: "1px solid rgba(0,229,255,0.3)", color: "#fff" }}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    background: isMaintainer ? "rgba(255,255,255,0.05)" : "#050b14",
+                    border: "1px solid rgba(0,229,255,0.3)",
+                    color: isMaintainer ? "rgba(255,255,255,0.6)" : "#fff",
+                    cursor: isMaintainer ? "not-allowed" : "text"
+                  }}
                 />
               </div>
 
@@ -8444,10 +8274,19 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="text"
+                    disabled={isMaintainer}
                     value={formData.nickname}
                     onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
                     placeholder="เช่น นนท์"
-                    style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#050b14", border: "1px solid rgba(0,229,255,0.3)", color: "#fff" }}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      background: isMaintainer ? "rgba(255,255,255,0.05)" : "#050b14",
+                      border: "1px solid rgba(0,229,255,0.3)",
+                      color: isMaintainer ? "rgba(255,255,255,0.6)" : "#fff",
+                      cursor: isMaintainer ? "not-allowed" : "text"
+                    }}
                   />
                 </div>
                 <div>
@@ -8457,10 +8296,19 @@ export default function AdminPage() {
                   <input
                     type="text"
                     required
+                    disabled={isMaintainer}
                     value={formData.topic}
                     onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
                     placeholder="เช่น Battle Spirits"
-                    style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#050b14", border: "1px solid rgba(0,229,255,0.3)", color: "#fff" }}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      background: isMaintainer ? "rgba(255,255,255,0.05)" : "#050b14",
+                      border: "1px solid rgba(0,229,255,0.3)",
+                      color: isMaintainer ? "rgba(255,255,255,0.6)" : "#fff",
+                      cursor: isMaintainer ? "not-allowed" : "text"
+                    }}
                   />
                 </div>
               </div>
@@ -8553,9 +8401,9 @@ export default function AdminPage() {
               </div>
 
               {/* Optional Score Inputs */}
-              <div style={{ marginBottom: "18px" }}>
+              <div style={{ marginBottom: "18px", opacity: isMaintainer ? 0.6 : 1 }}>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "6px" }}>
-                  คะแนนแต่ละหมวด (เว้นว่างได้หากยังไม่ได้แข่ง)
+                  คะแนนแต่ละหมวด {isMaintainer ? "(ล็อกไว้สำหรับ Maintainer)" : "(เว้นว่างได้หากยังไม่ได้แข่ง)"}
                 </label>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "8px" }}>
                   <div>
@@ -8564,6 +8412,7 @@ export default function AdminPage() {
                       type="number"
                       min="0"
                       max="25"
+                      disabled={isMaintainer}
                       value={formData.scores["3sec"]}
                       onChange={(e) => setFormData({ ...formData, scores: { ...formData.scores, "3sec": e.target.value } })}
                       style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.2)", color: "#ffd700", textAlign: "center" }}
@@ -8575,6 +8424,7 @@ export default function AdminPage() {
                       type="number"
                       min="0"
                       max="25"
+                      disabled={isMaintainer}
                       value={formData.scores.qa}
                       onChange={(e) => setFormData({ ...formData, scores: { ...formData.scores, qa: e.target.value } })}
                       style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.2)", color: "#ffd700", textAlign: "center" }}
@@ -8586,6 +8436,7 @@ export default function AdminPage() {
                       type="number"
                       min="0"
                       max="25"
+                      disabled={isMaintainer}
                       value={formData.scores.jigsaw}
                       onChange={(e) => setFormData({ ...formData, scores: { ...formData.scores, jigsaw: e.target.value } })}
                       style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.2)", color: "#ffd700", textAlign: "center" }}
@@ -8597,6 +8448,7 @@ export default function AdminPage() {
                       type="number"
                       min="0"
                       max="25"
+                      disabled={isMaintainer}
                       value={formData.scores.attribute}
                       onChange={(e) => setFormData({ ...formData, scores: { ...formData.scores, attribute: e.target.value } })}
                       style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.2)", color: "#ffd700", textAlign: "center" }}
@@ -8618,14 +8470,16 @@ export default function AdminPage() {
                   style={{
                     padding: "10px 22px",
                     borderRadius: "8px",
-                    background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                    background: isMaintainer
+                      ? "linear-gradient(90deg, #c084fc 0%, #7e22ce 100%)"
+                      : "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
                     border: "none",
-                    color: "#030812",
+                    color: isMaintainer ? "#ffffff" : "#030812",
                     fontWeight: "800",
                     cursor: "pointer"
                   }}
                 >
-                  💾 บันทึกข้อมูล
+                  {isMaintainer ? "💾 บันทึกรูปภาพ" : "💾 บันทึกข้อมูล"}
                 </button>
               </div>
             </form>

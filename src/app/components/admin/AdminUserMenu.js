@@ -163,7 +163,7 @@ export default function AdminUserMenu({
           <span style={{ maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {user?.name || user?.username || "Admin"}
           </span>
-          {user?.isMainAdmin && (
+          {user?.isMainAdmin ? (
             <span
               style={{
                 fontSize: "10px",
@@ -176,6 +176,36 @@ export default function AdminUserMenu({
               }}
             >
               MAIN ADMIN
+            </span>
+          ) : user?.role === "maintainer" ? (
+            <span
+              style={{
+                fontSize: "10px",
+                background: "rgba(168, 85, 247, 0.25)",
+                border: "1px solid #c084fc",
+                color: "#e9d5ff",
+                fontWeight: "900",
+                padding: "2px 7px",
+                borderRadius: "10px",
+                letterSpacing: "0.5px",
+              }}
+            >
+              MAINTAINER
+            </span>
+          ) : (
+            <span
+              style={{
+                fontSize: "10px",
+                background: "rgba(0, 229, 255, 0.2)",
+                border: "1px solid #00e5ff",
+                color: "#67e8f9",
+                fontWeight: "800",
+                padding: "2px 7px",
+                borderRadius: "10px",
+                letterSpacing: "0.5px",
+              }}
+            >
+              ADMIN
             </span>
           )}
           <span style={{ fontSize: "10px", opacity: 0.7, transform: showDropdown ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>

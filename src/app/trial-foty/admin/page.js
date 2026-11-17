@@ -110,6 +110,7 @@ export default function TrialAdminPage() {
     handleLoginSuccess,
     handleLogout: handleAdminLogout,
   } = useAdminSession("trial_foty");
+  const isMaintainer = user?.role === "maintainer";
   const [trialAdminPassConfig, setTrialAdminPassConfig] = useState("trial_admin_2026");
   const [savingPassConfig, setSavingPassConfig] = useState(false);
 
@@ -2715,6 +2716,32 @@ export default function TrialAdminPage() {
             TAB: POLL RANKING MANAGEMENT (Matching Main Admin)
            ======================================================== */}
         {activeTab === "poll" && (
+          isMaintainer ? (
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(20, 15, 30, 0.9) 0%, rgba(10, 8, 20, 0.95) 100%)",
+                border: "1.5px solid rgba(255, 75, 143, 0.4)",
+                borderRadius: "16px",
+                padding: "48px 24px",
+                textAlign: "center",
+                maxWidth: "600px",
+                margin: "40px auto",
+                boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+              }}
+            >
+              <div style={{ fontSize: "56px", marginBottom: "16px" }}>🔒</div>
+              <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#f472b6", marginBottom: "8px" }}>
+                สิทธิ์การเข้าถึงจำกัด (Restricted Access)
+              </h3>
+              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.75)", lineHeight: "1.7", margin: 0 }}>
+                บัญชีของคุณมีสิทธิ์ระดับ <strong style={{ color: "#38bdf8" }}>🛠️ Maintainer</strong> จึงไม่สามารถเปิดดูผลโหวตหรือจัดการตารางอันดับโพลล์ได้
+                <br />
+                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
+                  (ส่วนนี้สงวนสิทธิ์เฉพาะ Admin หรือ Main Admin ของ The Trial เท่านั้น)
+                </span>
+              </p>
+            </div>
+          ) : (
           <div>
             {/* Header & Action Bar */}
             <div
@@ -3917,6 +3944,7 @@ export default function TrialAdminPage() {
               </div>
             </div>
           </div>
+          )
         )}
 
         {activeTab === "contestants" && (
@@ -3941,24 +3969,48 @@ export default function TrialAdminPage() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={openAddModal}
+              {!isMaintainer && (
+                <button
+                  type="button"
+                  onClick={openAddModal}
+                  style={{
+                    padding: "10px 18px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                    color: "#030812",
+                    fontWeight: "800",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)",
+                  }}
+                >
+                  ➕ เพิ่มผู้เข้าแข่งขันใหม่
+                </button>
+              )}
+            </div>
+
+            {isMaintainer && (
+              <div
                 style={{
-                  padding: "10px 18px",
-                  borderRadius: "8px",
-                  background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                  color: "#030812",
-                  fontWeight: "800",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)",
+                  background: "rgba(0, 229, 255, 0.08)",
+                  border: "1px solid rgba(0, 229, 255, 0.3)",
+                  borderRadius: "10px",
+                  padding: "12px 18px",
+                  marginBottom: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  fontSize: "13px",
+                  color: "#e0f2fe",
                 }}
               >
-                ➕ เพิ่มผู้เข้าแข่งขันใหม่
-              </button>
-            </div>
+                <span style={{ fontSize: "18px" }}>ℹ️</span>
+                <span>
+                  <strong>สิทธิ์ Maintainer:</strong> สามารถเปลี่ยนลิงก์รูปภาพ (Google Photos) หรืออัปโหลดรูปผู้เข้าแข่งขันได้ แต่ไม่สามารถเพิ่ม ลบ หรือแก้ไขชื่อ/หัวข้อของผู้เข้าแข่งขันได้
+                </span>
+              </div>
+            )}
 
             {/* Search & Filter Toolbar */}
             <div
@@ -4234,33 +4286,35 @@ export default function TrialAdminPage() {
                                 style={{
                                   padding: "5px 8px",
                                   borderRadius: "6px",
-                                  background: "rgba(255,255,255,0.08)",
-                                  border: "1px solid rgba(255,255,255,0.2)",
-                                  color: "#ffffff",
+                                  background: isMaintainer ? "rgba(0, 229, 255, 0.15)" : "rgba(255,255,255,0.08)",
+                                  border: isMaintainer ? "1px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255,255,255,0.2)",
+                                  color: isMaintainer ? "#67e8f9" : "#ffffff",
                                   fontSize: "12px",
                                   cursor: "pointer",
                                 }}
-                                title="แก้ไขข้อมูล"
+                                title={isMaintainer ? "เปลี่ยนรูปผู้เข้าแข่งขัน" : "แก้ไขข้อมูล"}
                               >
-                                ✏️
+                                {isMaintainer ? "📷 เปลี่ยนรูป" : "✏️"}
                               </button>
 
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteContestant(c)}
-                                style={{
-                                  padding: "5px 8px",
-                                  borderRadius: "6px",
-                                  background: "rgba(239, 68, 68, 0.15)",
-                                  border: "1px solid rgba(239, 68, 68, 0.4)",
-                                  color: "#fca5a5",
-                                  fontSize: "12px",
-                                  cursor: "pointer",
-                                }}
-                                title="ลบผู้เข้าแข่งขัน"
-                              >
-                                🗑️
-                              </button>
+                              {!isMaintainer && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteContestant(c)}
+                                  style={{
+                                    padding: "5px 8px",
+                                    borderRadius: "6px",
+                                    background: "rgba(239, 68, 68, 0.15)",
+                                    border: "1px solid rgba(239, 68, 68, 0.4)",
+                                    color: "#fca5a5",
+                                    fontSize: "12px",
+                                    cursor: "pointer",
+                                  }}
+                                  title="ลบผู้เข้าแข่งขัน"
+                                >
+                                  🗑️
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -5852,7 +5906,7 @@ export default function TrialAdminPage() {
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
               <h3 style={{ fontSize: "18px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
-                {modalMode === "edit" ? "✏️ แก้ไขข้อมูล / ผูกรูปผู้เข้าแข่งขัน" : "➕ เพิ่มผู้เข้าแข่งขันใหม่"}
+                {isMaintainer ? "📷 เปลี่ยนรูปภาพผู้เข้าแข่งขัน (Maintainer)" : (modalMode === "edit" ? "✏️ แก้ไขข้อมูล / ผูกรูปผู้เข้าแข่งขัน" : "➕ เพิ่มผู้เข้าแข่งขันใหม่")}
               </h3>
               <button
                 type="button"
@@ -5863,14 +5917,21 @@ export default function TrialAdminPage() {
               </button>
             </div>
 
+            {isMaintainer && (
+              <div style={{ background: "rgba(0, 229, 255, 0.1)", border: "1px solid rgba(0, 229, 255, 0.3)", borderRadius: "8px", padding: "10px", marginBottom: "14px", fontSize: "12px", color: "#e0f2fe" }}>
+                🔒 บัญชีสิทธิ์ Maintainer สามารถแก้ไขเฉพาะ URL รูปภาพหรืออัปโหลดรูปภาพใหม่เท่านั้น (ข้อมูลชื่อและหัวข้อถูกล็อก)
+              </div>
+            )}
+
             <form onSubmit={handleSaveContestant}>
               <div style={{ marginBottom: "14px" }}>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
-                  ชื่อจริง - นามสกุล *
+                  ชื่อจริง - นามสกุล * {isMaintainer && "(ล็อก)"}
                 </label>
                 <input
                   type="text"
                   required
+                  disabled={isMaintainer}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="เช่น นัทธสม บุญมา"
@@ -5878,10 +5939,11 @@ export default function TrialAdminPage() {
                     width: "100%",
                     padding: "10px",
                     borderRadius: "8px",
-                    background: "#050b14",
+                    background: isMaintainer ? "rgba(255,255,255,0.05)" : "#050b14",
                     border: "1px solid rgba(0,229,255,0.3)",
-                    color: "#fff",
+                    color: isMaintainer ? "rgba(255,255,255,0.6)" : "#fff",
                     boxSizing: "border-box",
+                    cursor: isMaintainer ? "not-allowed" : "text",
                   }}
                 />
               </div>
@@ -5889,10 +5951,11 @@ export default function TrialAdminPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
-                    ชื่อเล่น
+                    ชื่อเล่น {isMaintainer && "(ล็อก)"}
                   </label>
                   <input
                     type="text"
+                    disabled={isMaintainer}
                     value={formData.nickname}
                     onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
                     placeholder="เช่น ซ่า"
@@ -5900,19 +5963,21 @@ export default function TrialAdminPage() {
                       width: "100%",
                       padding: "10px",
                       borderRadius: "8px",
-                      background: "#050b14",
+                      background: isMaintainer ? "rgba(255,255,255,0.05)" : "#050b14",
                       border: "1px solid rgba(0,229,255,0.3)",
-                      color: "#fff",
+                      color: isMaintainer ? "rgba(255,255,255,0.6)" : "#fff",
                       boxSizing: "border-box",
+                      cursor: isMaintainer ? "not-allowed" : "text",
                     }}
                   />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
-                    ลำดับแข่ง (Order)
+                    ลำดับแข่ง (Order) {isMaintainer && "(ล็อก)"}
                   </label>
                   <input
                     type="number"
+                    disabled={isMaintainer}
                     value={formData.order}
                     onChange={(e) => setFormData({ ...formData, order: e.target.value })}
                     placeholder="เช่น 1, 2, 3"
@@ -5920,10 +5985,11 @@ export default function TrialAdminPage() {
                       width: "100%",
                       padding: "10px",
                       borderRadius: "8px",
-                      background: "#050b14",
+                      background: isMaintainer ? "rgba(255,255,255,0.05)" : "#050b14",
                       border: "1px solid rgba(0,229,255,0.3)",
-                      color: "#fff",
+                      color: isMaintainer ? "rgba(255,255,255,0.6)" : "#fff",
                       boxSizing: "border-box",
+                      cursor: isMaintainer ? "not-allowed" : "text",
                     }}
                   />
                 </div>
@@ -5931,11 +5997,12 @@ export default function TrialAdminPage() {
 
               <div style={{ marginBottom: "14px" }}>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
-                  หัวข้อแฟนพันธุ์แท้ *
+                  หัวข้อแฟนพันธุ์แท้ * {isMaintainer && "(ล็อก)"}
                 </label>
                 <input
                   type="text"
                   required
+                  disabled={isMaintainer}
                   value={formData.topic}
                   onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
                   placeholder="เช่น ประวัติศาสตร์ไทย"
@@ -5943,20 +6010,22 @@ export default function TrialAdminPage() {
                     width: "100%",
                     padding: "10px",
                     borderRadius: "8px",
-                    background: "#050b14",
+                    background: isMaintainer ? "rgba(255,255,255,0.05)" : "#050b14",
                     border: "1px solid rgba(0,229,255,0.3)",
-                    color: "#fff",
+                    color: isMaintainer ? "rgba(255,255,255,0.6)" : "#fff",
                     boxSizing: "border-box",
+                    cursor: isMaintainer ? "not-allowed" : "text",
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: "14px" }}>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#ffa940", marginBottom: "4px" }}>
-                  🗓️ นัดหมายวัน-เวลาแข่งรอบอุ่นเครื่อง (Warm-up Schedule)
+                  🗓️ นัดหมายวัน-เวลาแข่งรอบอุ่นเครื่อง (Warm-up Schedule) {isMaintainer && "(ล็อก)"}
                 </label>
                 <input
                   type="text"
+                  disabled={isMaintainer}
                   value={formData.warmupSchedule || ""}
                   onChange={(e) => setFormData({ ...formData, warmupSchedule: e.target.value })}
                   placeholder="เช่น พุธ 12 พ.ย. 20:00 น."
@@ -5964,10 +6033,11 @@ export default function TrialAdminPage() {
                     width: "100%",
                     padding: "10px",
                     borderRadius: "8px",
-                    background: "#080402",
+                    background: isMaintainer ? "rgba(255,255,255,0.05)" : "#080402",
                     border: formData.warmupSchedule ? "1.5px solid #ff8800" : "1px solid rgba(255,136,0,0.3)",
                     color: formData.warmupSchedule ? "#ffa940" : "#fff",
                     boxSizing: "border-box",
+                    cursor: isMaintainer ? "not-allowed" : "text",
                   }}
                 />
                 <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "3px", display: "block" }}>

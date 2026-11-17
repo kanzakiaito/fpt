@@ -24,10 +24,14 @@ async function getCallerFromToken(token, section) {
   const hasAccess = Boolean(perm?.access || (user.permissions?.main?.isMainAdmin && section === "main"));
   if (!hasAccess) return null;
 
+  const isMainAdmin = Boolean(perm?.isMainAdmin || user.username === "admin");
+  const role = isMainAdmin ? "main_admin" : (perm?.role || "admin");
+
   return {
     ...user,
     currentSection: section,
-    isSectionMainAdmin: Boolean(perm?.isMainAdmin || user.username === "admin"),
+    role,
+    isSectionMainAdmin: isMainAdmin,
   };
 }
 
@@ -52,6 +56,7 @@ export async function GET(request) {
       username: caller.username,
       name: caller.name,
       section,
+      role: caller.role,
       isMainAdmin: caller.isSectionMainAdmin,
       permissions: caller.permissions,
     },
@@ -88,6 +93,7 @@ export async function POST(request) {
           username: caller.username,
           name: caller.name,
           section,
+          role: caller.role,
           isMainAdmin: caller.isSectionMainAdmin,
           permissions: caller.permissions,
         },
@@ -143,12 +149,16 @@ export async function POST(request) {
       // Users with access to this section
       const sectionUsers = allUsers.map((u) => {
         const p = u.permissions?.[section] || { access: false, isMainAdmin: false };
+        const role = Boolean(p.isMainAdmin || u.username === "admin")
+          ? "main_admin"
+          : (p.role || "admin");
         return {
           id: u.id,
           username: u.username,
           name: u.name || u.username,
           hasAccess: Boolean(p.access),
           isMainAdmin: Boolean(p.isMainAdmin || u.username === "admin"),
+          role,
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
           otherSections: Object.keys(u.permissions || {}).filter((k) => k !== section && u.permissions[k]?.access),
@@ -160,6 +170,7 @@ export async function POST(request) {
         users: sectionUsers,
         caller: {
           username: caller.username,
+          role: caller.role,
           isMainAdmin: caller.isSectionMainAdmin,
         },
       });
@@ -187,13 +198,15 @@ export async function POST(request) {
 
       const allUsers = await getAdminUsers();
       const existingIdx = allUsers.findIndex((u) => u.username.toLowerCase() === rawUsername);
-      const isTargetMainAdmin = Boolean(targetUser.isMainAdmin);
+      const rawRole = targetUser.role || (targetUser.isMainAdmin ? "main_admin" : "admin");
+      const isTargetMainAdmin = rawRole === "main_admin" || Boolean(targetUser.isMainAdmin);
+      const targetRole = isTargetMainAdmin ? "main_admin" : rawRole;
 
       if (existingIdx >= 0) {
         // Update existing user
         const existing = allUsers[existingIdx];
         const perms = { ...(existing.permissions || {}) };
-        perms[section] = { access: true, isMainAdmin: isTargetMainAdmin };
+        perms[section] = { access: true, isMainAdmin: isTargetMainAdmin, role: targetRole };
 
         const updatedUser = {
           ...existing,
@@ -230,7 +243,7 @@ export async function POST(request) {
           passwordHash: hashPassword(targetUser.password.trim()),
           name: targetUser.name?.trim() || rawUsername,
           permissions: {
-            [section]: { access: true, isMainAdmin: isTargetMainAdmin },
+            [section]: { access: true, isMainAdmin: isTargetMainAdmin, role: targetRole },
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -248,7 +261,7 @@ export async function POST(request) {
 
     // 7. GRANT ACCESS (to an existing user)
     if (action === "grant_access") {
-      const { username: targetUsername, isMainAdmin = false } = body;
+      const { username: targetUsername, isMainAdmin = false, role: rawReqRole } = body;
       const allUsers = await getAdminUsers();
       const existingIdx = allUsers.findIndex((u) => u.username.toLowerCase() === String(targetUsername).toLowerCase().trim());
 
@@ -258,7 +271,9 @@ export async function POST(request) {
 
       const existing = allUsers[existingIdx];
       const perms = { ...(existing.permissions || {}) };
-      perms[section] = { access: true, isMainAdmin: Boolean(isMainAdmin) };
+      const isTargetMainAdmin = Boolean(isMainAdmin || rawReqRole === "main_admin");
+      const targetRole = isTargetMainAdmin ? "main_admin" : (rawReqRole || "admin");
+      perms[section] = { access: true, isMainAdmin: isTargetMainAdmin, role: targetRole };
 
       allUsers[existingIdx] = {
         ...existing,
@@ -352,6 +367,57 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         message: `ปรับสถานะ Main Admin ของ ${existing.username} สำหรับฝั่ง ${section} สำเร็จ`,
+      });
+    }
+
+    // 10. UPDATE ROLE
+    if (action === "update_role") {
+      const { username: targetUsername, role = "admin" } = body;
+      const cleanTarget = String(targetUsername).toLowerCase().trim();
+
+      if (cleanTarget === "admin" && role !== "main_admin") {
+        return NextResponse.json({ success: false, error: "ไม่สามารถลดระดับ Super Admin ได้" });
+      }
+
+      const allUsers = await getAdminUsers();
+      const existingIdx = allUsers.findIndex((u) => u.username.toLowerCase() === cleanTarget);
+
+      if (existingIdx < 0) {
+        return NextResponse.json({ success: false, error: "ไม่พบบัญชีผู้ใช้นี้ในระบบ" });
+      }
+
+      const existing = allUsers[existingIdx];
+      const isMainAdmin = role === "main_admin";
+
+      if (existing.username.toLowerCase() === caller.username.toLowerCase() && !isMainAdmin) {
+        const otherMainAdmins = allUsers.filter(
+          (u) => u.username.toLowerCase() !== caller.username.toLowerCase() && u.permissions?.[section]?.isMainAdmin
+        );
+        if (otherMainAdmins.length === 0) {
+          return NextResponse.json({
+            success: false,
+            error: "ไม่สามารถลดระดับตนเองได้เนื่องจากคุณเป็น Main Admin คนเดียวของฝั่งนี้",
+          });
+        }
+      }
+
+      const perms = { ...(existing.permissions || {}) };
+      perms[section] = {
+        access: true,
+        isMainAdmin,
+        role,
+      };
+
+      allUsers[existingIdx] = {
+        ...existing,
+        permissions: perms,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await saveAdminUsers(allUsers);
+      return NextResponse.json({
+        success: true,
+        message: `ปรับบทบาทของ ${existing.username} เป็น ${role.toUpperCase()} สำเร็จ`,
       });
     }
 

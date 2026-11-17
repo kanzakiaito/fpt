@@ -19,7 +19,7 @@ export default function AdminUserManagement({
   const [inputUsername, setInputUsername] = useState("");
   const [inputName, setInputName] = useState("");
   const [inputPassword, setInputPassword] = useState("");
-  const [inputIsMainAdmin, setInputIsMainAdmin] = useState(false);
+  const [inputRole, setInputRole] = useState("admin");
   const [checkingUser, setCheckingUser] = useState(false);
   const [existingUserFound, setExistingUserFound] = useState(null); // null | { username, name, sections }
   const [savingUser, setSavingUser] = useState(false);
@@ -133,7 +133,8 @@ export default function AdminUserManagement({
             username: cleanUser,
             name: inputName.trim() || cleanUser,
             password: inputPassword.trim() || undefined,
-            isMainAdmin: inputIsMainAdmin,
+            role: inputRole,
+            isMainAdmin: inputRole === "main_admin",
           },
         }),
       });
@@ -144,7 +145,7 @@ export default function AdminUserManagement({
         setInputUsername("");
         setInputName("");
         setInputPassword("");
-        setInputIsMainAdmin(false);
+        setInputRole("admin");
         setExistingUserFound(null);
         fetchUsers();
       } else {
@@ -158,7 +159,7 @@ export default function AdminUserManagement({
   };
 
   // Quick grant access
-  const handleQuickGrant = async (targetUsername) => {
+  const handleQuickGrant = async (targetUsername, grantRole = "admin") => {
     try {
       const res = await fetch("/api/auth", {
         method: "POST",
@@ -168,7 +169,8 @@ export default function AdminUserManagement({
           token,
           section,
           username: targetUsername,
-          isMainAdmin: false,
+          role: grantRole,
+          isMainAdmin: grantRole === "main_admin",
         }),
       });
       const data = await res.json();
@@ -201,6 +203,32 @@ export default function AdminUserManagement({
       const data = await res.json();
       if (data.success) {
         showNotification(data.message || "อัปเดตสถานะสำเร็จ");
+        fetchUsers();
+      } else {
+        showNotification(data.error || "เกิดข้อผิดพลาด");
+      }
+    } catch (e) {
+      showNotification("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    }
+  };
+
+  // Update user role
+  const handleUpdateRole = async (targetUser, newRole) => {
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_role",
+          token,
+          section,
+          username: targetUser.username,
+          role: newRole,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showNotification(data.message || `ปรับบทบาทเป็น ${newRole} สำเร็จ`);
         fetchUsers();
       } else {
         showNotification(data.error || "เกิดข้อผิดพลาด");
@@ -396,7 +424,7 @@ export default function AdminUserManagement({
                         </td>
                         <td style={{ padding: "12px 16px", color: "#e2e8f0" }}>{u.name || "-"}</td>
                         <td style={{ padding: "12px 16px" }}>
-                          {u.isMainAdmin ? (
+                          {u.role === "main_admin" || u.isMainAdmin ? (
                             <span
                               style={{
                                 display: "inline-flex",
@@ -408,10 +436,27 @@ export default function AdminUserManagement({
                                 color: primaryColor,
                                 border: `1px solid ${primaryBorder}`,
                                 fontSize: "12px",
-                                fontWeight: "700",
+                                fontWeight: "800",
                               }}
                             >
                               👑 MAIN ADMIN
+                            </span>
+                          ) : u.role === "maintainer" ? (
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                padding: "3px 10px",
+                                borderRadius: "12px",
+                                background: "rgba(168, 85, 247, 0.2)",
+                                color: "#c084fc",
+                                border: "1px solid rgba(168, 85, 247, 0.4)",
+                                fontSize: "12px",
+                                fontWeight: "800",
+                              }}
+                            >
+                              🛠️ MAINTAINER
                             </span>
                           ) : (
                             <span
@@ -421,12 +466,14 @@ export default function AdminUserManagement({
                                 gap: "4px",
                                 padding: "3px 10px",
                                 borderRadius: "12px",
-                                background: "rgba(255, 255, 255, 0.08)",
-                                color: "rgba(255, 255, 255, 0.8)",
+                                background: "rgba(0, 229, 255, 0.12)",
+                                color: "#38bdf8",
+                                border: "1px solid rgba(56, 189, 248, 0.3)",
                                 fontSize: "12px",
+                                fontWeight: "800",
                               }}
                             >
-                              👤 ADMIN
+                              ⭐ ADMIN
                             </span>
                           )}
                         </td>
@@ -439,23 +486,27 @@ export default function AdminUserManagement({
                         </td>
                         <td style={{ padding: "12px 16px", textAlign: "right" }}>
                           {currentUser?.isMainAdmin && (
-                            <div style={{ display: "inline-flex", gap: "8px" }}>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
                               {!isSuper && (
-                                <button
-                                  onClick={() => handleToggleMainAdmin(u)}
-                                  title={u.isMainAdmin ? "ปลดออกจาก Main Admin" : "ตั้งเป็น Main Admin"}
+                                <select
+                                  value={u.role || (u.isMainAdmin ? "main_admin" : "admin")}
+                                  onChange={(e) => handleUpdateRole(u, e.target.value)}
+                                  title="เปลี่ยนระดับสิทธิ์"
                                   style={{
-                                    padding: "4px 10px",
+                                    padding: "4px 8px",
                                     borderRadius: "6px",
                                     border: "1px solid rgba(255, 255, 255, 0.2)",
-                                    background: u.isMainAdmin ? "rgba(255, 215, 0, 0.15)" : "rgba(255, 255, 255, 0.06)",
-                                    color: u.isMainAdmin ? "#ffd700" : "#ffffff",
+                                    background: "#081020",
+                                    color: "#ffffff",
                                     fontSize: "12px",
+                                    fontWeight: "700",
                                     cursor: "pointer",
                                   }}
                                 >
-                                  {u.isMainAdmin ? "👑 ปลด Main" : "⭐ ตั้งเป็น Main"}
-                                </button>
+                                  <option value="main_admin">👑 Main Admin</option>
+                                  <option value="admin">⭐ Admin</option>
+                                  <option value="maintainer">🛠️ Maintainer</option>
+                                </select>
                               )}
 
                               {!isSuper && !isSelf && (
@@ -523,21 +574,40 @@ export default function AdminUserManagement({
                       </div>
                     </div>
                     {currentUser?.isMainAdmin && (
-                      <button
-                        onClick={() => handleQuickGrant(u.username)}
-                        style={{
-                          padding: "6px 12px",
-                          borderRadius: "8px",
-                          border: `1px solid ${primaryBorder}`,
-                          background: "rgba(0, 229, 255, 0.12)",
-                          color: primaryColor,
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          cursor: "pointer",
-                        }}
-                      >
-                        ➕ ให้สิทธิ์
-                      </button>
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <button
+                          onClick={() => handleQuickGrant(u.username, "admin")}
+                          title="ให้สิทธิ์เป็น Admin"
+                          style={{
+                            padding: "6px 10px",
+                            borderRadius: "8px",
+                            border: `1px solid ${primaryBorder}`,
+                            background: "rgba(0, 229, 255, 0.12)",
+                            color: primaryColor,
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            cursor: "pointer",
+                          }}
+                        >
+                          ➕ Admin
+                        </button>
+                        <button
+                          onClick={() => handleQuickGrant(u.username, "maintainer")}
+                          title="ให้สิทธิ์เป็น Maintainer"
+                          style={{
+                            padding: "6px 10px",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(168, 85, 247, 0.4)",
+                            background: "rgba(168, 85, 247, 0.15)",
+                            color: "#c084fc",
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            cursor: "pointer",
+                          }}
+                        >
+                          🛠️ Maintainer
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -731,30 +801,31 @@ export default function AdminUserManagement({
               </div>
 
               <div style={{ marginBottom: "20px" }}>
-                <label
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "700", color: "#e2e8f0", marginBottom: "6px" }}>
+                  ระดับสิทธิ์การใช้งาน (Role):
+                </label>
+                <select
+                  value={inputRole}
+                  onChange={(e) => setInputRole(e.target.value)}
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    fontSize: "13px",
-                    color: "#ffffff",
-                    cursor: "pointer",
-                    background: "rgba(255, 255, 255, 0.05)",
+                    width: "100%",
                     padding: "10px 14px",
                     borderRadius: "8px",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    background: "rgba(0, 10, 25, 0.7)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "#ffffff",
+                    fontSize: "13.5px",
+                    fontWeight: "700",
+                    cursor: "pointer",
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={inputIsMainAdmin}
-                    onChange={(e) => setInputIsMainAdmin(e.target.checked)}
-                    style={{ width: "16px", height: "16px", accentColor: primaryColor }}
-                  />
-                  <span>
-                    👑 <strong>ตั้งเป็น Main Admin ของฝั่งนี้</strong> (สามารถจัดการสิทธิ์ผู้ใช้อื่นในฝั่งนี้ได้)
-                  </span>
-                </label>
+                  <option value="main_admin">👑 Main Admin (ผู้ดูแลหลัก - มีสิทธิ์เต็ม จัดการผู้ใช้ได้)</option>
+                  <option value="admin">⭐ Admin (ผู้ดูแลทั่วไป - จัดการคะแนน, ข้อมูล, โพลล์, ใบสมัคร)</option>
+                  <option value="maintainer">🛠️ Maintainer (ผู้ดูแลระดับจัดการแข่งขัน - เปลี่ยนรูปและคุมตารางแข่งขัน)</option>
+                </select>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "6px", lineHeight: "1.5" }}>
+                  💡 Maintainer จะไม่สามารถดูผลโหวต, ดูใบสมัคร หรือแก้ไขข้อมูลผู้เข้าแข่งขันได้ แต่สามารถเปลี่ยน Path รูปและจัดการตารางแข่งขันได้
+                </div>
               </div>
 
               {modalError && (
