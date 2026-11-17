@@ -1,0 +1,46 @@
+[
+  {
+    "id": "usr_admin",
+    "username": "admin",
+    "passwordHash": "6657c87a0c1f72f01a708f86b5107170fc92fe3d83edcb69f56727c8266a3731",
+    "name": "Super Admin (ผู้ดูแลหลัก)",
+    "permissions": {
+      "main": {
+        "access": true,
+        "isMainAdmin": true
+      },
+      "tournament": {
+        "access": true,
+        "isMainAdmin": true
+      },
+      "trial_foty": {
+        "access": true,
+        "isMainAdmin": true
+      }
+    },
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "usr_trial_admin",
+    "username": "trial_admin",
+    "passwordHash": "898404275ffc550a73936e9bdb2e19d33ef7a79f19bd553ca74d981b95f9917b",
+    "name": "Trial Admin (แอดมินงุ่นง่าน)",
+    "permissions": {
+      "main": {
+        "access": false,
+        "isMainAdmin": false
+      },
+      "tournament": {
+        "access": false,
+        "isMainAdmin": false
+      },
+      "trial_foty": {
+        "access": true,
+        "isMainAdmin": true
+      }
+    },
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-11-17T09:17:06.667Z"
+  }
+]

@@ -10,221 +10,221 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
-        "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-        "ตัวละคร Touhou Project ต่อไปนี้ปรากฏตัวครั้งแรกในภาคใด?"
+        "นี่คือภาพ iPhone รุ่นใด?",
+        "สิ่งต่อไปนี้เกิดขึ้นครั้งแรกใน iPhone รุ่นใด? (หากมีมากกว่า 1 รุ่น ตอบรุ่นไหนก็ได้)",
+        "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "Kirisame Marisa"
+            "answer": "iPhone X"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "Yakumo Yukari"
+            "answer": "iPhone Duo"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "Koumeiji Satori"
+            "answer": "iPhone 4s"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "Kazami Yuuka"
+            "answer": "iPhone 7"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "Murasa Minamitsu"
+            "answer": "iPhone 16e"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "Usami Sumireko"
+            "answer": "iPhone 17 Pro"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "Hata no Kokoro"
+            "answer": "iPhone 5c"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "Toyosatomimi no Miko"
+            "answer": "iPhone 3G"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "Kirishima Yuuta"
+            "answer": "iPhone Air"
         },
         {
-            "question": "นี่คือภาพตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพ iPhone รุ่นใด?",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "Hakurei Reimu"
+            "answer": "iPhone (1st generation)"
         },
         {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/11.mp3",
-            "video": null,
-            "answer": "Cirno"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/12.mp3",
-            "video": null,
-            "answer": "Ibuki Suika"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/13.mp3",
-            "video": null,
-            "answer": "Kagiyama Hina"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/14.mp3",
-            "video": null,
-            "answer": "Aki Minoriko"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/15.mp3",
-            "video": null,
-            "answer": "Shameimaru Aya"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/16.mp3",
-            "video": null,
-            "answer": "Mizuhashi Parsee"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/17.mp3",
-            "video": null,
-            "answer": "Horikawa Raiko"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/18.mp3",
-            "video": null,
-            "answer": "Toramaru Shou"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/19.mp3",
-            "video": null,
-            "answer": "Sariel"
-        },
-        {
-            "question": "นี่คือเสียงจากเพลงประกอบตัวละคร Touhou Project ที่มีชื่อว่าอะไร? (ตอบชื่อตัวละคร)",
-            "image": null,
-            "audio": "public/audio/20.mp3",
-            "video": null,
-            "answer": "Flandre Scarlet"
-        },
-        {
-            "question": "Houraisan Kaguya",
+            "question": "ระบบจดจำใบหน้า (Face ID)",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Imperishable Night (8)"
+            "answer": "iPhone X"
         },
         {
-            "question": "Niwatari Kutaka",
+            "question": "หน้าจอพับได้",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Wily Beast and Weakest Creature (17)"
+            "answer": "iPhone Duo"
         },
         {
-            "question": "Yorigami Jo-on",
+            "question": "Siri",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Antinomy of Common Flowers (15.5)"
+            "answer": "iPhone 4s"
         },
         {
-            "question": "Ibaraki Kasen",
+            "question": "นำรูเสียบหูฟังขนาด 3.5 mm ออกจากตัวเครื่อง",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Wild and Horned Hermit"
+            "answer": "iPhone 7 / 7 Plus"
         },
         {
-            "question": "Hakurei Reimu",
+            "question": "ชิพ A18 และ Apple C1 ตัวใหม่ที่ช่วยยืดอายุการใช้งานแบตเตอรี่",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "the Highly Responsive to Prayers (1)"
+            "answer": "iPhone 16e"
+        },
+        {
+            "question": "ระบบลดความร้อนเครื่องด้วยห้องไอน้ำ (Vapor-chamber cooling system)",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "iPhone 17 Pro"
+        },
+        {
+            "question": "รองรับระบบอินเตอร์เน็ต 3G",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "iPhone 3G"
+        },
+        {
+            "question": "ระบบดาวเทียมฉุกเฉินสำหรับโทรศัพท์ (Satellite phone)",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "iPhone 14 / 14 Plus / 14 Pro / 14 Pro Max"
+        },
+        {
+            "question": "ความหนาของเครื่องเพียง 5.6 mm",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "iPhone Air"
+        },
+        {
+            "question": "สมาร์ตโฟนรุ่นแรกสุดในตระกูล iPhone",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "iPhone (1st generation)"
+        },
+        {
+            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
+            "image": "public/img/21.png",
+            "audio": null,
+            "video": null,
+            "answer": "iPhone X"
+        },
+        {
+            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
+            "image": "public/img/22.png",
+            "audio": null,
+            "video": null,
+            "answer": "iPhone Duo"
+        },
+        {
+            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
+            "image": "public/img/23.png",
+            "audio": null,
+            "video": null,
+            "answer": "iPhone 4s"
+        },
+        {
+            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
+            "image": "public/img/24.png",
+            "audio": null,
+            "video": null,
+            "answer": "iPhone XR"
+        },
+        {
+            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
+            "image": "public/img/25.png",
+            "audio": null,
+            "video": null,
+            "answer": "iPhone (1st generation)"
         }
     ],
     "qa": {
-        "question": "เงาตัวละคร Touhou Project ที่ปรากฏใน PV เพลง Bad Apple เป็นลำดับที่ 22 คือใคร?",
-        "answer": "Inubashiri Momiji",
-        "audio": "public/sound/qa-audio.mp3",
+        "question": "ภายในของเครื่อง iPhone X มีสัญลักษณ์ Apple อยู่กี่ตำแหน่ง / มีสกรูปักอยู่ทั้งหมดกี่จุด?",
+        "answer": "3 ตำแหน่ง / 18 จุด",
+        "audio": null,
         "choices": [
-            "Chen",
-            "Inubashiri Momiji",
-            "Inaba Tewi",
-            "Reisen Udongein Inaba",
-            "Yakumo Ran"
+            "ไม่มี / 10 จุด",
+            "1 ตำแหน่ง / 12 จุด",
+            "2 ตำแหน่ง / 14 จุด",
+            "2 ตำแหน่ง / 15 จุด",
+            "3 ตำแหน่ง / 18 จุด"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
-            5,
             1,
-            3
+            3,
+            2
         ]
     },
     "jigsaw": {
         "mode": "square",
         "image": "public/img/jigsaw.png",
-        "answer": "Patchouli Knowledge",
-        "question": "หลังจิ๊กซอว์นี้คือตัวละคร Touhou Project ที่มีชื่อว่าอะไร?"
+        "answer": "iPhone SE",
+        "question": "หลังจิ๊กซอว์นี้คือ iPhone รุ่นใด?"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของตัวละคร Touhou Project ที่มีชื่อว่าอะไร?",
+        "question": "นี่คือคุณสมบัติของแอปพลิเคชั่นใน iPhone ที่มีชื่อว่าอะไร?",
         "clues": [
-            "เป็นศัตรูในภาค The Embodiment of Scarlet Devil",
-            "ใช้ชีวิตในเก็นโซเคียวเป็นหลักร้อยปี",
-            "เพลงประจำตัวของตัวละครเคยถูก IOSYS นำมา Remix แล้ว",
-            "ผมสีทอง ตาสีแดง",
-            "ไม่เป็นโยวไค ไม่ใช่มนุษย์หูสัตว์ ไม่จัดว่าเป็นเทพธิดา"
+            "ใช้ฟรี ไม่ต้องจ่ายค่าแอป",
+            "โลโก้ไม่มีสีเขียว",
+            "เป็นแอปพลิเคชั่นประเภท Internet Browser",
+            "เป็นแอปพลิเคชั่น Build-in ภายในเครื่อง",
+            "ชื่อแอปพลิเคชั่นมี 3 พยางค์"
         ],
-        "answer": "Flandre Scarlet"
+        "answer": "Safari"
     },
     "battle": {
         "player1": {

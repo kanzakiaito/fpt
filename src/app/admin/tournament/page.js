@@ -3,6 +3,10 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import defaultTournamentData from "@/app/data/tournament.json";
+import AdminUserMenu from "@/app/components/admin/AdminUserMenu";
+import AdminLoginScreen from "@/app/components/admin/AdminLoginScreen";
+import AdminUserManagement from "@/app/components/admin/AdminUserManagement";
+import { useAdminSession } from "@/lib/useAdminSession";
 
 export function getYouTubeId(url) {
   if (!url || typeof url !== "string") return null;
@@ -581,10 +585,15 @@ function AdminTopicDropdown({
 
 export default function AdminTournamentPage() {
   // Authentication State
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authChecking, setAuthChecking] = useState(true);
-  const [passwordInput, setPasswordInput] = useState("");
-  const [authError, setAuthError] = useState("");
+  const {
+    isAuthenticated,
+    setIsAuthenticated,
+    authChecking,
+    user,
+    token,
+    handleLoginSuccess,
+    handleLogout,
+  } = useAdminSession("tournament");
 
   // Data State
   const [data, setData] = useState(defaultTournamentData);
@@ -632,48 +641,7 @@ export default function AdminTournamentPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  // Check Auth on load
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem("fpt_admin_auth");
-      if (stored === "true") {
-        setIsAuthenticated(true);
-      }
-      setAuthChecking(false);
-    }
-  }, []);
 
-  // Handle Login
-  const handleLogin = async (e) => {
-    if (e) e.preventDefault();
-    if (!passwordInput.trim()) {
-      setAuthError("กรุณากรอกรหัสผ่านผู้ดูแลระบบ");
-      return;
-    }
-    setAuthError("");
-    try {
-      const res = await fetch("/api/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "verify_admin", password: passwordInput.trim() }),
-      });
-      const data = await res.json();
-      if (data.valid) {
-        setIsAuthenticated(true);
-        sessionStorage.setItem("fpt_admin_auth", "true");
-        setPasswordInput("");
-      } else {
-        setAuthError("รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
-      }
-    } catch (err) {
-      setAuthError("เกิดข้อผิดพลาดในการตรวจสอบรหัสผ่าน");
-    }
-  };
-
-  const handleLogout = () => {
-    sessionStorage.removeItem("fpt_admin_auth");
-    setIsAuthenticated(false);
-  };
 
   // Fetch Data from API
   const loadData = async () => {
@@ -1505,117 +1473,13 @@ export default function AdminTournamentPage() {
 
   if (!isAuthenticated) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "radial-gradient(ellipse at center, #0a192f 0%, #030812 100%)",
-          color: "#fff",
-          fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
-          padding: "20px",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "440px",
-            width: "100%",
-            background: "linear-gradient(160deg, rgba(16, 32, 60, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",
-            border: "1px solid rgba(0, 229, 255, 0.35)",
-            boxShadow: "0 0 40px rgba(0, 229, 255, 0.15)",
-            borderRadius: "20px",
-            padding: "36px 30px",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ maxWidth: "290px", margin: "0 auto 18px" }}>
-            <img
-              src="/img/tournament_logo_cropped.png"
-              alt="FANPANTAE TOURNAMENT 2026/27"
-              style={{ width: "100%", height: "auto", filter: "drop-shadow(0 0 20px rgba(0,229,255,0.7))" }}
-            />
-          </div>
-          <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#00e5ff", marginBottom: "8px" }}>
-            ห้องควบคุม Tournament (Tournament Admin)
-          </h2>
-          <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.65)", marginBottom: "24px" }}>
-            กรุณากรอกรหัสผ่านผู้ดูแลระบบเพื่อเข้าสู่การควบคุม
-          </p>
-
-          <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: "20px", textAlign: "left" }}>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "8px" }}>
-                รหัสผ่าน Admin
-              </label>
-              <input
-                type="password"
-                placeholder="กรอกรหัสผ่านผู้ดูแลระบบ..."
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                autoFocus
-                style={{
-                  width: "100%",
-                  padding: "12px 16px",
-                  borderRadius: "10px",
-                  border: authError ? "1px solid #ff4d4f" : "1px solid rgba(0, 229, 255, 0.4)",
-                  background: "rgba(0, 15, 30, 0.7)",
-                  color: "#ffffff",
-                  fontSize: "16px",
-                  outline: "none",
-                  boxSizing: "border-box",
-                }}
-              />
-            </div>
-
-            {authError && (
-              <div
-                style={{
-                  background: "rgba(255, 77, 79, 0.15)",
-                  border: "1px solid rgba(255, 77, 79, 0.5)",
-                  color: "#ff7875",
-                  padding: "10px 14px",
-                  borderRadius: "8px",
-                  fontSize: "13px",
-                  marginBottom: "16px",
-                  fontWeight: "600",
-                }}
-              >
-                ⚠️ {authError}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              style={{
-                width: "100%",
-                padding: "13px",
-                borderRadius: "10px",
-                background: "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)",
-                border: "none",
-                color: "#060c18",
-                fontWeight: "800",
-                fontSize: "15px",
-                cursor: "pointer",
-                boxShadow: "0 4px 15px rgba(0, 229, 255, 0.4)",
-                transition: "transform 0.15s ease",
-              }}
-            >
-              เข้าสู่ระบบ Tournament Admin
-            </button>
-          </form>
-
-          <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px" }}>
-            <Link href="/tournament" style={{ color: "#00e5ff", fontSize: "13px", textDecoration: "none" }}>
-              ← ดูหน้า Tournament
-            </Link>
-            <span style={{ color: "rgba(255,255,255,0.2)" }}>|</span>
-            <Link href="/admin" style={{ color: "#c7d2fe", fontSize: "13px", textDecoration: "none" }}>
-              ไปหน้า Admin ปกติ →
-            </Link>
-          </div>
-        </div>
-      </div>
+      <AdminLoginScreen
+        section="tournament"
+        title="ห้องควบคุม Tournament (Tournament Admin)"
+        subtitle="กรุณากรอก Username และ Password เพื่อเข้าสู่ระบบผู้ดูแลทัวร์นาเมนต์"
+        theme="cyan"
+        onLoginSuccess={handleLoginSuccess}
+      />
     );
   }
 
@@ -1812,20 +1676,12 @@ export default function AdminTournamentPage() {
           >
             ⚠️ รีเซ็ตข้อมูลทัวร์นาเมนต์
           </button>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(255, 77, 79, 0.15)",
-              color: "#ff7875",
-              fontSize: "13px",
-              border: "1px solid rgba(255, 77, 79, 0.4)",
-              cursor: "pointer",
-            }}
-          >
-            🚪 ออกจากระบบ
-          </button>
+          <AdminUserMenu
+            user={user}
+            section="tournament"
+            onLogout={handleLogout}
+            theme="cyan"
+          />
         </div>
       </header>
 
@@ -1859,6 +1715,26 @@ export default function AdminTournamentPage() {
               {tab.label}
             </button>
           ))}
+          {user?.isMainAdmin && (
+            <button
+              onClick={() => setActiveTab("users")}
+              style={{
+                padding: "12px 20px",
+                fontSize: "15px",
+                fontWeight: "700",
+                background: activeTab === "users" ? "rgba(0, 229, 255, 0.12)" : "transparent",
+                color: activeTab === "users" ? "#00e5ff" : "rgba(255,255,255,0.6)",
+                border: "none",
+                borderBottom: activeTab === "users" ? "2px solid #00e5ff" : "2px solid transparent",
+                cursor: "pointer",
+                borderRadius: "6px 6px 0 0",
+                whiteSpace: "nowrap",
+                transition: "all 0.15s ease",
+              }}
+            >
+              👥 จัดการผู้ใช้ (Admin Users)
+            </button>
+          )}
           <Link
             href="/admin/tournament/photos"
             style={{
@@ -2898,6 +2774,19 @@ export default function AdminTournamentPage() {
               })()}
             </div>
           </div>
+        )}
+
+        {/* ========================================================
+            TAB: USER MANAGEMENT (ADMIN ACCOUNTS)
+           ======================================================== */}
+        {activeTab === "users" && (
+          <AdminUserManagement
+            token={token}
+            section="tournament"
+            currentUser={user}
+            theme="cyan"
+            sectionLabel="Tournament 2026-27"
+          />
         )}
       </main>
 
