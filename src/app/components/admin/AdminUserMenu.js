@@ -1,8 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
-export default function AdminUserMenu({ user, section, onLogout, theme = "cyan" }) {
+export default function AdminUserMenu({
+  user,
+  section = "main",
+  onLogout,
+  onReset,
+  resetLabel = "รีเซ็ตข้อมูล",
+  customLinks,
+  theme = "cyan",
+}) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showPassModal, setShowPassModal] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
@@ -21,7 +30,44 @@ export default function AdminUserMenu({ user, section, onLogout, theme = "cyan" 
   const btnGradient = isGold
     ? "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)"
     : "linear-gradient(135deg, #00e5ff 0%, #0077b6 100%)";
-  const btnTextColor = isGold ? "#030812" : "#030812";
+  const btnTextColor = "#030812";
+
+  // Predefined default links by section if customLinks is not passed
+  const getSectionLinks = () => {
+    if (customLinks && Array.isArray(customLinks)) return customLinks;
+
+    if (section === "tournament") {
+      return [
+        { href: "/", label: "หน้าหลักแฟนพันธุ์แท้", icon: "🏠", target: "_blank" },
+        { href: "/tournament", label: "หน้า Tournament (/tournament)", icon: "⚔️", target: "_blank" },
+        { href: "/admin", label: "Admin ปกติ (/admin)", icon: "⚙️" },
+        { href: "/admin/tournament/photos", label: "จัดการรูปถ่ายผู้เข้าแข่งขัน", icon: "📸" },
+      ];
+    }
+
+    if (section === "trial_foty") {
+      return [
+        { href: "/", label: "หน้าหลักแฟนพันธุ์แท้", icon: "🏠", target: "_blank" },
+        { href: "/trial-foty", label: "ตารางคะแนนงุ่นง่าน (/trial-foty)", icon: "📊", target: "_blank" },
+        { href: "/trial-foty/vote", label: "หน้าเปิดโหวตงุ่นง่าน (/vote)", icon: "🗳️", target: "_blank" },
+        { href: "/trial-foty/info", label: "หน้าข้อมูลผู้เข้าแข่งขัน & ถามทีมงาน", icon: "ℹ️", target: "_blank" },
+        { href: "/admin", label: "Admin ปกติ (/admin)", icon: "⚙️" },
+        { href: "/admin/tournament", label: "ห้อง Tournament Admin", icon: "⚔️" },
+      ];
+    }
+
+    // Default: main
+    return [
+      { href: "/", label: "หน้าหลักแฟนพันธุ์แท้", icon: "🏠", target: "_blank" },
+      { href: "/history", label: "ทำเนียบแชมป์ (/history)", icon: "🏆", target: "_blank" },
+      { href: "/game", label: "หน้าเกมแข่งขัน (/game)", icon: "🎮", target: "_blank" },
+      { href: "/admin/tournament", label: "จัดการ Tournament 2026-27", icon: "⚔️" },
+      { href: "/admin/tournament/photos", label: "จัดการรูปถ่ายผู้เข้าแข่งขัน", icon: "📸" },
+      { href: "/trial-foty/admin", label: "ห้อง Admin Trial FoTY", icon: "🌟" },
+    ];
+  };
+
+  const navLinks = getSectionLinks();
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -76,117 +122,224 @@ export default function AdminUserMenu({ user, section, onLogout, theme = "cyan" 
   return (
     <>
       <div style={{ position: "relative", display: "inline-block" }}>
+        {/* Invisible Backdrop for closing dropdown on outside click */}
+        {showDropdown && (
+          <div
+            onClick={() => setShowDropdown(false)}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              zIndex: 9990,
+              cursor: "default",
+            }}
+          />
+        )}
+
+        {/* Profile Pill Trigger Button */}
         <button
           onClick={() => setShowDropdown(!showDropdown)}
           style={{
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            padding: "6px 14px",
+            padding: "8px 16px",
             background: primaryBg,
-            border: `1px solid ${primaryBorder}`,
-            borderRadius: "20px",
+            border: `1.5px solid ${primaryBorder}`,
+            borderRadius: "24px",
             color: "#ffffff",
             fontSize: "13px",
-            fontWeight: "600",
+            fontWeight: "700",
             cursor: "pointer",
-            boxShadow: `0 0 12px ${isGold ? "rgba(255, 215, 0, 0.15)" : "rgba(0, 229, 255, 0.15)"}`,
-            transition: "all 0.2s",
+            boxShadow: `0 0 16px ${isGold ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.2)"}`,
+            transition: "all 0.2s ease",
+            position: "relative",
+            zIndex: 9991,
           }}
         >
           <span style={{ fontSize: "16px" }}>👤</span>
-          <span>{user?.name || user?.username || "Admin"}</span>
+          <span style={{ maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {user?.name || user?.username || "Admin"}
+          </span>
           {user?.isMainAdmin && (
             <span
               style={{
                 fontSize: "10px",
                 background: isGold ? "#ffd700" : "#00e5ff",
                 color: "#030812",
-                fontWeight: "800",
-                padding: "2px 6px",
+                fontWeight: "900",
+                padding: "2px 7px",
                 borderRadius: "10px",
+                letterSpacing: "0.5px",
               }}
             >
               MAIN ADMIN
             </span>
           )}
-          <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
+          <span style={{ fontSize: "10px", opacity: 0.7, transform: showDropdown ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+            ▼
+          </span>
         </button>
 
+        {/* Dropdown Menu */}
         {showDropdown && (
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               position: "absolute",
-              top: "115%",
+              top: "120%",
               right: 0,
-              width: "220px",
-              background: "rgba(10, 20, 38, 0.96)",
-              backdropFilter: "blur(12px)",
+              width: "280px",
+              background: "rgba(10, 20, 38, 0.98)",
+              backdropFilter: "blur(16px)",
               border: `1px solid ${primaryBorder}`,
-              borderRadius: "12px",
-              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
-              padding: "10px 0",
+              borderRadius: "14px",
+              boxShadow: "0 14px 40px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 229, 255, 0.15)",
+              padding: "8px 0",
               zIndex: 9999,
               textAlign: "left",
+              animation: "fadeIn 0.15s ease-out",
             }}
           >
-            <div style={{ padding: "8px 16px", borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
-              <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)" }}>เข้าสู่ระบบในชื่อ</div>
-              <div style={{ fontSize: "14px", fontWeight: "700", color: primaryColor }}>
+            {/* User Info Header */}
+            <div style={{ padding: "10px 18px", borderBottom: "1px solid rgba(255, 255, 255, 0.08)" }}>
+              <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.5)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                เข้าสู่ระบบในชื่อ
+              </div>
+              <div style={{ fontSize: "15px", fontWeight: "800", color: primaryColor, marginTop: "2px" }}>
                 @{user?.username}
               </div>
+              {user?.name && user.name !== user.username && (
+                <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.75)", marginTop: "1px" }}>
+                  {user.name}
+                </div>
+              )}
             </div>
 
-            <button
-              onClick={() => {
-                setShowDropdown(false);
-                setShowPassModal(true);
-              }}
-              style={{
-                width: "100%",
-                padding: "10px 16px",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                background: "none",
-                border: "none",
-                color: "#ffffff",
-                fontSize: "13px",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
-            >
-              <span>🔑</span>
-              <span>เปลี่ยนรหัสผ่าน</span>
-            </button>
+            {/* Navigation / Quick Links Section */}
+            {navLinks.length > 0 && (
+              <div style={{ padding: "6px 0", borderBottom: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                <div style={{ padding: "4px 18px 6px", fontSize: "11px", color: "rgba(255, 255, 255, 0.4)", fontWeight: "700" }}>
+                  เมนูลัด / นำทาง
+                </div>
+                {navLinks.map((item, idx) => (
+                  <Link
+                    key={idx}
+                    href={item.href}
+                    target={item.target || undefined}
+                    onClick={() => setShowDropdown(false)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      padding: "8px 18px",
+                      color: "#e2e8f0",
+                      fontSize: "13px",
+                      textDecoration: "none",
+                      transition: "background 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0, 229, 255, 0.1)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span style={{ fontSize: "15px" }}>{item.icon || "🔗"}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
 
-            <button
-              onClick={() => {
-                setShowDropdown(false);
-                if (onLogout) onLogout();
-              }}
-              style={{
-                width: "100%",
-                padding: "10px 16px",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                background: "none",
-                border: "none",
-                color: "#ff6b6b",
-                fontSize: "13px",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 80, 80, 0.12)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
-            >
-              <span>🚪</span>
-              <span>ออกจากระบบ</span>
-            </button>
+            {/* Reset Action (if provided) */}
+            {onReset && (
+              <div style={{ padding: "6px 0", borderBottom: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    onReset();
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "9px 18px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    background: "none",
+                    border: "none",
+                    color: "#fca5a5",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    transition: "background 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239, 68, 68, 0.18)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+                >
+                  <span style={{ fontSize: "15px" }}>⚠️</span>
+                  <span>{resetLabel}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Account Settings Section */}
+            <div style={{ padding: "6px 0" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDropdown(false);
+                  setShowPassModal(true);
+                }}
+                style={{
+                  width: "100%",
+                  padding: "9px 18px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  background: "none",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "background 0.15s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+              >
+                <span style={{ fontSize: "15px" }}>🔑</span>
+                <span>เปลี่ยนรหัสผ่าน</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDropdown(false);
+                  if (onLogout) onLogout();
+                }}
+                style={{
+                  width: "100%",
+                  padding: "9px 18px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  background: "none",
+                  border: "none",
+                  color: "#ff6b6b",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "background 0.15s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 80, 80, 0.15)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+              >
+                <span style={{ fontSize: "15px" }}>🚪</span>
+                <span>ออกจากระบบ</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

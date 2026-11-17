@@ -1819,72 +1819,12 @@ export default function AdminPage() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <Link
-            href="/"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(255,255,255,0.06)",
-              color: "#80d0ff",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(0, 229, 255, 0.3)"
-            }}
-          >
-            🏠 หน้าหลัก
-          </Link>
-          <Link
-            href="/history"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(255, 215, 0, 0.15)",
-              color: "#ffd700",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(255, 215, 0, 0.4)",
-              fontWeight: "700"
-            }}
-          >
-            🏆 ทำเนียบแชมป์
-          </Link>
-          <Link
-            href="/game"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(0, 180, 216, 0.15)",
-              color: "#00e5ff",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(0, 229, 255, 0.4)"
-            }}
-          >
-            🎮 ไปที่หน้าเกม (/game)
-          </Link>
-          <button
-            type="button"
-            onClick={() => setShowResetModal(true)}
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(239, 68, 68, 0.2)",
-              color: "#fca5a5",
-              fontSize: "13px",
-              fontWeight: "700",
-              border: "1px solid rgba(239, 68, 68, 0.5)",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px"
-            }}
-          >
-            ⚠️ รีเซ็ตการแข่งขัน
-          </button>
           <AdminUserMenu
             user={user}
             section="main"
             onLogout={handleAdminLogout}
+            onReset={() => setShowResetModal(true)}
+            resetLabel="รีเซ็ตการแข่งขัน"
             theme="cyan"
           />
         </div>

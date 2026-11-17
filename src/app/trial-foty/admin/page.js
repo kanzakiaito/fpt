@@ -1420,85 +1420,13 @@ export default function TrialAdminPage() {
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", overflowX: "auto", maxWidth: "100%", WebkitOverflowScrolling: "touch" }}>
-          <Link
-            href="/trial-foty/info"
-            target="_blank"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(255, 215, 0, 0.15)",
-              color: "#ffd700",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(255, 215, 0, 0.4)",
-              fontWeight: "700",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            ℹ️ หน้าข้อมูลผู้เข้าแข่งขัน & ถามทีมงาน ↗
-          </Link>
-
-          <Link
-            href="/trial-foty"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(0, 229, 255, 0.15)",
-              color: "#00e5ff",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(0, 229, 255, 0.4)",
-              fontWeight: "700",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            📊 ดูตารางคะแนน (/trial-foty)
-          </Link>
-
-          <Link
-            href="/"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(255,255,255,0.06)",
-              color: "#80d0ff",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(0, 229, 255, 0.3)",
-            }}
-          >
-            🏠 หน้าหลักเว็บ
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => setShowResetModal(true)}
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(239, 68, 68, 0.2)",
-              color: "#fca5a5",
-              fontSize: "13px",
-              fontWeight: "700",
-              border: "1px solid rgba(239, 68, 68, 0.5)",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            ⚠️ รีเซ็ตคะแนนแข่งขัน
-          </button>
-
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <AdminUserMenu
             user={user}
             section="trial_foty"
             onLogout={handleAdminLogout}
+            onReset={() => setShowResetModal(true)}
+            resetLabel="รีเซ็ตคะแนนแข่งขัน"
             theme="gold"
           />
         </div>

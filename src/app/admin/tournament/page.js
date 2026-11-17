@@ -1596,90 +1596,13 @@ export default function AdminTournamentPage() {
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <Link
-            href="/"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(255,255,255,0.06)",
-              color: "#80d0ff",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(0, 229, 255, 0.3)",
-            }}
-          >
-            🏠 หน้าหลัก
-          </Link>
-          <Link
-            href="/tournament"
-            target="_blank"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(0, 180, 216, 0.15)",
-              color: "#00e5ff",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(0, 229, 255, 0.4)",
-              fontWeight: "700",
-            }}
-          >
-            ⚔️ หน้า Tournament (/tournament)
-          </Link>
-          <Link
-            href="/admin"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(99, 102, 241, 0.15)",
-              color: "#c7d2fe",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(99, 102, 241, 0.4)",
-              fontWeight: "700",
-            }}
-          >
-            ⚙️ Admin ปกติ (/admin)
-          </Link>
-          <Link
-            href="/admin/tournament/photos"
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(255, 215, 0, 0.15)",
-              color: "#ffd700",
-              fontSize: "13px",
-              textDecoration: "none",
-              border: "1px solid rgba(255, 215, 0, 0.4)",
-              fontWeight: "700",
-            }}
-          >
-            📸 จัดการรูปถ่ายผู้เข้าแข่งขัน
-          </Link>
-          <button
-            type="button"
-            onClick={handleReset}
-            style={{
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: "rgba(239, 68, 68, 0.2)",
-              color: "#fca5a5",
-              fontSize: "13px",
-              fontWeight: "700",
-              border: "1px solid rgba(239, 68, 68, 0.5)",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            ⚠️ รีเซ็ตข้อมูลทัวร์นาเมนต์
-          </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <AdminUserMenu
             user={user}
             section="tournament"
             onLogout={handleLogout}
+            onReset={handleReset}
+            resetLabel="รีเซ็ตข้อมูลทัวร์นาเมนต์"
             theme="cyan"
           />
         </div>
