@@ -1144,6 +1144,17 @@ export default function TrialAdminPage() {
         warmupSchedule: formData.warmupSchedule || "",
       };
 
+      if (isMaintainer && modalMode === "edit") {
+        const orig = contestants.find((c) => String(c.id) === String(formData.id));
+        if (orig) {
+          payload.name = orig.name;
+          payload.nickname = orig.nickname;
+          payload.topic = orig.topic;
+          payload.order = orig.order;
+          payload.warmupSchedule = orig.warmupSchedule || "";
+        }
+      }
+
       const res = await fetch("/api/trial", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

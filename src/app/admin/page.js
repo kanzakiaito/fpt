@@ -1690,14 +1690,13 @@ export default function AdminPage() {
         attribute: formData.scores.attribute === "" ? null : Number(formData.scores.attribute),
       };
 
-      // Maintainer can ONLY update image
+      // Maintainer cannot update player info (name, nickname, topic) but CAN update image and scores
       if (isMaintainer) {
         const orig = contestants.find((c) => String(c.id) === String(formData.id));
         if (orig) {
           finalName = orig.name;
           finalNickname = orig.nickname;
           finalTopic = orig.topic;
-          formattedScores = orig.scores || formattedScores;
         }
       }
 
@@ -4168,7 +4167,7 @@ export default function AdminPage() {
                   gap: "10px"
                 }}>
                   <span style={{ fontSize: "18px" }}>🛠️</span>
-                  <span><strong>สิทธิ์ Maintainer:</strong> สามารถเปลี่ยน URL รูปภาพหรืออัปโหลดรูปผู้เข้าแข่งขันได้ แต่ไม่สามารถเพิ่ม/ลบ หรือแก้ไขชื่อ หัวข้อ หรือคะแนนได้</span>
+                  <span><strong>สิทธิ์ Maintainer:</strong> สามารถกรอกคะแนนการแข่งขันและเปลี่ยน URL รูปภาพหรืออัปโหลดรูปได้ (แต่ไม่สามารถเพิ่ม/ลบ หรือแก้ไขชื่อและหัวข้อของผู้เข้าแข่งขันได้)</span>
                 </div>
               )}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "18px" }}>
@@ -4413,9 +4412,9 @@ export default function AdminPage() {
                                 fontWeight: isMaintainer ? "700" : "500",
                                 cursor: "pointer"
                               }}
-                              title={isMaintainer ? "เปลี่ยนรูปภาพผู้เข้าแข่งขัน" : "แก้ไขข้อมูล / ผูกรูป"}
+                              title={isMaintainer ? "กรอกคะแนน / เปลี่ยนรูปภาพผู้เข้าแข่งขัน" : "แก้ไขข้อมูล / ผูกรูป"}
                             >
-                              {isMaintainer ? "📷 เปลี่ยนรูป" : "✏️ แก้ไข"}
+                              {isMaintainer ? "📝 กรอกคะแนน / รูป" : "✏️ แก้ไข"}
                             </button>
                             {!isMaintainer && (
                               <button
@@ -8401,9 +8400,9 @@ export default function AdminPage() {
               </div>
 
               {/* Optional Score Inputs */}
-              <div style={{ marginBottom: "18px", opacity: isMaintainer ? 0.6 : 1 }}>
+              <div style={{ marginBottom: "18px" }}>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "6px" }}>
-                  คะแนนแต่ละหมวด {isMaintainer ? "(ล็อกไว้สำหรับ Maintainer)" : "(เว้นว่างได้หากยังไม่ได้แข่ง)"}
+                  คะแนนแต่ละหมวด (เว้นว่างได้หากยังไม่ได้แข่ง)
                 </label>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "8px" }}>
                   <div>
@@ -8412,7 +8411,6 @@ export default function AdminPage() {
                       type="number"
                       min="0"
                       max="25"
-                      disabled={isMaintainer}
                       value={formData.scores["3sec"]}
                       onChange={(e) => setFormData({ ...formData, scores: { ...formData.scores, "3sec": e.target.value } })}
                       style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.2)", color: "#ffd700", textAlign: "center" }}
@@ -8424,7 +8422,6 @@ export default function AdminPage() {
                       type="number"
                       min="0"
                       max="25"
-                      disabled={isMaintainer}
                       value={formData.scores.qa}
                       onChange={(e) => setFormData({ ...formData, scores: { ...formData.scores, qa: e.target.value } })}
                       style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.2)", color: "#ffd700", textAlign: "center" }}
@@ -8436,7 +8433,6 @@ export default function AdminPage() {
                       type="number"
                       min="0"
                       max="25"
-                      disabled={isMaintainer}
                       value={formData.scores.jigsaw}
                       onChange={(e) => setFormData({ ...formData, scores: { ...formData.scores, jigsaw: e.target.value } })}
                       style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.2)", color: "#ffd700", textAlign: "center" }}
@@ -8448,7 +8444,6 @@ export default function AdminPage() {
                       type="number"
                       min="0"
                       max="25"
-                      disabled={isMaintainer}
                       value={formData.scores.attribute}
                       onChange={(e) => setFormData({ ...formData, scores: { ...formData.scores, attribute: e.target.value } })}
                       style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#050b14", border: "1px solid rgba(255,255,255,0.2)", color: "#ffd700", textAlign: "center" }}
@@ -8479,7 +8474,7 @@ export default function AdminPage() {
                     cursor: "pointer"
                   }}
                 >
-                  {isMaintainer ? "💾 บันทึกรูปภาพ" : "💾 บันทึกข้อมูล"}
+                  {isMaintainer ? "💾 บันทึกคะแนน & รูปภาพ" : "💾 บันทึกข้อมูล"}
                 </button>
               </div>
             </form>

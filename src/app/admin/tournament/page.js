@@ -1346,17 +1346,22 @@ export default function AdminTournamentPage() {
         .filter((t) => t && t.trim())
         .map((t) => ({ topic: t.trim() }));
 
+      const finalNewName = isMaintainer ? editingContestant.name : contestantFormData.newName.trim();
+      const finalNickname = isMaintainer ? (editingContestant.nickname || "") : contestantFormData.nickname.trim();
+      const finalGroup = isMaintainer ? (editingContestant.group || "A") : contestantFormData.group;
+      const finalTopics = isMaintainer ? (editingContestant.topics || []) : formattedTopics;
+
       const res = await fetch("/api/tournament", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "update_contestant",
           name: editingContestant.name,
-          newName: contestantFormData.newName.trim(),
-          nickname: contestantFormData.nickname.trim(),
-          group: contestantFormData.group,
+          newName: finalNewName,
+          nickname: finalNickname,
+          group: finalGroup,
           photo: contestantFormData.photo.trim(),
-          topics: formattedTopics,
+          topics: finalTopics,
         }),
       });
       const result = await res.json();
@@ -4149,10 +4154,10 @@ export default function AdminTournamentPage() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "14px", marginBottom: "18px" }}>
               <div>
                 <h3 style={{ fontSize: "18px", fontWeight: "900", margin: 0, color: "#ffffff" }}>
-                  ✏️ ปรับข้อมูลผู้เข้าแข่งขัน: {editingContestant.name}
+                  {isMaintainer ? "📷 เปลี่ยนรูปภาพผู้เข้าแข่งขัน: " : "✏️ ปรับข้อมูลผู้เข้าแข่งขัน: "}{editingContestant.name}
                 </h3>
                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
-                  แก้ไขชื่อเล่น, ชื่อจริง, สายการแข่งขัน, รูปโปรไฟล์ และ 4 หัวข้อที่ลงทะเบียน
+                  {isMaintainer ? "สิทธิ์ Maintainer สามารถเปลี่ยน URL รูปภาพหรืออัปโหลดรูปภาพได้เท่านั้น" : "แก้ไขชื่อเล่น, ชื่อจริง, สายการแข่งขัน, รูปโปรไฟล์ และ 4 หัวข้อที่ลงทะเบียน"}
                 </div>
               </div>
               <button
@@ -4172,6 +4177,12 @@ export default function AdminTournamentPage() {
                 ✕
               </button>
             </div>
+
+            {isMaintainer && (
+              <div style={{ background: "rgba(0, 229, 255, 0.1)", border: "1px solid rgba(0, 229, 255, 0.3)", borderRadius: "8px", padding: "10px 14px", marginBottom: "16px", fontSize: "12px", color: "#e0f2fe" }}>
+                🔒 สิทธิ์ Maintainer: สามารถแก้ไขเฉพาะ URL รูปภาพเท่านั้น (ข้อมูลชื่อเล่น, ชื่อจริง, สาย และหัวข้อถูกล็อกไม่ให้แก้ไข)
+              </div>
+            )}
 
             {/* Profile Avatar & Names */}
             <div style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "18px", background: "rgba(15, 23, 42, 0.6)", padding: "14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
@@ -4217,10 +4228,11 @@ export default function AdminTournamentPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
               <div>
                 <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
-                  ชื่อจริง - นามสกุล *
+                  ชื่อจริง - นามสกุล * {isMaintainer && "(ล็อก)"}
                 </label>
                 <input
                   type="text"
+                  disabled={isMaintainer}
                   value={contestantFormData.newName}
                   onChange={(e) => setContestantFormData({ ...contestantFormData, newName: e.target.value })}
                   placeholder="เช่น สมชาย ใจดี"
@@ -4228,21 +4240,23 @@ export default function AdminTournamentPage() {
                     width: "100%",
                     padding: "8px 12px",
                     borderRadius: "8px",
-                    background: "rgba(15, 23, 42, 0.8)",
+                    background: isMaintainer ? "rgba(255,255,255,0.05)" : "rgba(15, 23, 42, 0.8)",
                     border: "1px solid rgba(0, 229, 255, 0.4)",
-                    color: "#ffffff",
+                    color: isMaintainer ? "rgba(255,255,255,0.6)" : "#ffffff",
                     fontSize: "13px",
                     outline: "none",
+                    cursor: isMaintainer ? "not-allowed" : "text",
                   }}
                 />
               </div>
 
               <div>
                 <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
-                  ชื่อเล่น
+                  ชื่อเล่น {isMaintainer && "(ล็อก)"}
                 </label>
                 <input
                   type="text"
+                  disabled={isMaintainer}
                   value={contestantFormData.nickname}
                   onChange={(e) => setContestantFormData({ ...contestantFormData, nickname: e.target.value })}
                   placeholder="เช่น นัท, พีท, แมน"
@@ -4250,11 +4264,12 @@ export default function AdminTournamentPage() {
                     width: "100%",
                     padding: "8px 12px",
                     borderRadius: "8px",
-                    background: "rgba(15, 23, 42, 0.8)",
+                    background: isMaintainer ? "rgba(255,255,255,0.05)" : "rgba(15, 23, 42, 0.8)",
                     border: "1px solid rgba(255,255,255,0.15)",
-                    color: "#ffffff",
+                    color: isMaintainer ? "rgba(255,255,255,0.6)" : "#ffffff",
                     fontSize: "13px",
                     outline: "none",
+                    cursor: isMaintainer ? "not-allowed" : "text",
                   }}
                 />
               </div>
@@ -4263,22 +4278,23 @@ export default function AdminTournamentPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "12px", marginBottom: "16px" }}>
               <div>
                 <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
-                  กลุ่ม / สาย
+                  กลุ่ม / สาย {isMaintainer && "(ล็อก)"}
                 </label>
                 <select
+                  disabled={isMaintainer}
                   value={contestantFormData.group}
                   onChange={(e) => setContestantFormData({ ...contestantFormData, group: e.target.value })}
                   style={{
                     width: "100%",
                     padding: "8px 12px",
                     borderRadius: "8px",
-                    background: "rgba(15, 23, 42, 0.95)",
+                    background: isMaintainer ? "rgba(255,255,255,0.05)" : "rgba(15, 23, 42, 0.95)",
                     border: "1px solid rgba(255,255,255,0.15)",
                     color: contestantFormData.group === "A" ? "#00e5ff" : "#ffd700",
                     fontSize: "13px",
                     fontWeight: "800",
                     outline: "none",
-                    cursor: "pointer",
+                    cursor: isMaintainer ? "not-allowed" : "pointer",
                   }}
                 >
                   <option value="A">กลุ่ม A</option>
@@ -4300,7 +4316,7 @@ export default function AdminTournamentPage() {
                     padding: "8px 12px",
                     borderRadius: "8px",
                     background: "rgba(15, 23, 42, 0.8)",
-                    border: "1px solid rgba(255,255,255,0.15)",
+                    border: "1.5px solid #00e5ff",
                     color: "#ffffff",
                     fontSize: "12px",
                     outline: "none",
@@ -4313,7 +4329,7 @@ export default function AdminTournamentPage() {
             <div style={{ background: "rgba(15, 23, 42, 0.6)", padding: "14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "20px" }}>
               <div style={{ fontSize: "13px", fontWeight: "800", color: "#38bdf8", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
                 <span>🎯</span>
-                <span>4 หัวข้อประจำตัวที่ลงทะเบียน (Topics):</span>
+                <span>4 หัวข้อประจำตัวที่ลงทะเบียน (Topics): {isMaintainer && "(ล็อกสำหรับ Maintainer)"}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 {[0, 1, 2, 3].map((idx) => (
@@ -4323,6 +4339,7 @@ export default function AdminTournamentPage() {
                     </label>
                     <input
                       type="text"
+                      disabled={isMaintainer}
                       value={contestantFormData.topics[idx] || ""}
                       onChange={(e) => {
                         const newTopics = [...contestantFormData.topics];
@@ -4334,11 +4351,12 @@ export default function AdminTournamentPage() {
                         width: "100%",
                         padding: "7px 10px",
                         borderRadius: "6px",
-                        background: "#070c18",
+                        background: isMaintainer ? "rgba(255,255,255,0.05)" : "#070c18",
                         border: "1px solid rgba(56, 189, 248, 0.3)",
-                        color: "#ffffff",
+                        color: isMaintainer ? "rgba(255,255,255,0.6)" : "#ffffff",
                         fontSize: "12px",
                         outline: "none",
+                        cursor: isMaintainer ? "not-allowed" : "text",
                       }}
                     />
                   </div>
@@ -4380,7 +4398,7 @@ export default function AdminTournamentPage() {
                   boxShadow: "0 4px 15px rgba(0, 229, 255, 0.4)",
                 }}
               >
-                {savingContestant ? "กำลังบันทึก..." : "💾 บันทึกข้อมูลผู้เข้าแข่งขัน"}
+                {savingContestant ? "กำลังบันทึก..." : (isMaintainer ? "💾 บันทึกรูปภาพ" : "💾 บันทึกข้อมูลผู้เข้าแข่งขัน")}
               </button>
             </div>
           </div>
