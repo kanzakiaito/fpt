@@ -47,6 +47,7 @@ const DEFAULT_SETTINGS = {
   tournamentPenaltyOverride: "auto",
   fotyUpdateUpToMatch: "all",
   fotyAirUpToEpisode: 1,
+  fotyUpcomingEpisode: "auto",
   fotyBroadcastCustoms: {},
   showFotyQualifyingOnHome: false,
   fotyRevealUpToOrder: "all",
@@ -129,6 +130,7 @@ export async function GET(request) {
       tournamentPenaltyOverride: settings.tournamentPenaltyOverride || "auto",
       fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
       fotyAirUpToEpisode: settings.fotyAirUpToEpisode !== undefined ? settings.fotyAirUpToEpisode : 1,
+      fotyUpcomingEpisode: settings.fotyUpcomingEpisode !== undefined ? settings.fotyUpcomingEpisode : "auto",
       fotyBroadcastCustoms: settings.fotyBroadcastCustoms || {},
       showFotyQualifyingOnHome: Boolean(settings.showFotyQualifyingOnHome),
       fotyRevealUpToOrder: settings.fotyRevealUpToOrder !== undefined ? settings.fotyRevealUpToOrder : "all",
@@ -170,6 +172,7 @@ export async function GET(request) {
     tournamentPenaltyOverride: settings.tournamentPenaltyOverride || "auto",
     fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
     fotyAirUpToEpisode: settings.fotyAirUpToEpisode !== undefined ? settings.fotyAirUpToEpisode : 1,
+    fotyUpcomingEpisode: settings.fotyUpcomingEpisode !== undefined ? settings.fotyUpcomingEpisode : "auto",
     fotyBroadcastCustoms: settings.fotyBroadcastCustoms || {},
     showFotyQualifyingOnHome: Boolean(settings.showFotyQualifyingOnHome),
     fotyRevealUpToOrder: settings.fotyRevealUpToOrder !== undefined ? settings.fotyRevealUpToOrder : "all",
@@ -383,6 +386,9 @@ export async function POST(request) {
       if (body.fotyAirUpToEpisode !== undefined) {
         newSettings.fotyAirUpToEpisode = body.fotyAirUpToEpisode;
       }
+      if (body.fotyUpcomingEpisode !== undefined) {
+        newSettings.fotyUpcomingEpisode = body.fotyUpcomingEpisode;
+      }
       if (body.fotyBroadcastCustoms !== undefined) {
         newSettings.fotyBroadcastCustoms = body.fotyBroadcastCustoms;
       }
@@ -453,6 +459,7 @@ export async function POST(request) {
       const newSettings = {
         ...current,
         fotyAirUpToEpisode: body.fotyAirUpToEpisode !== undefined ? body.fotyAirUpToEpisode : current.fotyAirUpToEpisode,
+        fotyUpcomingEpisode: body.fotyUpcomingEpisode !== undefined ? body.fotyUpcomingEpisode : (current.fotyUpcomingEpisode || "auto"),
         fotyBroadcastCustoms: body.fotyBroadcastCustoms !== undefined ? body.fotyBroadcastCustoms : current.fotyBroadcastCustoms,
       };
       await saveKVData("fpt_settings", newSettings, writeSettings);
@@ -460,6 +467,7 @@ export async function POST(request) {
         success: true,
         message: "บันทึกตารางออกอากาศแฟนพันธุ์แท้ 2026 เรียบร้อยแล้ว",
         fotyAirUpToEpisode: newSettings.fotyAirUpToEpisode,
+        fotyUpcomingEpisode: newSettings.fotyUpcomingEpisode,
         fotyBroadcastCustoms: newSettings.fotyBroadcastCustoms,
       });
     }

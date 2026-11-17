@@ -232,6 +232,8 @@ export default function HistoryClient({ isSecretFoty = false }) {
 
   // Settings
   const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
+  const [fotyUpcomingEpisode, setFotyUpcomingEpisode] = useState("auto");
+  const [fotyBroadcastCustoms, setFotyBroadcastCustoms] = useState({});
   const [showFavFanInNav, setShowFavFanInNav] = useState(false);
   const [showPollInNav, setShowPollInNav] = useState(false);
 
@@ -279,6 +281,12 @@ export default function HistoryClient({ isSecretFoty = false }) {
         }
         if (settingsData.fotyAirUpToEpisode !== undefined) {
           setFotyAirUpToEpisode(settingsData.fotyAirUpToEpisode);
+        }
+        if (settingsData.fotyUpcomingEpisode !== undefined) {
+          setFotyUpcomingEpisode(settingsData.fotyUpcomingEpisode);
+        }
+        if (settingsData.fotyBroadcastCustoms) {
+          setFotyBroadcastCustoms(settingsData.fotyBroadcastCustoms);
         }
 
         if (isSecretFoty) {
@@ -465,10 +473,21 @@ export default function HistoryClient({ isSecretFoty = false }) {
   const auditionEpisodes = useMemo(() => {
     if (!currentSeason || !currentSeason.audition) return [];
     let list = [...currentSeason.audition];
+
+    const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
+    const upcomingEpNum = (fotyAirUpToEpisode === "all" || fotyUpcomingEpisode === "none")
+      ? null
+      : (fotyUpcomingEpisode && fotyUpcomingEpisode !== "auto")
+      ? Number(fotyUpcomingEpisode)
+      : (maxEp + 1 <= 14 ? maxEp + 1 : null);
+
     if (isPublic2026) {
-      const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 1);
-      list = list.filter((item) => (Number(item.episode) || 1) <= maxEp);
+      list = list.filter((item) => {
+        const ep = Number(item.episode) || 0;
+        return ep <= maxEp || (upcomingEpNum !== null && ep === upcomingEpNum);
+      });
     }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       list = list.filter((item) => {
@@ -479,30 +498,54 @@ export default function HistoryClient({ isSecretFoty = false }) {
         return name.includes(q) || nick.includes(q) || topic.includes(q) || epStr.includes(q);
       });
     }
+
     const groups = [];
-    list.forEach((item) => {
+    list.forEach((rawItem) => {
+      const epNum = Number(rawItem.episode) || 0;
+      const isUpcoming = isPublic2026 && epNum > maxEp;
+
+      // Mask all scores & spoiler info for upcoming episode
+      const item = isUpcoming
+        ? {
+            ...rawItem,
+            isUpcoming: true,
+            totalScore: "-",
+            scores: { "3sec": "-", qa: "-", jigsaw: "-", attribute: "-", action: "-" },
+            stage1: { set1: "-", set2: "-", set3: "-", total: "-" },
+            stage2: { action: "-", jigsaw: "-", properties: "-" },
+            stage3: null,
+            evaluating: { q1: "-", q2: "-", q3: "-", q4: "-" },
+            final: "-",
+            quota: false,
+          }
+        : rawItem;
+
       let grp = groups.find((g) => String(g.episode) === String(item.episode));
       if (!grp) {
-        grp = { episode: item.episode, date: item.date, contestants: [] };
+        const epCustom = (isPublic2026 || String(activeYear) === "2026") ? (fotyBroadcastCustoms?.[item.episode] || {}) : {};
+        const airDate = epCustom.airDate || item.date;
+        grp = {
+          episode: item.episode,
+          date: airDate,
+          replayUrl: epCustom.replayUrl || item.replayUrl || "",
+          isUpcoming,
+          contestants: [],
+        };
         groups.push(grp);
       }
       grp.contestants.push(item);
     });
+
     return groups;
-  }, [currentSeason, searchQuery, isPublic2026, fotyAirUpToEpisode]);
+  }, [currentSeason, searchQuery, isPublic2026, activeYear, fotyAirUpToEpisode, fotyUpcomingEpisode, fotyBroadcastCustoms]);
 
   const totalAuditionContestantsShown = useMemo(() => {
     return auditionEpisodes.reduce((acc, ep) => acc + (ep.contestants?.length || 0), 0);
   }, [auditionEpisodes]);
 
   const displayedAuditionCount = useMemo(() => {
-    if (!currentSeason?.audition) return 0;
-    if (isPublic2026) {
-      const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 1);
-      return currentSeason.audition.filter((item) => (Number(item.episode) || 1) <= maxEp).length;
-    }
-    return currentSeason.audition.length;
-  }, [currentSeason, isPublic2026, fotyAirUpToEpisode]);
+    return totalAuditionContestantsShown;
+  }, [totalAuditionContestantsShown]);
 
   // Filtered battle royale (2022)
   const battleRoyaleList = useMemo(() => {
@@ -1684,32 +1727,49 @@ export default function HistoryClient({ isSecretFoty = false }) {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        background: "linear-gradient(90deg, rgba(82, 196, 26, 0.15) 0%, rgba(10, 25, 18, 0.6) 100%)",
-                        borderLeft: "4px solid #52c41a",
-                        borderTop: "1px solid rgba(82, 196, 26, 0.3)",
-                        borderRight: "1px solid rgba(82, 196, 26, 0.3)",
-                        borderBottom: "1px solid rgba(82, 196, 26, 0.3)",
+                        background: epGroup.isUpcoming
+                          ? "linear-gradient(90deg, rgba(250, 173, 20, 0.18) 0%, rgba(25, 20, 10, 0.7) 100%)"
+                          : "linear-gradient(90deg, rgba(82, 196, 26, 0.15) 0%, rgba(10, 25, 18, 0.6) 100%)",
+                        borderLeft: epGroup.isUpcoming ? "4px solid #faad14" : "4px solid #52c41a",
+                        borderTop: epGroup.isUpcoming ? "1px solid rgba(250, 173, 20, 0.4)" : "1px solid rgba(82, 196, 26, 0.3)",
+                        borderRight: epGroup.isUpcoming ? "1px solid rgba(250, 173, 20, 0.4)" : "1px solid rgba(82, 196, 26, 0.3)",
+                        borderBottom: epGroup.isUpcoming ? "1px solid rgba(250, 173, 20, 0.4)" : "1px solid rgba(82, 196, 26, 0.3)",
                         borderRadius: "10px",
                         padding: "10px 18px",
                         marginBottom: "12px"
                       }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                           <span style={{
                             padding: "4px 12px",
-                            background: "linear-gradient(135deg, #52c41a 0%, #237804 100%)",
+                            background: epGroup.isUpcoming
+                              ? "linear-gradient(135deg, #faad14 0%, #d48806 100%)"
+                              : "linear-gradient(135deg, #52c41a 0%, #237804 100%)",
                             color: "#ffffff",
                             fontWeight: "900",
                             fontSize: "13px",
                             borderRadius: "6px",
-                            boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)"
+                            boxShadow: epGroup.isUpcoming ? "0 0 10px rgba(250, 173, 20, 0.5)" : "0 0 10px rgba(82, 196, 26, 0.4)"
                           }}>
                             EP. {epGroup.episode}
                           </span>
                           <span style={{ color: "#ffffff", fontWeight: "900", fontSize: "15px" }}>
                             📅 {epGroup.date}
                           </span>
+                          {epGroup.isUpcoming && (
+                            <span style={{
+                              padding: "3px 10px",
+                              background: "rgba(250, 173, 20, 0.25)",
+                              border: "1px solid #faad14",
+                              color: "#ffd700",
+                              fontSize: "11px",
+                              fontWeight: "900",
+                              borderRadius: "6px"
+                            }}>
+                              ⏳ กำลังจะออกอากาศ (รอการแข่งขัน)
+                            </span>
+                          )}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#86efac" }}>
+                        <div style={{ fontSize: "12px", color: epGroup.isUpcoming ? "#ffd700" : "#86efac" }}>
                           ผู้เข้าแข่งขัน {epGroup.contestants.length} คน
                         </div>
                       </div>
@@ -2008,23 +2068,23 @@ export default function HistoryClient({ isSecretFoty = false }) {
                                   height: "48px",
                                   borderRadius: "8px",
                                   transform: "skewX(-16deg)",
-                                  background: "linear-gradient(180deg, #0e1e14 0%, #06130a 100%)",
-                                  border: "1.5px solid #52c41a",
-                                  boxShadow: "0 0 8px rgba(82, 196, 26, 0.3)",
+                                  background: c.isUpcoming ? "rgba(10,20,35,0.7)" : "linear-gradient(180deg, #0e1e14 0%, #06130a 100%)",
+                                  border: c.isUpcoming ? "1px solid rgba(255,255,255,0.15)" : "1.5px solid #52c41a",
+                                  boxShadow: c.isUpcoming ? "none" : "0 0 8px rgba(82, 196, 26, 0.3)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "space-between",
                                   padding: "0 10px"
                                 }}>
                                   <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "6px" }}>
-                                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>{c.stage1?.set1}</span>
+                                    <span style={{ fontSize: "11px", color: c.isUpcoming ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.6)" }}>{c.stage1?.set1 ?? "-"}</span>
                                     <span style={{ color: "rgba(255,255,255,0.3)" }}>/</span>
-                                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>{c.stage1?.set2}</span>
+                                    <span style={{ fontSize: "11px", color: c.isUpcoming ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.6)" }}>{c.stage1?.set2 ?? "-"}</span>
                                     <span style={{ color: "rgba(255,255,255,0.3)" }}>/</span>
-                                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>{c.stage1?.set3}</span>
+                                    <span style={{ fontSize: "11px", color: c.isUpcoming ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.6)" }}>{c.stage1?.set3 ?? "-"}</span>
                                   </div>
-                                  <div style={{ transform: "skewX(16deg)", fontWeight: "900", fontSize: "16px", color: "#86efac" }}>
-                                    {c.stage1?.total}
+                                  <div style={{ transform: "skewX(16deg)", fontWeight: "900", fontSize: "16px", color: c.isUpcoming ? "rgba(255,255,255,0.3)" : "#86efac" }}>
+                                    {c.stage1?.total ?? "-"}
                                   </div>
                                 </div>
 
@@ -2088,15 +2148,22 @@ export default function HistoryClient({ isSecretFoty = false }) {
                                   height: "48px",
                                   borderRadius: "8px",
                                   transform: "skewX(-16deg)",
-                                  background: "linear-gradient(180deg, #2a2006 0%, #120e02 100%)",
-                                  border: "2px solid #ffd700",
-                                  boxShadow: "0 0 12px rgba(255, 215, 0, 0.4)",
+                                  background: c.isUpcoming ? "rgba(10,20,35,0.7)" : "linear-gradient(180deg, #2a2006 0%, #120e02 100%)",
+                                  border: c.isUpcoming ? "1px solid rgba(255,255,255,0.15)" : "2px solid #ffd700",
+                                  boxShadow: c.isUpcoming ? "none" : "0 0 12px rgba(255, 215, 0, 0.4)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center"
                                 }}>
-                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "18px", color: "#ffd700", textShadow: "0 0 8px rgba(255, 215, 0, 0.6)" }}>
-                                    {c.totalScore}
+                                  <span style={{
+                                    transform: "skewX(16deg)",
+                                    fontStyle: "italic",
+                                    fontWeight: "900",
+                                    fontSize: "18px",
+                                    color: c.isUpcoming ? "rgba(255,255,255,0.3)" : "#ffd700",
+                                    textShadow: c.isUpcoming ? "none" : "0 0 8px rgba(255, 215, 0, 0.6)"
+                                  }}>
+                                    {c.isUpcoming ? "-" : c.totalScore}
                                   </span>
                                 </div>
 
@@ -4147,6 +4214,27 @@ export default function HistoryClient({ isSecretFoty = false }) {
               {/* TYPE 1: 2026 AUDITION MODAL CONTENT                       */}
               {/* ========================================================= */}
               {is2026Audition && (
+                selectedSpotlight.isUpcoming ? (
+                  <div style={{
+                    textAlign: "center",
+                    padding: "36px 20px",
+                    background: "rgba(0, 0, 0, 0.4)",
+                    borderRadius: "14px",
+                    border: "1.5px dashed rgba(250, 173, 20, 0.4)",
+                    marginBottom: "18px"
+                  }}>
+                    <div style={{ fontSize: "40px", marginBottom: "12px" }}>⏳</div>
+                    <div style={{ fontSize: "18px", fontWeight: "900", color: "#ffd700", marginBottom: "8px" }}>
+                      เทปนี้กำลังจะออกอากาศเร็ว ๆ นี้
+                    </div>
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", maxWidth: "420px", margin: "0 auto" }}>
+                      {selectedSpotlight.date ? `กำหนดออกอากาศ: ${selectedSpotlight.date}` : "รอติดตามชมการแข่งขันพร้อมกันในวันออกอากาศ"}
+                    </div>
+                    <div style={{ marginTop: "16px", display: "inline-block", padding: "4px 14px", borderRadius: "20px", background: "rgba(250, 173, 20, 0.15)", border: "1px solid #faad14", color: "#ffd700", fontSize: "12px", fontWeight: "800" }}>
+                      🔒 ปิดการแสดงผลคะแนนเพื่อป้องกันการสปอยล์
+                    </div>
+                  </div>
+                ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "18px" }}>
                   {/* ด่านที่ 1 : 3 วินาที */}
                   <div style={{
@@ -4482,6 +4570,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                     )}
                   </div>
                 </div>
+                )
               )}
 
               {/* ========================================================= */}
@@ -4904,7 +4993,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
               )}
 
               {/* Total Score Banner (for Audition and Qualifying) */}
-              {(is2026Audition || isLegacyAudition || isQualifying) && (
+              {(is2026Audition || isLegacyAudition || isQualifying) && !selectedSpotlight.isUpcoming && (
                 <div style={{
                   display: "flex",
                   alignItems: "center",
@@ -4925,7 +5014,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
               )}
 
               {/* Total Bonus Won Banner for 2026 */}
-              {is2026Audition && totalBonusWon2026 > 0 && (
+              {is2026Audition && !selectedSpotlight.isUpcoming && totalBonusWon2026 > 0 && (
                 <div style={{
                   display: "flex",
                   alignItems: "center",

@@ -78,6 +78,7 @@ export default function AdminPage() {
   const [tournamentAwardOverride, setTournamentAwardOverride] = useState("auto");
   const [tournamentPenaltyOverride, setTournamentPenaltyOverride] = useState("auto");
   const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
+  const [fotyUpcomingEpisode, setFotyUpcomingEpisode] = useState("auto");
   const [fotyBroadcastCustoms, setFotyBroadcastCustoms] = useState({});
   const [showFotyQualifyingOnHome, setShowFotyQualifyingOnHome] = useState(false);
   const [fotyRevealUpToOrder, setFotyRevealUpToOrder] = useState("all");
@@ -571,6 +572,9 @@ export default function AdminPage() {
         if (data.fotyAirUpToEpisode !== undefined) {
           setFotyAirUpToEpisode(data.fotyAirUpToEpisode);
         }
+        if (data.fotyUpcomingEpisode !== undefined) {
+          setFotyUpcomingEpisode(data.fotyUpcomingEpisode);
+        }
         if (data.fotyBroadcastCustoms) {
           setFotyBroadcastCustoms(data.fotyBroadcastCustoms);
         }
@@ -939,6 +943,7 @@ export default function AdminPage() {
           tournamentAwardOverride,
           tournamentPenaltyOverride,
           fotyAirUpToEpisode,
+          fotyUpcomingEpisode,
           fotyBroadcastCustoms,
           showFotyQualifyingOnHome,
           fotyRevealUpToOrder,
@@ -1032,6 +1037,7 @@ export default function AdminPage() {
           body: JSON.stringify({
             action: "save_foty_broadcast",
             fotyAirUpToEpisode,
+            fotyUpcomingEpisode,
             fotyBroadcastCustoms,
           }),
         });
@@ -5105,52 +5111,23 @@ export default function AdminPage() {
                     borderRadius: "14px",
                     padding: "20px",
                     marginBottom: "24px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "16px",
                   }}
                 >
-                  <div>
-                    <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span>📺</span> ตอนนี้แข่งขัน / ออกอากาศถึงตอนที่เท่าไหร่:
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
+                    <div>
+                      <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span>📺</span> จัดการการออกอากาศรอบ Audition 2026:
+                      </div>
+                      <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", marginTop: "4px", maxWidth: "680px" }}>
+                        กำหนดว่าเทปใดออกอากาศแล้ว และเทปใดกำลังจะออกอากาศ โดยเทปที่เลือกเป็น <strong>"กำลังจะออกอากาศ"</strong> จะขึ้นในหน้า <code>/history</code> พร้อมวันออกอากาศ แต่จะ<strong>ปิดการแสดงคะแนนเป็น - ทุกช่อง</strong>เพื่อป้องกันการสปอยล์
+                      </div>
                     </div>
-                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", marginTop: "4px" }}>
-                      ข้อมูลรอบ Audition ปี 2026 ทั้ง 14 ตอนถูกดึงมาจากระบบประวัติศาสตร์อัตโนมัติ โดยตอนที่ยังไม่ออกอากาศจะถูกซ่อนไว้ในหน้า <code>/history</code> สาธารณะ และหน้าแรกจะโชว์เฉพาะตอนที่แข่งแล้วและตอนถัดไป
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                    <select
-                      value={fotyAirUpToEpisode}
-                      onChange={(e) => setFotyAirUpToEpisode(e.target.value)}
-                      style={{
-                        padding: "10px 16px",
-                        borderRadius: "8px",
-                        background: "#050b14",
-                        border: "1.5px solid #ffd700",
-                        color: "#ffd700",
-                        fontSize: "15px",
-                        fontWeight: "800",
-                        minWidth: "250px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <option value="0">ยังไม่ออกอากาศ (ซ่อนทั้งหมด)</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((ep) => (
-                        <option key={ep} value={ep}>
-                          ออกอากาศถึงตอนที่ {ep} (คู่ที่ {ep})
-                        </option>
-                      ))}
-                      <option value="all">🌐 แสดงผลครบทุกตอน (14 ตอน)</option>
-                    </select>
 
                     <button
                       type="button"
                       onClick={() => handleSaveWeeklyMatches("foty")}
                       style={{
-                        padding: "10px 20px",
+                        padding: "10px 22px",
                         borderRadius: "8px",
                         background: "linear-gradient(135deg, #ffd700 0%, #ff9900 100%)",
                         border: "none",
@@ -5163,6 +5140,68 @@ export default function AdminPage() {
                     >
                       💾 บันทึกตารางออกอากาศ 2026
                     </button>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "13px", fontWeight: "800", color: "#86efac", marginBottom: "6px" }}>
+                        1. ออกอากาศแล้วถึงตอนที่ (Aired Episodes - แสดงคะแนน):
+                      </label>
+                      <select
+                        value={fotyAirUpToEpisode}
+                        onChange={(e) => setFotyAirUpToEpisode(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1.5px solid #52c41a",
+                          color: "#86efac",
+                          fontSize: "14px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <option value="0">ยังไม่ออกอากาศ (ซ่อนทั้งหมด)</option>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((ep) => (
+                          <option key={ep} value={ep}>
+                            ออกอากาศถึงตอนที่ {ep} (คู่ที่ {ep})
+                          </option>
+                        ))}
+                        <option value="all">🌐 แสดงผลครบทุกตอน (14 ตอน)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "13px", fontWeight: "800", color: "#ffd700", marginBottom: "6px" }}>
+                        2. เทปที่กำลังจะออกอากาศ (Upcoming - ห้ามสปอยล์คะแนน):
+                      </label>
+                      <select
+                        value={fotyUpcomingEpisode}
+                        onChange={(e) => setFotyUpcomingEpisode(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1.5px solid #ffd700",
+                          color: "#ffd700",
+                          fontSize: "14px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <option value="auto">
+                          ⚡ ตอนถัดไปอัตโนมัติ {fotyAirUpToEpisode === "all" ? "(ไม่มี)" : `(ตอนที่ ${Math.min(14, (Number(fotyAirUpToEpisode) || 0) + 1)})`}
+                        </option>
+                        <option value="none">🚫 ไม่แสดงเทปที่กำลังจะออกอากาศ</option>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((ep) => (
+                          <option key={ep} value={ep}>
+                            ⏳ ตอนที่ {ep} (คู่ที่ {ep} - ซ่อนคะแนนทั้งหมด)
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -5349,7 +5388,12 @@ export default function AdminPage() {
                     const c2 = ep.contestants[1] || null;
                     const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
                     const isCompleted = ep.episode <= maxEp;
-                    const isNext = ep.episode === maxEp + 1;
+                    const upcomingEpNum = (fotyAirUpToEpisode === "all" || fotyUpcomingEpisode === "none")
+                      ? null
+                      : (fotyUpcomingEpisode && fotyUpcomingEpisode !== "auto")
+                      ? Number(fotyUpcomingEpisode)
+                      : (maxEp + 1 <= 14 ? maxEp + 1 : null);
+                    const isNext = ep.episode === upcomingEpNum;
 
                     return (
                       <div
@@ -5373,12 +5417,12 @@ export default function AdminPage() {
                             </span>
                             {isCompleted && (
                               <span style={{ background: "rgba(82, 196, 26, 0.2)", border: "1px solid #52c41a", color: "#73d13d", fontSize: "11px", fontWeight: "800", padding: "2px 8px", borderRadius: "4px" }}>
-                                ✓ ออกอากาศแล้ว
+                                ✓ ออกอากาศแล้ว (แสดงคะแนน)
                               </span>
                             )}
                             {isNext && (
                               <span style={{ background: "rgba(250, 173, 20, 0.2)", border: "1px solid #faad14", color: "#ffd700", fontSize: "11px", fontWeight: "800", padding: "2px 8px", borderRadius: "4px" }}>
-                                ⏳ ตอนถัดไป
+                                ⏳ กำลังจะออกอากาศ (ไม่สปอยล์คะแนน)
                               </span>
                             )}
                             {!isCompleted && !isNext && (

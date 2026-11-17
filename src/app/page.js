@@ -37,6 +37,7 @@ export default function MainPage() {
   const [historyState, setHistoryState] = useState(null);
   const [weeklyMatches, setWeeklyMatches] = useState([]);
   const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
+  const [fotyUpcomingEpisode, setFotyUpcomingEpisode] = useState("auto");
   const [fotyBroadcastCustoms, setFotyBroadcastCustoms] = useState({});
   const [showFotyInNav, setShowFotyInNav] = useState(true);
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
@@ -106,6 +107,9 @@ export default function MainPage() {
         if (settingsData.fotyAirUpToEpisode !== undefined) {
           setFotyAirUpToEpisode(settingsData.fotyAirUpToEpisode);
         }
+        if (settingsData.fotyUpcomingEpisode !== undefined) {
+          setFotyUpcomingEpisode(settingsData.fotyUpcomingEpisode);
+        }
         if (settingsData.fotyBroadcastCustoms) {
           setFotyBroadcastCustoms(settingsData.fotyBroadcastCustoms);
         }
@@ -155,13 +159,18 @@ export default function MainPage() {
 
     const list = Array.from(map.values()).sort((a, b) => a.episode - b.episode);
     const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
+    const upcomingEpNum = (fotyAirUpToEpisode === "all" || fotyUpcomingEpisode === "none")
+      ? null
+      : (fotyUpcomingEpisode && fotyUpcomingEpisode !== "auto")
+      ? Number(fotyUpcomingEpisode)
+      : (maxEp + 1 <= 14 ? maxEp + 1 : null);
 
     return list.map((ep) => {
       const custom = fotyBroadcastCustoms?.[ep.episode] || {};
       const c1 = ep.contestants[0] || null;
       const c2 = ep.contestants[1] || null;
       const isCompleted = ep.episode <= maxEp;
-      const isNext = ep.episode === maxEp + 1;
+      const isNext = ep.episode === upcomingEpNum;
       const status = isCompleted ? "completed" : isNext ? "next" : "upcoming";
       const airDate = custom.airDate || ep.defaultDate || `ตอนที่ ${ep.episode}`;
       const replayUrl = custom.replayUrl || "";
@@ -202,7 +211,7 @@ export default function MainPage() {
           : null,
       };
     });
-  }, [historyState, fotyAirUpToEpisode, fotyBroadcastCustoms]);
+  }, [historyState, fotyAirUpToEpisode, fotyUpcomingEpisode, fotyBroadcastCustoms]);
 
   // Episodes shown on Homepage: only completed/aired episodes up to fotyAirUpToEpisode (no upcoming episode)
   const visibleWeeklyMatches = useMemo(() => {
