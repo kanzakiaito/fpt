@@ -284,12 +284,23 @@ function writeData(data) {
   }
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const data = await getKVData("fpt_leaderboard", readData);
   let historyData = await getKVData("fpt_history", readHistoryData);
   if (!historyData) historyData = readHistoryData();
   const finals = historyData?.seasons?.["2026"]?.finals || [];
-  return NextResponse.json({ success: true, data, finals });
+  return NextResponse.json(
+    { success: true, data, finals },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "CDN-Cache-Control": "no-store",
+      },
+    }
+  );
 }
 
 export async function POST(request) {

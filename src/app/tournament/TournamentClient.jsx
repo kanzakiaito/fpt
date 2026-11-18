@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import defaultTournamentData from "@/app/data/tournament.json";
-import heroContestantsData from "@/app/data/heroContestants.json";
 
 function getOptimizedAvatarUrl(url, size = 120) {
   if (!url || typeof url !== "string") return "";
@@ -295,15 +294,6 @@ export default function TournamentClient({
     if (found?.photo && String(found.photo).trim()) return found.photo;
     if (found?.image && String(found.image).trim()) return found.image;
 
-    // 2. Check in heroContestantsData (official Google Photos ชูนิ้ว)
-    const heroFound = (heroContestantsData || []).find((h) => {
-      const hName = (h.name || "").trim().toLowerCase();
-      const hNick = (h.nickname || "").trim().toLowerCase();
-      return (cleanName && (hName === cleanName || hName.includes(cleanName) || cleanName.includes(hName))) ||
-             (cleanNick && (hNick === cleanNick || hNick.includes(cleanNick)));
-    });
-    if (heroFound?.image && String(heroFound.image).trim()) return heroFound.image;
-
     return "";
   };
 
@@ -316,11 +306,6 @@ export default function TournamentClient({
       const gA = data?.standings?.groupA || [];
       const gB = data?.standings?.groupB || [];
       list = [...gA, ...gB];
-    }
-    if (list.length === 0) {
-      const defGA = defaultTournamentData?.standings?.groupA || [];
-      const defGB = defaultTournamentData?.standings?.groupB || [];
-      list = [...defGA, ...defGB];
     }
     if (list.length === 0) return [[], [], [], [], [], []];
 

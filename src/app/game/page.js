@@ -38,15 +38,15 @@ export function getOptimizedImageUrl(src, targetSize = 80) {
 
 // Helper: Resolve contestant Google Photos URL by name or nickname fallback
 export function resolveContestantPhoto(name, nickname, explicitPhoto) {
-  if (explicitPhoto && typeof explicitPhoto === "string" && explicitPhoto.startsWith("http")) {
-    return explicitPhoto;
+  if (explicitPhoto && typeof explicitPhoto === "string" && explicitPhoto.trim()) {
+    return explicitPhoto.trim();
   }
   const cleanName = (name || "").trim();
   const cleanNick = (nickname || "").trim();
   return (
     (cleanName && contestantPhotos[cleanName]) ||
     (cleanNick && contestantPhotos[cleanNick]) ||
-    (explicitPhoto && typeof explicitPhoto === "string" ? explicitPhoto : "")
+    ""
   );
 }
 

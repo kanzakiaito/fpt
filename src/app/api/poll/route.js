@@ -150,7 +150,7 @@ export async function GET() {
       return {
         ...item,
         id: item.id || (matchedAud?.order ? String(matchedAud.order) : String(idx + 1)),
-        image: item.image || matchedAud?.image || "",
+        image: (matchedAud && matchedAud.image) ? matchedAud.image : (item.image || ""),
         nickname: item.nickname || matchedAud?.nickname || "",
         name: item.name || matchedAud?.name || "",
         topic: item.topic || matchedAud?.topic || "-",
@@ -168,14 +168,22 @@ export async function GET() {
       image: c.image || "",
     }));
 
-    return NextResponse.json({
-      success: true,
-      data: enriched,
-      candidates,
-      votingOpen,
-      showInNav,
-      showPollTable,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: enriched,
+        candidates,
+        votingOpen,
+        showInNav,
+        showPollTable,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "CDN-Cache-Control": "no-store",
+        },
+      }
+    );
   } catch (err) {
     console.error("GET /api/poll error:", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

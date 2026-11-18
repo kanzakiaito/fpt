@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
-import heroContestants from "../data/heroContestants.json";
 
 function getScorePillStyle(score, categoryKey) {
   const is25 = score !== null && score !== undefined && score !== "" && score !== "-" && Number(score) === 25;
@@ -540,9 +539,9 @@ export default function MainPage() {
   const fetchData = async () => {
     try {
       const [scoresRes, settingsRes, pollRes] = await Promise.all([
-        fetch("/api/scores"),
-        fetch("/api/settings"),
-        fetch("/api/poll"),
+        fetch(`/api/scores?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/poll?t=${Date.now()}`, { cache: "no-store" }),
       ]);
       const scoresData = await scoresRes.json();
       const settingsData = await settingsRes.json();
@@ -550,6 +549,9 @@ export default function MainPage() {
 
       if (scoresData.success && Array.isArray(scoresData.data)) {
         setLeaderboard(scoresData.data);
+        try {
+          localStorage.setItem("fpt_leaderboard_cache", JSON.stringify(scoresData.data));
+        } catch (e) {}
       }
       if (scoresData.finals && Array.isArray(scoresData.finals)) {
         setFinalsRounds(scoresData.finals);
@@ -595,6 +597,14 @@ export default function MainPage() {
   };
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem("fpt_leaderboard_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) setLeaderboard(parsed);
+      }
+    } catch (e) {}
+
     fetchData();
     // Poll every 3 seconds for real-time live scoring sync with admin
     const timer = setInterval(fetchData, 3000);
@@ -738,14 +748,22 @@ export default function MainPage() {
   }, [leaderboard, pollList]);
 
   // 6 columns of contestant photos for the hero background wall
-  // 4 repetitions (20 items per column) so columns can traverse the full vertical range with zero blank gaps
   const heroColumns = useMemo(() => {
+    const list = leaderboard && leaderboard.length > 0 ? leaderboard : [];
+    if (list.length === 0) return [[], [], [], [], [], []];
     const cols = [[], [], [], [], [], []];
-    heroContestants.forEach((c, idx) => {
+    list.forEach((c, idx) => {
       cols[idx % 6].push(c);
     });
-    return cols.map((col) => [...col, ...col, ...col, ...col]);
-  }, []);
+    return cols.map((col) => {
+      if (col.length === 0) return [];
+      let expanded = [...col];
+      while (expanded.length < 8) {
+        expanded = [...expanded, ...col];
+      }
+      return expanded;
+    });
+  }, [leaderboard]);
 
   const filteredStandings = useMemo(() => {
     // When sorting by poll, also include unplayed contestants in their poll ranking position
@@ -1282,7 +1300,8 @@ export default function MainPage() {
           gridTemplateColumns: "repeat(6, 1fr)",
           gap: "10px",
           padding: "0 14px",
-          opacity: 0.2,
+          opacity: leaderboard.length > 0 ? 0.2 : 0,
+          transition: "opacity 0.5s ease-in-out",
           pointerEvents: "none",
           zIndex: 1,
           filter: "contrast(1.05) saturate(0.85)",

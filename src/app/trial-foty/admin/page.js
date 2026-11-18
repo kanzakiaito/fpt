@@ -193,9 +193,9 @@ export default function TrialAdminPage() {
     try {
       setLoading(true);
       const [resTrial, resPoll, resInfo] = await Promise.all([
-        fetch("/api/trial", { cache: "no-store" }),
-        fetch("/api/trial-poll", { cache: "no-store" }),
-        fetch("/api/trial-info", { cache: "no-store" }),
+        fetch(`/api/trial?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/trial-poll?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/trial-info?t=${Date.now()}`, { cache: "no-store" }),
       ]);
       let roster = [];
       if (resTrial.ok) {
@@ -218,7 +218,7 @@ export default function TrialAdminPage() {
             );
             return {
               ...item,
-              image: item.image || matched?.image || "",
+              image: (matched && matched.image) ? matched.image : (item.image || ""),
               warmupSchedule: item.warmupSchedule || matched?.warmupSchedule || "",
             };
           });

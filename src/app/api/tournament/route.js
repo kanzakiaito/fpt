@@ -22,9 +22,20 @@ export {
 
 
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const data = await getTournamentData();
-  return NextResponse.json({ success: true, data });
+  return NextResponse.json(
+    { success: true, data },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "CDN-Cache-Control": "no-store",
+      },
+    }
+  );
 }
 
 export async function POST(request) {

@@ -113,15 +113,23 @@ export async function GET() {
     // Sort by votes desc, then order asc
     enrichedContestants.sort((a, b) => b.votes - a.votes || a.order - b.order);
 
-    return NextResponse.json({
-      success: true,
-      votingOpen,
-      showInNav,
-      totalVotes: votes.length,
-      validVotesCount,
-      contestants: enrichedContestants,
-      votes,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        votingOpen,
+        showInNav,
+        totalVotes: votes.length,
+        validVotesCount,
+        contestants: enrichedContestants,
+        votes,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "CDN-Cache-Control": "no-store",
+        },
+      }
+    );
   } catch (err) {
     console.error("GET /api/fav-fan error:", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

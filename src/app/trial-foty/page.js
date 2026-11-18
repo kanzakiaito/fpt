@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
 import TrialNavbar from "./components/TrialNavbar";
-import fallbackPollData from "../data/trial-poll.json";
 
 // ─── Score Pill Styles matching authentic page.js ────────────────────────────
 
@@ -298,7 +297,7 @@ function evaluatePlayerStatus(player, denseLeaderboard, targetTotalPlayers = 24)
 
 export default function TrialFOTYPage() {
   const [contestants, setContestants] = useState([]);
-  const [pollList, setPollList] = useState(fallbackPollData);
+  const [pollList, setPollList] = useState([]);
   const [votingOpen, setVotingOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);

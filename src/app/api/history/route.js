@@ -55,7 +55,15 @@ export async function GET() {
         "2024": true,
       };
     }
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json(
+      { success: true, data },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "CDN-Cache-Control": "no-store",
+        },
+      }
+    );
   } catch (err) {
     console.error("GET /api/history error:", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

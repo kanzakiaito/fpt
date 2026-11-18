@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import TrialNavbar from "../components/TrialNavbar";
-import fallbackPollData from "../../data/trial-poll.json";
 
 function getOptimizedImageUrl(url, size = 100) {
   if (!url) return "";
@@ -843,7 +842,7 @@ function ChampionDropdownCard({
 
 // ── Main Ballot Vote Page ─────────────────────────────────────────────────────
 export default function TrialFotyBallotVotePage() {
-  const [pollList, setPollList] = useState(fallbackPollData);
+  const [pollList, setPollList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -927,6 +926,14 @@ export default function TrialFotyBallotVotePage() {
   };
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem("fpt_trial_poll_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) setPollList(parsed);
+      }
+    } catch (e) {}
+
     loadPollData();
     try {
       const stored = localStorage.getItem("trial_foty_ballot_voted");

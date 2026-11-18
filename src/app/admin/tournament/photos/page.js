@@ -46,7 +46,7 @@ export default function TournamentPhotosPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/tournament");
+      const res = await fetch(`/api/tournament?t=${Date.now()}`, { cache: "no-store" });
       const json = await res.json();
       if (json.success && json.data) {
         setData(json.data);

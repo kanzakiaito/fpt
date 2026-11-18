@@ -623,7 +623,7 @@ export default function AdminPage() {
   const loadContestants = async () => {
     setLoadingContestants(true);
     try {
-      const res = await fetch("/api/scores");
+      const res = await fetch(`/api/scores?t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setContestants(data.data);
@@ -641,7 +641,7 @@ export default function AdminPage() {
   const loadPoll = async () => {
     setLoadingPoll(true);
     try {
-      const res = await fetch("/api/poll");
+      const res = await fetch(`/api/poll?t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setPollItems(data.data);
@@ -658,7 +658,7 @@ export default function AdminPage() {
   const loadFavFanVotes = async () => {
     setLoadingFavFan(true);
     try {
-      const res = await fetch("/api/fav-fan");
+      const res = await fetch(`/api/fav-fan?t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (data.success) {
         setFavFanVotes(Array.isArray(data.votes) ? data.votes : []);

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
-import heroContestants from "./data/heroContestants.json";
 import historyData from "./data/history.json";
 
 // Dynamic size and protocol optimization for Google Photos / external images
@@ -65,10 +64,10 @@ export default function MainPage() {
   const fetchData = async () => {
     try {
       const [scoresRes, settingsRes, historyRes, pollRes] = await Promise.all([
-        fetch("/api/scores", { cache: "no-store" }),
-        fetch("/api/settings", { cache: "no-store" }),
-        fetch("/api/history", { cache: "no-store" }),
-        fetch("/api/poll", { cache: "no-store" }),
+        fetch(`/api/scores?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/history?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/poll?t=${Date.now()}`, { cache: "no-store" }),
       ]);
       const scoresData = await scoresRes.json();
       const settingsData = await settingsRes.json();
@@ -77,6 +76,9 @@ export default function MainPage() {
 
       if (scoresData.success && Array.isArray(scoresData.data)) {
         setLeaderboard(scoresData.data);
+        try {
+          localStorage.setItem("fpt_leaderboard_cache", JSON.stringify(scoresData.data));
+        } catch (e) {}
       }
       if (historyResData.success && historyResData.data) {
         setHistoryState(historyResData.data);
@@ -126,6 +128,14 @@ export default function MainPage() {
   };
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem("fpt_leaderboard_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) setLeaderboard(parsed);
+      }
+    } catch (e) {}
+
     fetchData();
     const timer = setInterval(fetchData, 4000);
     return () => clearInterval(timer);
@@ -133,12 +143,20 @@ export default function MainPage() {
 
   // 6 columns of contestant photos for the hero background wall
   const heroColumns = useMemo(() => {
-    const list = leaderboard && leaderboard.length > 0 ? leaderboard : heroContestants;
+    const list = leaderboard && leaderboard.length > 0 ? leaderboard : [];
+    if (list.length === 0) return [[], [], [], [], [], []];
     const cols = [[], [], [], [], [], []];
     list.forEach((c, idx) => {
       cols[idx % 6].push(c);
     });
-    return cols.map((col) => [...col, ...col, ...col, ...col]);
+    return cols.map((col) => {
+      if (col.length === 0) return [];
+      let expanded = [...col];
+      while (expanded.length < 8) {
+        expanded = [...expanded, ...col];
+      }
+      return expanded;
+    });
   }, [leaderboard]);
 
   // 2026 Audition weekly episodes from history data
@@ -843,7 +861,8 @@ export default function MainPage() {
             gridTemplateColumns: "repeat(6, 1fr)",
             gap: "10px",
             padding: "0 14px",
-            opacity: 0.2,
+            opacity: leaderboard.length > 0 ? 0.2 : 0,
+            transition: "opacity 0.5s ease-in-out",
             pointerEvents: "none",
             zIndex: 1,
             filter: "contrast(1.05) saturate(0.85)",

@@ -661,8 +661,8 @@ export default function AdminTournamentPage() {
     setLoading(true);
     try {
       const [res, sRes] = await Promise.all([
-        fetch("/api/tournament"),
-        fetch("/api/settings?admin=1"),
+        fetch(`/api/tournament?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/settings?admin=1&t=${Date.now()}`, { cache: "no-store" }),
       ]);
       const json = await res.json();
       if (json.success && json.data) {

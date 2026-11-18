@@ -14,8 +14,8 @@ function getContestantPollRank(item, list) {
   if (item.pollRank !== undefined && item.pollRank !== null && item.pollRank !== "") {
     return Number(item.pollRank);
   }
-  const searchList = Array.isArray(list) && list.length > 0 ? list : pollData;
-  if (!Array.isArray(searchList)) return null;
+  const searchList = Array.isArray(list) && list.length > 0 ? list : [];
+  if (!Array.isArray(searchList) || searchList.length === 0) return null;
   const found = searchList.find((p) => {
     const pName = (p.name || "").trim().toLowerCase();
     const iName = (item.name || "").trim().toLowerCase();
@@ -221,7 +221,7 @@ function getScorePillStyle(score, categoryKey) {
 
 export default function HistoryClient({ isSecretFoty = false }) {
   const [data, setData] = useState(historyData);
-  const [pollList, setPollList] = useState(pollData || []);
+  const [pollList, setPollList] = useState([]);
   const [activeYear, setActiveYear] = useState(isSecretFoty ? "2026" : "2024");
   const [activeTab, setActiveTab] = useState(isSecretFoty ? "qualifying" : "audition"); // 'qualifying' | 'playoffs' | 'finals' | 'info'
   const [searchQuery, setSearchQuery] = useState("");
@@ -252,9 +252,9 @@ export default function HistoryClient({ isSecretFoty = false }) {
     async function checkAuth() {
       try {
         const [settingsRes, historyRes, pollRes] = await Promise.all([
-          fetch("/api/settings"),
-          fetch("/api/history"),
-          fetch("/api/poll"),
+          fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" }),
+          fetch(`/api/history?t=${Date.now()}`, { cache: "no-store" }),
+          fetch(`/api/poll?t=${Date.now()}`, { cache: "no-store" }),
         ]);
         const settingsData = await settingsRes.json();
         const historyDataRes = await historyRes.json();
