@@ -591,6 +591,7 @@ export default function AdminTournamentPage() {
     authChecking,
     user,
     token,
+    noAccessInfo,
     handleLoginSuccess,
     handleLogout,
   } = useAdminSession("tournament");
@@ -1597,6 +1598,8 @@ export default function AdminTournamentPage() {
         title="ห้องควบคุม Tournament (Tournament Admin)"
         subtitle="กรุณากรอก Username และ Password เพื่อเข้าสู่ระบบผู้ดูแลทัวร์นาเมนต์"
         theme="cyan"
+        noAccessInfo={noAccessInfo}
+        onLogout={handleLogout}
         onLoginSuccess={handleLoginSuccess}
       />
     );

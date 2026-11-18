@@ -7,6 +7,8 @@ export default function AdminLoginScreen({
   title = "ระบบจัดการแข่งขัน (Admin Room)",
   subtitle = "กรุณากรอก Username และ Password เพื่อเข้าสู่ระบบผู้ดูแล",
   theme = "cyan",
+  noAccessInfo = null,
+  onLogout = null,
   onLoginSuccess,
 }) {
   const [username, setUsername] = useState("");
@@ -24,6 +26,8 @@ export default function AdminLoginScreen({
     ? "linear-gradient(90deg, #ffd700 0%, #ff8800 100%)"
     : "linear-gradient(90deg, #00b4d8 0%, #0077b6 100%)";
   const btnTextColor = isGold ? "#030812" : "#ffffff";
+
+  const logoSrc = section === "trial_foty" ? "/img/trial_foty_logo.png" : "/img/logo.png";
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
@@ -60,7 +64,11 @@ export default function AdminLoginScreen({
           expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 1 day
         };
         try {
+          localStorage.setItem("fpt_admin_session", JSON.stringify(sessionData));
           localStorage.setItem(`fpt_admin_session_${section}`, JSON.stringify(sessionData));
+          ["main", "tournament", "trial_foty"].forEach((s) => {
+            localStorage.setItem(`fpt_admin_session_${s}`, JSON.stringify(sessionData));
+          });
         } catch (e) {}
 
         if (onLoginSuccess) {
@@ -107,7 +115,7 @@ export default function AdminLoginScreen({
       >
         <div style={{ maxWidth: "240px", margin: "0 auto 16px" }}>
           <img
-            src="/img/logo.png"
+            src={logoSrc}
             alt="Fanpantae 2026"
             style={{
               width: "100%",
@@ -140,9 +148,55 @@ export default function AdminLoginScreen({
         <h2 style={{ fontSize: "20px", fontWeight: "800", color: primaryColor, margin: "0 0 8px 0" }}>
           {title}
         </h2>
-        <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.65)", margin: "0 0 24px 0" }}>
+        <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.65)", margin: "0 0 20px 0" }}>
           {subtitle}
         </p>
+
+        {/* Access Denied Warning for Current SSO Account */}
+        {noAccessInfo && (
+          <div
+            style={{
+              padding: "12px 14px",
+              borderRadius: "10px",
+              background: "rgba(255, 170, 0, 0.12)",
+              border: "1px solid rgba(255, 170, 0, 0.4)",
+              color: "#ffc048",
+              fontSize: "12px",
+              lineHeight: "1.5",
+              marginBottom: "18px",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ fontWeight: "700", marginBottom: "4px" }}>
+              ⚠️ ล็อกอินในชื่อ: {noAccessInfo.name || noAccessInfo.username}
+            </div>
+            <div>
+              บัญชีนี้ยังไม่ได้รับสิทธิ์เข้าถึงส่วนผู้ดูแลนี้ ({section}) กรุณาเข้าสู่ระบบด้วยบัญชีอื่น หรือ
+            </div>
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                style={{
+                  marginTop: "8px",
+                  padding: "5px 12px",
+                  fontSize: "11px",
+                  fontWeight: "700",
+                  borderRadius: "6px",
+                  background: "rgba(255, 255, 255, 0.12)",
+                  border: "1px solid rgba(255, 255, 255, 0.25)",
+                  color: "#ffffff",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
+                🚪 ออกจากระบบเพื่อสลับบัญชี
+              </button>
+            )}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} style={{ textAlign: "left" }}>
           <div style={{ marginBottom: "16px" }}>
@@ -217,13 +271,14 @@ export default function AdminLoginScreen({
           {authError && (
             <div
               style={{
-                background: "rgba(255, 77, 79, 0.15)",
-                border: "1px solid rgba(255, 77, 79, 0.5)",
-                color: "#ff7875",
                 padding: "10px 14px",
                 borderRadius: "8px",
-                fontSize: "13px",
+                background: "rgba(255, 77, 79, 0.15)",
+                border: "1px solid rgba(255, 77, 79, 0.4)",
+                color: "#ff7875",
+                fontSize: "12px",
                 marginBottom: "18px",
+                textAlign: "center",
               }}
             >
               ⚠️ {authError}
@@ -235,23 +290,27 @@ export default function AdminLoginScreen({
             disabled={isVerifying}
             style={{
               width: "100%",
-              padding: "12px 20px",
+              padding: "13px",
               borderRadius: "10px",
               border: "none",
               background: btnGradient,
               color: btnTextColor,
-              fontSize: "16px",
-              fontWeight: "700",
-              cursor: isVerifying ? "wait" : "pointer",
-              boxShadow: isGold ? "0 0 20px rgba(255, 215, 0, 0.4)" : "0 0 20px rgba(0, 180, 216, 0.4)",
+              fontSize: "15px",
+              fontWeight: "800",
+              cursor: isVerifying ? "not-allowed" : "pointer",
+              boxShadow: isGold ? "0 4px 20px rgba(255, 215, 0, 0.4)" : "0 4px 20px rgba(0, 180, 216, 0.4)",
+              transition: "transform 0.15s, opacity 0.15s",
+              opacity: isVerifying ? 0.7 : 1,
             }}
           >
-            {isVerifying ? "กำลังตรวจสอบ..." : "เข้าสู่ระบบ (Login)"}
+            {isVerifying ? "กำลังตรวจสอบสิทธิ์..." : "เข้าสู่ระบบ (Sign In)"}
           </button>
         </form>
 
-        <div style={{ marginTop: "20px", fontSize: "11px", color: "rgba(255, 255, 255, 0.45)" }}>
-          🔒 เซสชันมีอายุ 24 ชั่วโมงหลังจากเข้าสู่ระบบ
+        <div style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid rgba(255, 255, 255, 0.08)" }}>
+          <p style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)", margin: 0 }}>
+            🔒 Single Sign-On • เข้าสู่ระบบครั้งเดียวใช้ได้ทุกส่วนที่คุณได้รับสิทธิ์
+          </p>
         </div>
       </div>
     </div>

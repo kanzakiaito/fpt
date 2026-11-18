@@ -45,6 +45,7 @@ export default function AdminPage() {
     authChecking,
     user,
     token,
+    noAccessInfo,
     handleLoginSuccess,
     handleLogout: handleAdminLogout,
   } = useAdminSession("main");
@@ -1802,6 +1803,8 @@ export default function AdminPage() {
         title="ระบบจัดการแข่งขัน (Admin Room)"
         subtitle="กรุณากรอก Username และ Password เพื่อเข้าสู่ระบบผู้ดูแล"
         theme="cyan"
+        noAccessInfo={noAccessInfo}
+        onLogout={handleAdminLogout}
         onLoginSuccess={handleLoginSuccess}
       />
     );

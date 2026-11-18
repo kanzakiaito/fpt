@@ -2,8 +2,20 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
+import { useAdminSession } from "@/lib/useAdminSession";
+import AdminLoginScreen from "@/app/components/admin/AdminLoginScreen";
 
 export default function QuestionArchiveAdmin() {
+  const {
+    isAuthenticated,
+    authChecking,
+    user,
+    token,
+    noAccessInfo,
+    handleLoginSuccess,
+    handleLogout,
+  } = useAdminSession("main");
+
   // Navigation & Core States
   const [activeTab, setActiveTab] = useState("3sec"); // "3sec", "qa", "jigsaw", "properties", "action", "saved"
   const [selectedYear, setSelectedYear] = useState("2026");
@@ -393,6 +405,28 @@ export default function QuestionArchiveAdmin() {
       showToast("❌ เกิดข้อผิดพลาดในการลบ", "error");
     }
   };
+
+  if (authChecking) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#06182c", color: "#00e5ff", fontFamily: "var(--font-th)" }}>
+        กำลังตรวจสอบสิทธิ์...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <AdminLoginScreen
+        section="main"
+        title="คลังคำถาม (Question Archive)"
+        subtitle="กรุณากรอก Username และ Password เพื่อเข้าสู่ระบบจัดการคลังคำถาม"
+        theme="cyan"
+        noAccessInfo={noAccessInfo}
+        onLogout={handleLogout}
+        onLoginSuccess={handleLoginSuccess}
+      />
+    );
+  }
 
   return (
     <div style={{

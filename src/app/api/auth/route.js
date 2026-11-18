@@ -21,10 +21,23 @@ async function getCallerFromToken(token, section) {
   if (!user) return null;
 
   const perm = user.permissions?.[section];
-  const hasAccess = Boolean(perm?.access || (user.permissions?.main?.isMainAdmin && section === "main"));
-  if (!hasAccess) return null;
+  const isSuperAdmin = user.username === "admin" || Boolean(user.permissions?.main?.isMainAdmin);
+  const hasAccess = Boolean(
+    user.username === "admin" ||
+    perm?.access ||
+    (isSuperAdmin && section === "main")
+  );
 
-  const isMainAdmin = Boolean(perm?.isMainAdmin || user.username === "admin");
+  if (!hasAccess) {
+    return {
+      noAccess: true,
+      username: user.username,
+      name: user.name || user.username,
+      permissions: user.permissions,
+    };
+  }
+
+  const isMainAdmin = Boolean(user.username === "admin" || perm?.isMainAdmin);
   const role = isMainAdmin ? "main_admin" : (perm?.role || "admin");
 
   return {
@@ -47,6 +60,15 @@ export async function GET(request) {
   const caller = await getCallerFromToken(token, section);
   if (!caller) {
     return NextResponse.json({ authenticated: false, error: "Invalid or expired token" });
+  }
+  if (caller.noAccess) {
+    return NextResponse.json({
+      authenticated: false,
+      noAccess: true,
+      username: caller.username,
+      name: caller.name,
+      error: `บัญชี "${caller.name || caller.username}" ไม่มีสิทธิ์เข้าถึงส่วนผู้ดูแลระบบ (${section})`,
+    });
   }
 
   return NextResponse.json({
@@ -81,9 +103,22 @@ export async function POST(request) {
     // 2. VERIFY TOKEN
     if (action === "verify") {
       const { token, section = "main" } = body;
+      if (!token) {
+        return NextResponse.json({ success: false, valid: false, error: "ไม่มีโทเคน" });
+      }
       const caller = await getCallerFromToken(token, section);
       if (!caller) {
         return NextResponse.json({ success: false, valid: false, error: "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่" });
+      }
+      if (caller.noAccess) {
+        return NextResponse.json({
+          success: false,
+          valid: true,
+          noAccess: true,
+          username: caller.username,
+          name: caller.name,
+          error: `บัญชี "${caller.name || caller.username}" ไม่มีสิทธิ์เข้าถึงส่วนผู้ดูแลระบบ (${section})`,
+        });
       }
       return NextResponse.json({
         success: true,
@@ -139,7 +174,7 @@ export async function POST(request) {
     const section = body.section || "main";
     const caller = await getCallerFromToken(token, section);
 
-    if (!caller) {
+    if (!caller || caller.noAccess) {
       return NextResponse.json({ success: false, error: "ไม่มีสิทธิ์ในการดำเนินการนี้ หรือเซสชันหมดอายุ" }, { status: 401 });
     }
 

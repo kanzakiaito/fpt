@@ -42,6 +42,7 @@ export default function AdminUserMenu({
         { href: "/tournament", label: "หน้า Tournament (/tournament)", icon: "⚔️", target: "_blank" },
         { href: "/admin", label: "Admin ปกติ (/admin)", icon: "⚙️" },
         { href: "/admin/tournament/photos", label: "จัดการรูปถ่ายผู้เข้าแข่งขัน", icon: "📸" },
+        { href: "/trial-foty/admin", label: "ห้อง Admin Trial FOTY", icon: "🌟" },
       ];
     }
 

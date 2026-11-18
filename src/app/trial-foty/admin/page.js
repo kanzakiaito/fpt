@@ -107,6 +107,7 @@ export default function TrialAdminPage() {
     authChecking,
     user,
     token,
+    noAccessInfo,
     handleLoginSuccess,
     handleLogout: handleAdminLogout,
   } = useAdminSession("trial_foty");
@@ -1349,6 +1350,8 @@ export default function TrialAdminPage() {
         title="ห้องควบคุมแอดมิน • งุ่นง่าน 2026"
         subtitle="กรุณากรอก Username และ Password เพื่อเข้าสู่การควบคุม Trial FoTY"
         theme="gold"
+        noAccessInfo={noAccessInfo}
+        onLogout={handleAdminLogout}
         onLoginSuccess={handleLoginSuccess}
       />
     );

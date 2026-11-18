@@ -15,6 +15,7 @@ export default function TournamentPhotosPage() {
     authChecking,
     user,
     token,
+    noAccessInfo,
     handleLoginSuccess,
     handleLogout,
   } = useAdminSession("tournament");
@@ -216,6 +217,8 @@ export default function TournamentPhotosPage() {
         title="จัดการรูปถ่ายผู้เข้าแข่งขัน (Contestant Photos)"
         subtitle="กรุณากรอก Username และ Password เพื่อเข้าสู่ระบบจัดการรูปถ่ายทัวร์นาเมนต์"
         theme="cyan"
+        noAccessInfo={noAccessInfo}
+        onLogout={handleLogout}
         onLoginSuccess={handleLoginSuccess}
       />
     );
