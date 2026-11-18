@@ -318,8 +318,8 @@ export default function TrialFOTYPage() {
     try {
       if (isManual) setLoading(true);
       const [resTrial, resPoll] = await Promise.all([
-        fetch("/api/trial", { cache: "no-store" }),
-        fetch("/api/trial-poll", { cache: "no-store" }).catch(() => null),
+        fetch(`/api/trial?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/trial-poll?t=${Date.now()}`, { cache: "no-store" }).catch(() => null),
       ]);
 
       if (resTrial && resTrial.ok) {
@@ -327,6 +327,9 @@ export default function TrialFOTYPage() {
         if (json.success && Array.isArray(json.data)) {
           setContestants(json.data);
           setLastUpdated(new Date());
+          try {
+            localStorage.setItem("fpt_trial_contestants_cache", JSON.stringify(json.data));
+          } catch (e) {}
         }
       }
 
@@ -334,6 +337,9 @@ export default function TrialFOTYPage() {
         const jsonPoll = await resPoll.json();
         if (jsonPoll.success && Array.isArray(jsonPoll.data)) {
           setPollList(jsonPoll.data);
+          try {
+            localStorage.setItem("fpt_trial_poll_cache", JSON.stringify(jsonPoll.data));
+          } catch (e) {}
         }
         if (jsonPoll.votingOpen !== undefined) {
           setVotingOpen(Boolean(jsonPoll.votingOpen));
@@ -357,25 +363,40 @@ export default function TrialFOTYPage() {
   };
 
   useEffect(() => {
+    try {
+      const cachedC = localStorage.getItem("fpt_trial_contestants_cache");
+      if (cachedC) {
+        const parsed = JSON.parse(cachedC);
+        if (Array.isArray(parsed) && parsed.length > 0) setContestants(parsed);
+      }
+      const cachedP = localStorage.getItem("fpt_trial_poll_cache");
+      if (cachedP) {
+        const parsedP = JSON.parse(cachedP);
+        if (Array.isArray(parsedP) && parsedP.length > 0) setPollList(parsedP);
+      }
+    } catch (e) {}
+
     fetchData();
     const interval = setInterval(() => fetchData(false), 8000);
     return () => clearInterval(interval);
   }, []);
 
-  // Compute 6 Floating Hero Columns (contestants duplicated seamlessly, fallback to trial-poll data for instant animation)
+  // Compute 6 Floating Hero Columns (using real contestants data, avoiding stale build-time fallbacks)
   const heroColumns = useMemo(() => {
-    const list =
-      contestants && contestants.length > 0
-        ? contestants
-        : fallbackPollData && fallbackPollData.length > 0
-          ? fallbackPollData
-          : [];
+    const list = contestants && contestants.length > 0 ? contestants : [];
     if (list.length === 0) return [[], [], [], [], [], []];
     const cols = [[], [], [], [], [], []];
     list.forEach((c, idx) => {
       cols[idx % 6].push(c);
     });
-    return cols.map((col) => [...col, ...col, ...col, ...col]);
+    return cols.map((col) => {
+      if (col.length === 0) return [];
+      let expanded = [...col];
+      while (expanded.length < 8) {
+        expanded = [...expanded, ...col];
+      }
+      return expanded;
+    });
   }, [contestants]);
 
   // Compute Dense Ranked Leaderboard
@@ -619,7 +640,8 @@ export default function TrialFOTYPage() {
             gridTemplateColumns: "repeat(6, 1fr)",
             gap: "10px",
             padding: "0 14px",
-            opacity: 0.22,
+            opacity: contestants.length > 0 ? 0.22 : 0,
+            transition: "opacity 0.5s ease-in-out",
             pointerEvents: "none",
             zIndex: 1,
             filter: "contrast(1.05) saturate(0.85)",

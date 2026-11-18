@@ -133,12 +133,13 @@ export default function MainPage() {
 
   // 6 columns of contestant photos for the hero background wall
   const heroColumns = useMemo(() => {
+    const list = leaderboard && leaderboard.length > 0 ? leaderboard : heroContestants;
     const cols = [[], [], [], [], [], []];
-    heroContestants.forEach((c, idx) => {
+    list.forEach((c, idx) => {
       cols[idx % 6].push(c);
     });
     return cols.map((col) => [...col, ...col, ...col, ...col]);
-  }, []);
+  }, [leaderboard]);
 
   // 2026 Audition weekly episodes from history data
   const fotyWeeklyEpisodes = useMemo(() => {

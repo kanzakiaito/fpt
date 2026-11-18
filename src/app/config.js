@@ -10,221 +10,221 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือภาพ iPhone รุ่นใด?",
-        "สิ่งต่อไปนี้เกิดขึ้นครั้งแรกใน iPhone รุ่นใด? (หากมีมากกว่า 1 รุ่น ตอบรุ่นไหนก็ได้)",
-        "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?"
+        "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+        "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+        "นี่คือคุณสมบัติของตัวละครในจักรวาล Magica ที่มีชื่อว่าอะไร?"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone X"
+            "answer": "Tomoe Mami"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone Duo"
+            "answer": "Miki Sayaka"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone 4s"
+            "answer": "Akemi Homura"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone 7"
+            "answer": "Momoe Nagisa"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone 16e"
+            "answer": "Tamaki Iroha"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone 17 Pro"
+            "answer": "Zi Ding Xiang"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone 5c"
+            "answer": "Alina Gray"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone 3G"
+            "answer": "Higure Fuka"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone Air"
+            "answer": "Nagiboshi Sorana"
         },
         {
-            "question": "นี่คือภาพ iPhone รุ่นใด?",
+            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "iPhone (1st generation)"
+            "answer": "Kaname Madoka"
         },
         {
-            "question": "ระบบจดจำใบหน้า (Face ID)",
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/11.png",
+            "audio": null,
+            "video": null,
+            "answer": "Gertrud"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/12.png",
+            "audio": null,
+            "video": null,
+            "answer": "Gisela"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/13.png",
+            "audio": null,
+            "video": null,
+            "answer": "Walpurgisnacht"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/14.png",
+            "audio": null,
+            "video": null,
+            "answer": "Roberta"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/15.png",
+            "audio": null,
+            "video": null,
+            "answer": "Candy"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/16.png",
+            "audio": null,
+            "video": null,
+            "answer": "Zenobia"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/17.png",
+            "audio": null,
+            "video": null,
+            "answer": "Albertine"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/18.png",
+            "audio": null,
+            "video": null,
+            "answer": "Oktavia von Seckendorff"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/19.png",
+            "audio": null,
+            "video": null,
+            "answer": "Neo Dorothy Motherfucker"
+        },
+        {
+            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "image": "public/img/20.png",
+            "audio": null,
+            "video": null,
+            "answer": "Charlotte"
+        },
+        {
+            "question": "สาวน้อยเวทมนตร์ในกลุ่ม Holy Quintet เพียงคนเดียวที่ใช้กระบองเป็นอาวุธ",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "iPhone X"
+            "answer": "Sakura Kyoko"
         },
         {
-            "question": "หน้าจอพับได้",
+            "question": "สาวน้อยเวทมนตร์ที่ใช้ \"ฟิล์มภาพยนตร์\" เป็นเอกลักษณ์ของตน",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "iPhone Duo"
+            "answer": "Aki Mabayu"
         },
         {
-            "question": "Siri",
+            "question": "แม่มดที่สังหาร Mami ให้หัวขาดและตัวห้อยลอยเหนือพื้น",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "iPhone 4s"
+            "answer": "Charlotte"
         },
         {
-            "question": "นำรูเสียบหูฟังขนาด 3.5 mm ออกจากตัวเครื่อง",
+            "question": "แมวสุดรักสุดหวงเพียงหนึ่งเดียวของ Madoka",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "iPhone 7 / 7 Plus"
+            "answer": "Amy"
         },
         {
-            "question": "ชิพ A18 และ Apple C1 ตัวใหม่ที่ช่วยยืดอายุการใช้งานแบตเตอรี่",
+            "question": "สิ่งมีชีวิตตัวเล็กปริศนา ที่เชิญชวนสร้างพันธะสัญญาในการเป็นสาวน้อยเวทมนตร์",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "iPhone 16e"
-        },
-        {
-            "question": "ระบบลดความร้อนเครื่องด้วยห้องไอน้ำ (Vapor-chamber cooling system)",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "iPhone 17 Pro"
-        },
-        {
-            "question": "รองรับระบบอินเตอร์เน็ต 3G",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "iPhone 3G"
-        },
-        {
-            "question": "ระบบดาวเทียมฉุกเฉินสำหรับโทรศัพท์ (Satellite phone)",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "iPhone 14 / 14 Plus / 14 Pro / 14 Pro Max"
-        },
-        {
-            "question": "ความหนาของเครื่องเพียง 5.6 mm",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "iPhone Air"
-        },
-        {
-            "question": "สมาร์ตโฟนรุ่นแรกสุดในตระกูล iPhone",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "iPhone (1st generation)"
-        },
-        {
-            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
-            "image": "public/img/21.png",
-            "audio": null,
-            "video": null,
-            "answer": "iPhone X"
-        },
-        {
-            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
-            "image": "public/img/22.png",
-            "audio": null,
-            "video": null,
-            "answer": "iPhone Duo"
-        },
-        {
-            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
-            "image": "public/img/23.png",
-            "audio": null,
-            "video": null,
-            "answer": "iPhone 4s"
-        },
-        {
-            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
-            "image": "public/img/24.png",
-            "audio": null,
-            "video": null,
-            "answer": "iPhone XR"
-        },
-        {
-            "question": "นี่คือภาพเหตุการณ์การเปิดตัวของ iPhone รุ่นใด?",
-            "image": "public/img/25.png",
-            "audio": null,
-            "video": null,
-            "answer": "iPhone (1st generation)"
+            "answer": "Kyubey"
         }
     ],
     "qa": {
-        "question": "ภายในของเครื่อง iPhone X มีสัญลักษณ์ Apple อยู่กี่ตำแหน่ง / มีสกรูปักอยู่ทั้งหมดกี่จุด?",
-        "answer": "3 ตำแหน่ง / 18 จุด",
+        "question": "จากทุกจักรวาลแห่ง Magica ตั้งแต่ภาคหลัก, ภาคเสริมในภาพยนตร์, Magia Record และ Magia Exedra สาวน้อยเวทมนตร์ที่คำอธิษฐานมีใจความสั้นที่สุดคือใคร / กล่าวไว้ว่าอย่างไร?",
+        "answer": "Tomoe Mami / \"ฉันอยากมีชีวิต\"",
         "audio": null,
         "choices": [
-            "ไม่มี / 10 จุด",
-            "1 ตำแหน่ง / 12 จุด",
-            "2 ตำแหน่ง / 14 จุด",
-            "2 ตำแหน่ง / 15 จุด",
-            "3 ตำแหน่ง / 18 จุด"
+            "Momoe Nagisa / \"ฉันอยากกินชีสเค้ก\"",
+            "Akemi Homura / \"ฉันอยากพบมาโดกะ\"",
+            "Nanami Yachiyo / \"ฉันอยากเป็นผู้นำ\"",
+            "Lilly Candy / \"ฉันอยากเป็นสุดยอด VTuber\"",
+            "Tomoe Mami / \"ฉันอยากมีชีวิต\""
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
+            4,
             1,
-            3,
             2
         ]
     },
     "jigsaw": {
-        "mode": "square",
+        "mode": "landscape",
         "image": "public/img/jigsaw.png",
-        "answer": "iPhone SE",
-        "question": "หลังจิ๊กซอว์นี้คือ iPhone รุ่นใด?"
+        "answer": "Momoe Nagisa",
+        "question": "หลังจิ๊กซอว์นี้คือตัวละครในจักรวาล Magica ที่มีชื่อว่าอะไร?"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของแอปพลิเคชั่นใน iPhone ที่มีชื่อว่าอะไร?",
+        "question": "นี่คือคุณสมบัติของสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
         "clues": [
-            "ใช้ฟรี ไม่ต้องจ่ายค่าแอป",
-            "โลโก้ไม่มีสีเขียว",
-            "เป็นแอปพลิเคชั่นประเภท Internet Browser",
-            "เป็นแอปพลิเคชั่น Build-in ภายในเครื่อง",
-            "ชื่อแอปพลิเคชั่นมี 3 พยางค์"
+            "เป็นสาวน้อยเวทมนตร์ที่ปรากฏใน Magia Record",
+            "ใช้ธนูเป็นอาวุธ",
+            "Soul Gem ประจำตัวมีสีชมพู",
+            "เป็นสาวน้อยเวทมนตร์ที่ปรากฏในภาพยนตร์ภาค Walpurgisnacht Rising",
+            "เป็นสาวน้อยเวทมนตร์ในกลุ่ม Holy Quintet"
         ],
-        "answer": "Safari"
+        "answer": "Kaname Madoka"
     },
     "battle": {
         "player1": {

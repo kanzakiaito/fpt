@@ -131,6 +131,9 @@ function computePollPercentages(items) {
   });
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const [data, trialContestants, gameScores, rawSettings] = await Promise.all([
     getKVData("fpt_trial_poll", readLocalPoll),
@@ -165,24 +168,32 @@ export async function GET() {
     );
     return {
       ...item,
-      image: item.image || matched?.image || "",
-      name: item.name || matched?.name || "",
-      nickname: item.nickname || matched?.nickname || "",
-      topic: item.topic || matched?.topic || "-",
-      warmupSchedule: item.warmupSchedule || matched?.warmupSchedule || "",
+      image: (matched && matched.image) ? matched.image : (item.image || ""),
+      name: (matched && matched.name) ? matched.name : (item.name || ""),
+      nickname: (matched && matched.nickname) ? matched.nickname : (item.nickname || ""),
+      topic: (matched && matched.topic) ? matched.topic : (item.topic || "-"),
+      warmupSchedule: (matched && matched.warmupSchedule) ? matched.warmupSchedule : (item.warmupSchedule || ""),
       gameScores: matchedGame?.scores || null,
       gameTotalScore: matchedGame?.totalScore !== undefined ? matchedGame.totalScore : Number(item.whatIfScore || 0),
     };
   });
 
-  return NextResponse.json({
-    success: true,
-    data: enrichedPoll,
-    votingOpen,
-    showWarmupTable,
-    showPollTable,
-    showTrialPollTable,
-  });
+  return NextResponse.json(
+    {
+      success: true,
+      data: enrichedPoll,
+      votingOpen,
+      showWarmupTable,
+      showPollTable,
+      showTrialPollTable,
+    },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "CDN-Cache-Control": "no-store",
+      },
+    }
+  );
 }
 
 export async function POST(request) {

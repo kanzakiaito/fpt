@@ -879,8 +879,8 @@ export default function TrialFotyBallotVotePage() {
   const loadPollData = async () => {
     try {
       const [resPoll, resTrial] = await Promise.all([
-        fetch("/api/trial-poll", { cache: "no-store" }),
-        fetch("/api/trial", { cache: "no-store" }).catch(() => null),
+        fetch(`/api/trial-poll?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/trial?t=${Date.now()}`, { cache: "no-store" }).catch(() => null),
       ]);
 
       let contestantsList = [];
@@ -904,13 +904,16 @@ export default function TrialFotyBallotVotePage() {
             );
             return {
               ...item,
-              image: item.image || matched?.image || "",
-              name: item.name || matched?.name || "",
-              nickname: item.nickname || matched?.nickname || "",
-              topic: item.topic || matched?.topic || "-",
+              image: (matched && matched.image) ? matched.image : (item.image || ""),
+              name: (matched && matched.name) ? matched.name : (item.name || ""),
+              nickname: (matched && matched.nickname) ? matched.nickname : (item.nickname || ""),
+              topic: (matched && matched.topic) ? matched.topic : (item.topic || "-"),
             };
           });
           setPollList(merged);
+          try {
+            localStorage.setItem("fpt_trial_poll_cache", JSON.stringify(merged));
+          } catch (e) {}
         }
         if (json.votingOpen !== undefined) {
           setVotingOpen(Boolean(json.votingOpen));

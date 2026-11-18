@@ -39,9 +39,20 @@ function writeData(data) {
   }
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const data = await getKVData("fpt_trial", readData);
-  return NextResponse.json({ success: true, data: data || [], finals: [] });
+  return NextResponse.json(
+    { success: true, data: data || [], finals: [] },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "CDN-Cache-Control": "no-store",
+      },
+    }
+  );
 }
 
 export async function POST(req) {
