@@ -1412,8 +1412,8 @@ export default function TrialAdminPage() {
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link href="/trial-foty" title="ไปที่ตารางคะแนนแข่งขัน">
             <img
-              src="/img/logo.png"
-              alt="Fanpantae 2026"
+              src="/img/trial_foty_logo.png"
+              alt="The Trial FOTY 2026"
               style={{
                 height: "34px",
                 width: "auto",

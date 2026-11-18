@@ -751,8 +751,8 @@ export default function TrialFOTYPage() {
             }}
           >
             <img
-              src="/img/logo.png"
-              alt="FANPANTAE 2026"
+              src="/img/trial_foty_logo.png"
+              alt="THE TRIAL FAN OF THE YEAR 2026"
               style={{
                 width: "100%",
                 height: "auto",

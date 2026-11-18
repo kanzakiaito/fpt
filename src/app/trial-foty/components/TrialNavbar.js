@@ -137,8 +137,8 @@ export default function TrialNavbar({
           }}
         >
           <img
-            src="/img/game_logo.png"
-            alt="FAN OF THE YEAR 2026"
+            src="/img/trial_foty_logo.png"
+            alt="THE TRIAL FAN OF THE YEAR 2026"
             style={{
               height: "36px",
               width: "auto",
