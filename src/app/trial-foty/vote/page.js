@@ -860,7 +860,7 @@ export default function TrialFotyBallotVotePage() {
     const isSuccess = feedbackModal.type === "success";
     setFeedbackModal({ open: false, type: "success", title: "", message: "", details: null });
     if (isSuccess && typeof window !== "undefined") {
-      window.location.href = "/";
+      window.location.href = "/trial-foty";
     }
   };
 
@@ -936,19 +936,7 @@ export default function TrialFotyBallotVotePage() {
 
     loadPollData();
     try {
-      const stored = localStorage.getItem("trial_foty_ballot_voted");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.ranks) {
-          // Normalize to arrays
-          const normalized = {};
-          Object.keys(parsed.ranks).forEach((k) => {
-            normalized[k] = Array.isArray(parsed.ranks[k]) ? parsed.ranks[k] : [parsed.ranks[k]].filter(Boolean);
-          });
-          setBallotRanks((prev) => ({ ...prev, ...normalized }));
-        }
-        if (parsed.champion) setChampionId(parsed.champion);
-      }
+      localStorage.removeItem("trial_foty_ballot_voted");
     } catch (e) {}
   }, []);
 
@@ -1029,14 +1017,16 @@ export default function TrialFotyBallotVotePage() {
           setPollList(data.data);
         }
         setHasVotedSuccess(true);
-        try {
-          localStorage.setItem(
-            "trial_foty_ballot_voted",
-            JSON.stringify({ ranks: ballotRanks, champion: championId, date: new Date().toISOString() })
-          );
-        } catch (e) {}
 
         const championCandidate = getCandidateById(championId);
+        const selectedCount = totalSelectedInRanks + 1;
+
+        // Reset ballot selections immediately so choices don't linger on screen or in storage
+        setBallotRanks({ "1": [], "2": [], "3": [], "4": [], "5": [] });
+        setChampionId("");
+        try {
+          localStorage.removeItem("trial_foty_ballot_voted");
+        } catch (e) {}
 
         setFeedbackModal({
           open: true,
@@ -1045,7 +1035,7 @@ export default function TrialFotyBallotVotePage() {
           message: "ผลการลงคะแนนของคุณถูกบันทึกเข้าสู่ระบบอย่างปลอดภัยเรียบร้อยแล้ว ขอบคุณที่ร่วมส่งแรงใจให้กับผู้เข้าแข่งขันครับ!",
           details: {
             champion: championCandidate,
-            selectedCount: totalSelectedInRanks + 1,
+            selectedCount: selectedCount,
           },
         });
       } else {
@@ -1455,7 +1445,7 @@ export default function TrialFotyBallotVotePage() {
               >
                 {feedbackModal.type === "success" ? (
                   <>
-                    <span>🏠</span> ปิดและกลับสู่หน้าแรก
+                    <span>🏆</span> ปิดและกลับสู่หน้าหลัก Trial FOTY
                   </>
                 ) : (
                   "ปิดหน้าต่าง"
