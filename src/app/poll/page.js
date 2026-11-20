@@ -577,6 +577,7 @@ export default function PollPage() {
   const [candidates, setCandidates] = useState([]);
   const [votingOpen, setVotingOpen] = useState(false);
   const [showPollTable, setShowPollTable] = useState(true);
+  const [isScoreHidden, setIsScoreHidden] = useState(false);
   const canViewStandings = showPollTable || isAdmin;
   const [loading, setLoading] = useState(true);
 
@@ -617,6 +618,9 @@ export default function PollPage() {
         setVotingOpen(Boolean(data.votingOpen));
         if (data.showPollTable !== undefined) {
           setShowPollTable(Boolean(data.showPollTable));
+        }
+        if (data.isScoreHidden !== undefined) {
+          setIsScoreHidden(Boolean(data.isScoreHidden));
         }
       }
     } catch (err) {
@@ -1245,6 +1249,33 @@ export default function PollPage() {
               />
             </div>
 
+            {/* Spoiler Shield Banner */}
+            {isScoreHidden && (
+              <div
+                style={{
+                  background: "linear-gradient(135deg, rgba(14, 165, 233, 0.16) 0%, rgba(2, 132, 199, 0.28) 100%)",
+                  border: "2px solid #38bdf8",
+                  borderRadius: "14px",
+                  padding: "16px 20px",
+                  marginBottom: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  boxShadow: "0 0 25px rgba(56, 189, 248, 0.22)",
+                }}
+              >
+                <span style={{ fontSize: "32px", flexShrink: 0 }}>🛡️</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "16px", fontWeight: "900", color: "#38bdf8" }}>
+                    ระบบปิดการมองเห็นคะแนนโพลล์ระหว่างโหวตเพื่อกันสปอยล์ (Official Spoiler Shield)
+                  </div>
+                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)", marginTop: "3px", lineHeight: "1.5" }}>
+                    เพื่อความยุติธรรมและรักษาความตื่นเต้น ระบบได้ทำการซ่อนคะแนนและอันดับสดไว้ชั่วคราวระหว่างเปิดรับโหวต โดยผลคะแนนโพลล์อย่างเป็นทางการจะเปิดเผยพร้อมกันหลังปิดรับโหวต
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {filteredPoll.map((item, idx) => {
                 const pctNum = parseFloat(item.percent) || 0;
@@ -1257,8 +1288,8 @@ export default function PollPage() {
                       justifyContent: "space-between",
                       padding: "12px 18px",
                       borderRadius: "14px",
-                      background: idx < 5 ? "rgba(0, 229, 255, 0.08)" : "rgba(255,255,255,0.02)",
-                      border: idx === 0 ? "1.5px solid #ffd700" : idx < 5 ? "1px solid rgba(0, 229, 255, 0.3)" : "1px solid rgba(255,255,255,0.08)",
+                      background: (!isScoreHidden && idx < 5) ? "rgba(0, 229, 255, 0.08)" : "rgba(255,255,255,0.02)",
+                      border: (!isScoreHidden && idx === 0) ? "1.5px solid #ffd700" : (!isScoreHidden && idx < 5) ? "1px solid rgba(0, 229, 255, 0.3)" : "1px solid rgba(255,255,255,0.08)",
                       gap: "14px",
                     }}
                   >
@@ -1267,11 +1298,11 @@ export default function PollPage() {
                         style={{
                           fontSize: "15px",
                           fontWeight: "900",
-                          color: idx === 0 ? "#ffd700" : idx === 1 ? "#e2e8f0" : idx === 2 ? "#cd7f32" : "#94a3b8",
+                          color: isScoreHidden ? "#94a3b8" : idx === 0 ? "#ffd700" : idx === 1 ? "#e2e8f0" : idx === 2 ? "#cd7f32" : "#94a3b8",
                           minWidth: "28px",
                         }}
                       >
-                        #{item.pollRank || idx + 1}
+                        {isScoreHidden ? "🛡️" : `#${item.pollRank || idx + 1}`}
                       </span>
 
                       <div
@@ -1280,7 +1311,7 @@ export default function PollPage() {
                           height: "42px",
                           borderRadius: "50%",
                           overflow: "hidden",
-                          border: idx === 0 ? "2px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.5)",
+                          border: (!isScoreHidden && idx === 0) ? "2px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.5)",
                           flexShrink: 0,
                           background: "#081020",
                         }}
@@ -1315,15 +1346,15 @@ export default function PollPage() {
                       >
                         <div
                           style={{
-                            width: `${Math.min(pctNum * 5, 100)}%`,
+                            width: isScoreHidden ? "0%" : `${Math.min(pctNum * 5, 100)}%`,
                             height: "100%",
                             background: idx === 0 ? "linear-gradient(90deg, #ffd700, #ff8800)" : "linear-gradient(90deg, #00e5ff, #0077b6)",
                             borderRadius: "4px",
                           }}
                         />
                       </div>
-                      <span style={{ fontSize: "15px", fontWeight: "900", color: idx === 0 ? "#ffd700" : "#ffffff", minWidth: "55px", textAlign: "right" }}>
-                        {item.percent}
+                      <span style={{ fontSize: "14px", fontWeight: "900", color: (!isScoreHidden && idx === 0) ? "#ffd700" : isScoreHidden ? "#94a3b8" : "#ffffff", minWidth: isScoreHidden ? "80px" : "55px", textAlign: "right" }}>
+                        {isScoreHidden ? "🔒 รอสรุปผล" : item.percent}
                       </span>
                     </div>
                   </div>

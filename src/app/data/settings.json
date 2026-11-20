@@ -14,5 +14,7 @@
   "favFanVotingOpen": false,
   "showFavFanInNav": false,
   "pollVotingOpen": false,
-  "showPollInNav": false
+  "showPollInNav": false,
+  "hidePollScoresDuringVote": true,
+  "hideTrialPollScoresDuringVote": true
 }

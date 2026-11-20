@@ -105,7 +105,7 @@ function recalculatePercentages(items) {
   });
 }
 
-export async function GET() {
+export async function GET(req) {
   try {
     const [pollData, rawSettings] = await Promise.all([
       getKVData("fpt_poll", readLocalPoll),
@@ -115,6 +115,17 @@ export async function GET() {
     const votingOpen = Boolean(rawSettings?.pollVotingOpen);
     const showInNav = Boolean(rawSettings?.showPollInNav);
     const showPollTable = rawSettings ? rawSettings.showPollTable !== false : true;
+    const hidePollScoresDuringVote = rawSettings ? rawSettings.hidePollScoresDuringVote !== false : true;
+
+    let isAdmin = false;
+    try {
+      if (req) {
+        const url = new URL(req.url);
+        if (url.searchParams.get("admin") === "1") isAdmin = true;
+      }
+    } catch (e) {}
+
+    const isScoreHidden = Boolean(!isAdmin && votingOpen && hidePollScoresDuringVote);
 
     let items = Array.isArray(pollData) && pollData.length > 0 ? pollData : [...DEFAULT_POLL];
     const auditions = getAudition2026();
@@ -168,14 +179,28 @@ export async function GET() {
       image: c.image || "",
     }));
 
+    let outputData = enriched;
+    if (isScoreHidden) {
+      outputData = enriched
+        .map((item) => ({
+          ...item,
+          pollRank: "?",
+          votes: 0,
+          percent: "🔒 รอสรุปผล",
+        }))
+        .sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
+    }
+
     return NextResponse.json(
       {
         success: true,
-        data: enriched,
+        data: outputData,
         candidates,
         votingOpen,
         showInNav,
         showPollTable,
+        isScoreHidden,
+        hidePollScoresDuringVote,
       },
       {
         headers: {
@@ -300,6 +325,20 @@ export async function POST(request) {
         success: true,
         votingOpen: newStatus,
         message: newStatus ? "เปิดรับการโหวตโพลล์แห่งปีแล้ว" : "ปิดรับการโหวตโพลล์แห่งปีแล้ว",
+      });
+    }
+
+    // Toggle hide poll scores during vote (Spoiler Shield)
+    if (action === "toggle_hide_scores" || action === "toggle_hide_poll_scores") {
+      let currentSettings = (await getKVData("fpt_settings", readLocalSettings)) || {};
+      const current = currentSettings.hidePollScoresDuringVote !== false;
+      const newStatus = body.hidePollScoresDuringVote !== undefined ? Boolean(body.hidePollScoresDuringVote) : !current;
+      currentSettings.hidePollScoresDuringVote = newStatus;
+      await saveKVData("fpt_settings", currentSettings, writeLocalSettings);
+      return NextResponse.json({
+        success: true,
+        hidePollScoresDuringVote: newStatus,
+        message: newStatus ? "🛡️ เปิดระบบปิดการมองเห็นคะแนนโพลล์ระหว่างโหวตแล้ว" : "🔓 ปิดระบบกันสปอยล์ (แสดงคะแนนตามปกติ)",
       });
     }
 

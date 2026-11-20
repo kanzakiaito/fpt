@@ -129,7 +129,7 @@ function computePollPercentages(items) {
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(req) {
   const [data, trialContestants, gameScores, rawSettings] = await Promise.all([
     getKVData("fpt_trial_poll", readLocalPoll),
     getKVData("fpt_trial", readTrialData),
@@ -142,6 +142,17 @@ export async function GET() {
     ? (rawSettings.showTrialPollTable !== undefined ? rawSettings.showTrialPollTable !== false : true)
     : true;
   const showPollTable = showTrialPollTable;
+  const hideTrialPollScoresDuringVote = rawSettings ? rawSettings.hideTrialPollScoresDuringVote !== false : true;
+
+  let isAdmin = false;
+  try {
+    if (req) {
+      const url = new URL(req.url);
+      if (url.searchParams.get("admin") === "1") isAdmin = true;
+    }
+  } catch (e) {}
+
+  const isScoreHidden = Boolean(!isAdmin && votingOpen && hideTrialPollScoresDuringVote);
 
   const pollList = Array.isArray(data) && data.length > 0 ? data : getDefaultPoll();
   const contestants = Array.isArray(trialContestants) ? trialContestants : [];
@@ -173,14 +184,31 @@ export async function GET() {
     };
   });
 
+  let outputData = enrichedPoll;
+  if (isScoreHidden) {
+    outputData = enrichedPoll
+      .map((item) => ({
+        ...item,
+        pollRank: "?",
+        votes: 0,
+        totalScore: 0,
+        percent: "🔒 รอสรุปผล",
+        championVotes: 0,
+        rankVotes: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      }))
+      .sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
+  }
+
   return NextResponse.json(
     {
       success: true,
-      data: enrichedPoll,
+      data: outputData,
       votingOpen,
       showWarmupTable,
       showPollTable,
       showTrialPollTable,
+      isScoreHidden,
+      hideTrialPollScoresDuringVote,
     },
     {
       headers: {
@@ -254,6 +282,27 @@ export async function POST(request) {
         showPollTable: newStatus,
         showTrialPollTable: newStatus,
         message: newStatus ? "🟢 เปิดแสดงตารางโพลล์ในหน้าแรกแล้ว" : "🔴 ซ่อนตารางโพลล์ในหน้าแรกแล้ว",
+      });
+    }
+
+    // Toggle hide trial poll scores during vote (Spoiler Shield)
+    if (body.action === "toggle_hide_scores" || body.action === "toggle_hide_trial_poll_scores") {
+      const rawSettings = await getKVData("fpt_settings", readSettings);
+      const currentVal = rawSettings ? rawSettings.hideTrialPollScoresDuringVote !== false : true;
+      const newStatus =
+        body.hideTrialPollScoresDuringVote !== undefined
+          ? Boolean(body.hideTrialPollScoresDuringVote)
+          : !currentVal;
+      const updatedSettings = {
+        ...(rawSettings || {}),
+        hideTrialPollScoresDuringVote: newStatus,
+      };
+      writeSettings(updatedSettings);
+      await saveKVData("fpt_settings", updatedSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        hideTrialPollScoresDuringVote: newStatus,
+        message: newStatus ? "🛡️ เปิดระบบปิดการมองเห็นคะแนนโพลล์ระหว่างโหวตแล้ว" : "🔓 ปิดระบบกันสปอยล์ (แสดงคะแนนตามปกติ)",
       });
     }
 

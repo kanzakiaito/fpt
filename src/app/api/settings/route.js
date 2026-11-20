@@ -33,6 +33,8 @@ const DEFAULT_SETTINGS = {
   showFavFanInNav: false,
   pollVotingOpen: false,
   showPollInNav: false,
+  hidePollScoresDuringVote: true,
+  hideTrialPollScoresDuringVote: true,
   protectFoty: false,
   fotyPassword: "",
   showFotyInNav: true,
@@ -116,6 +118,8 @@ export async function GET(request) {
       showFavFanInNav: Boolean(settings.showFavFanInNav),
       pollVotingOpen: Boolean(settings.pollVotingOpen),
       showPollInNav: Boolean(settings.showPollInNav),
+      hidePollScoresDuringVote: settings.hidePollScoresDuringVote !== false,
+      hideTrialPollScoresDuringVote: settings.hideTrialPollScoresDuringVote !== false,
       protectFoty: Boolean(settings.protectFoty),
       fotyPassword: settings.fotyPassword || "",
       showFotyInNav: settings.showFotyInNav !== false,
@@ -160,6 +164,8 @@ export async function GET(request) {
     showFavFanInNav: Boolean(settings.showFavFanInNav),
     pollVotingOpen: Boolean(settings.pollVotingOpen),
     showPollInNav: Boolean(settings.showPollInNav),
+    hidePollScoresDuringVote: settings.hidePollScoresDuringVote !== false,
+    hideTrialPollScoresDuringVote: settings.hideTrialPollScoresDuringVote !== false,
     protectFoty: Boolean(settings.protectFoty),
     showFotyInNav: settings.showFotyInNav !== false,
     protectCurrent: Boolean(settings.protectCurrent),
@@ -554,6 +560,37 @@ export async function POST(request) {
         success: true,
         showWarmupTable: newStatus,
         message: newStatus ? "เปิดแสดงตารางรอบอุ่นเครื่องแล้ว" : "ปิดแสดงตารางรอบอุ่นเครื่องแล้ว",
+      });
+    }
+
+    // Toggle hide poll scores during vote (Spoiler Shield)
+    if (body.action === "toggle_hide_poll_scores") {
+      const currentVal = current.hidePollScoresDuringVote !== false;
+      const newStatus =
+        body.hidePollScoresDuringVote !== undefined
+          ? Boolean(body.hidePollScoresDuringVote)
+          : !currentVal;
+      const newSettings = { ...current, hidePollScoresDuringVote: newStatus };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        hidePollScoresDuringVote: newStatus,
+        message: newStatus ? "🛡️ เปิดระบบปิดการมองเห็นคะแนนโพลล์ระหว่างโหวตแล้ว" : "🔓 ปิดระบบกันสปอยล์ (แสดงคะแนนโพลล์ตามปกติ)",
+      });
+    }
+
+    if (body.action === "toggle_hide_trial_poll_scores") {
+      const currentVal = current.hideTrialPollScoresDuringVote !== false;
+      const newStatus =
+        body.hideTrialPollScoresDuringVote !== undefined
+          ? Boolean(body.hideTrialPollScoresDuringVote)
+          : !currentVal;
+      const newSettings = { ...current, hideTrialPollScoresDuringVote: newStatus };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        hideTrialPollScoresDuringVote: newStatus,
+        message: newStatus ? "🛡️ เปิดระบบปิดการมองเห็นคะแนนโพลล์ Trial ระหว่างโหวตแล้ว" : "🔓 ปิดระบบกันสปอยล์ (แสดงคะแนนโพลล์ตามปกติ)",
       });
     }
 

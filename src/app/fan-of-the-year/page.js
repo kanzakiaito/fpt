@@ -106,7 +106,7 @@ function getOptimizedImageUrl(src, targetSize = 120) {
 // Helper to look up contestant poll rank from pollList
 function getContestantPollRank(item, pollList) {
   if (!item) return null;
-  if (item.pollRank !== undefined && item.pollRank !== null && item.pollRank !== "") {
+  if (item.pollRank !== undefined && item.pollRank !== null && item.pollRank !== "" && item.pollRank !== "?") {
     return Number(item.pollRank);
   }
   if (!Array.isArray(pollList)) return null;
@@ -123,7 +123,7 @@ function getContestantPollRank(item, pollList) {
     if (pTopic && iTopic && (pTopic === iTopic || pTopic.includes(iTopic) || iTopic.includes(pTopic))) return true;
     return false;
   });
-  return found ? Number(found.pollRank) : null;
+  return found && found.pollRank !== undefined && found.pollRank !== "?" ? Number(found.pollRank) : null;
 }
 
 // Dense Ranking Calculation - Only contestants with recorded scores appear in standings
@@ -503,6 +503,7 @@ export default function MainPage() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [totalContestants, setTotalContestants] = useState(23);
   const [pollList, setPollList] = useState(POLL_CONTESTANTS);
+  const [isScoreHidden, setIsScoreHidden] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Tab State: 'standings' | 'poll'
@@ -558,6 +559,9 @@ export default function MainPage() {
       }
       if (pollData.success && Array.isArray(pollData.data) && pollData.data.length > 0) {
         setPollList(pollData.data);
+      }
+      if (pollData.isScoreHidden !== undefined) {
+        setIsScoreHidden(Boolean(pollData.isScoreHidden));
       }
       if (settingsData.success) {
         if (settingsData.showPollTable !== undefined) {
@@ -3617,6 +3621,34 @@ export default function MainPage() {
                   </div>
                 </div>
 
+                {/* Spoiler Protection Alert Banner */}
+                {isScoreHidden && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "12px 18px",
+                      borderRadius: "10px",
+                      background: "linear-gradient(90deg, rgba(234, 179, 8, 0.15) 0%, rgba(202, 138, 4, 0.05) 100%)",
+                      border: "1px solid rgba(234, 179, 8, 0.4)",
+                      marginBottom: "14px",
+                      color: "#fef08a",
+                      fontSize: "13.5px",
+                    }}
+                  >
+                    <span style={{ fontSize: "20px" }}>🛡️</span>
+                    <div>
+                      <div style={{ fontWeight: "800", color: "#facc15" }}>
+                        โหมดป้องกันสปอยล์ (Spoiler Shield Active)
+                      </div>
+                      <div style={{ fontSize: "12.5px", color: "rgba(254, 240, 138, 0.85)" }}>
+                        คะแนนและอันดับจริงถูกซ่อนไว้ระหว่างการเปิดโหวตเพื่อความโปร่งใสและตื่นเต้น โดยจะเปิดเผยผลอย่างเป็นทางการหลังปิดโหวต
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Column Headers Row (Slanted Pills) */}
                 <div style={{
                   display: "flex",
@@ -3710,17 +3742,18 @@ export default function MainPage() {
                     ไม่พบข้อมูลโพลล์ที่ตรงกับการค้นหา
                   </div>
                 ) : (
-                  filteredPoll.map((item) => {
+                  filteredPoll.map((item, idx) => {
                     const matchedContestant = leaderboard.find((c) =>
                       (c.name && item.name && (c.name.trim() === item.name.trim() || c.name.includes(item.name) || item.name.includes(c.name))) ||
                       (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim()) ||
                       (c.topic && item.topic && (c.topic.trim() === item.topic.trim() || item.topic.includes(c.topic) || c.topic.includes(item.topic)))
                     );
                     const photo = matchedContestant?.image || null;
-                    const isRank1 = item.pollRank === 1;
-                    const isRank2 = item.pollRank === 2;
-                    const isRank3 = item.pollRank === 3;
-                    const isTop5 = item.pollRank <= 5;
+                    const isHidden = isScoreHidden || item.pollRank === "?" || item.percent === "🔒 รอสรุปผล";
+                    const isRank1 = !isHidden && item.pollRank === 1;
+                    const isRank2 = !isHidden && item.pollRank === 2;
+                    const isRank3 = !isHidden && item.pollRank === 3;
+                    const isTop5 = !isHidden && Number(item.pollRank) <= 5;
 
                     const borderColor = isTop5
                       ? "#ffd700"
@@ -3734,7 +3767,7 @@ export default function MainPage() {
 
                     return (
                       <div
-                        key={item.pollRank}
+                        key={item.id || item.name || idx}
                         onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
                         title="คลิกเพื่อดูสถิติเจาะลึก"
                         style={{
@@ -3774,11 +3807,11 @@ export default function MainPage() {
                             transform: "skewX(16deg)",
                             fontStyle: "italic",
                             fontWeight: "900",
-                            fontSize: "24px",
+                            fontSize: isHidden ? "18px" : "24px",
                             color: isTop5 ? "#000000" : "#ffffff",
                             textShadow: isTop5 ? "none" : "0 2px 6px rgba(0,0,0,0.8)"
                           }}>
-                            {item.pollRank}
+                            {isHidden ? "🛡️" : item.pollRank}
                           </span>
                         </div>
 
@@ -3956,9 +3989,12 @@ export default function MainPage() {
                             transform: "skewX(16deg)",
                             fontStyle: "italic",
                             fontWeight: "900",
-                            fontSize: "18px",
-                            color: isTop5 ? "#ffd700" : "#67e8f9",
-                            textShadow: isTop5 ? "0 0 10px rgba(255, 215, 0, 0.7)" : "0 0 8px rgba(0, 229, 255, 0.5)"
+                            fontSize: isHidden ? "12px" : "18px",
+                            color: isTop5 ? "#ffd700" : isHidden ? "#fbbf24" : "#67e8f9",
+                            textShadow: isTop5 ? "0 0 10px rgba(255, 215, 0, 0.7)" : "0 0 8px rgba(0, 229, 255, 0.5)",
+                            whiteSpace: "nowrap",
+                            textAlign: "center",
+                            padding: "0 4px",
                           }}>
                             {item.percent}
                           </span>

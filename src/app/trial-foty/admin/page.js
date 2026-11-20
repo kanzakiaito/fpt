@@ -127,6 +127,8 @@ export default function TrialAdminPage() {
   const [togglingPollTable, setTogglingPollTable] = useState(false);
   const [showMainPollTable, setShowMainPollTable] = useState(true);
   const [togglingMainPollTable, setTogglingMainPollTable] = useState(false);
+  const [hideTrialPollScores, setHideTrialPollScores] = useState(true);
+  const [togglingHideScores, setTogglingHideScores] = useState(false);
   const [syncingGameScores, setSyncingGameScores] = useState(false);
 
   // ── Trial Info & Staff Q&A States ─────────────────────────────────────────
@@ -232,6 +234,9 @@ export default function TrialAdminPage() {
           setShowPollTable(Boolean(jsonPoll.showTrialPollTable));
         } else if (jsonPoll.showPollTable !== undefined) {
           setShowPollTable(Boolean(jsonPoll.showPollTable));
+        }
+        if (jsonPoll.hideTrialPollScoresDuringVote !== undefined) {
+          setHideTrialPollScores(Boolean(jsonPoll.hideTrialPollScoresDuringVote));
         }
       }
       if (resInfo.ok) {
@@ -714,6 +719,9 @@ export default function TrialAdminPage() {
         if (data.showPollTable !== undefined) {
           setShowMainPollTable(Boolean(data.showPollTable));
         }
+        if (data.hideTrialPollScoresDuringVote !== undefined) {
+          setHideTrialPollScores(Boolean(data.hideTrialPollScoresDuringVote));
+        }
       }
     } catch (e) {
       console.error(e);
@@ -796,6 +804,30 @@ export default function TrialAdminPage() {
       showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
     } finally {
       setTogglingPollTable(false);
+    }
+  };
+
+  const handleToggleHideScores = async (newStatus) => {
+    const targetStatus = typeof newStatus === "boolean" ? newStatus : !hideTrialPollScores;
+    setTogglingHideScores(true);
+    try {
+      const res = await fetch("/api/trial-poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_hide_scores", hideTrialPollScoresDuringVote: targetStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setHideTrialPollScores(targetStatus);
+        showToast(targetStatus ? "🛡️ เปิดระบบปิดการมองเห็นคะแนนโพลล์ระหว่างโหวตแล้ว" : "🔓 ปิดระบบกันสปอยล์ (แสดงคะแนนสดตามปกติ)", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการตั้งค่า", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setTogglingHideScores(false);
     }
   };
 
@@ -3178,6 +3210,107 @@ export default function TrialAdminPage() {
                       : showPollTable
                       ? "🔒 คลิกเพื่อปิดซ่อน"
                       : "🔓 คลิกเพื่อเปิดแสดง"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Spoiler Shield Toggle Control Box */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "16px 20px",
+                  borderRadius: "14px",
+                  background: hideTrialPollScores
+                    ? "linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, rgba(12, 74, 110, 0.25) 100%)"
+                    : "linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(30, 41, 59, 0.2) 100%)",
+                  border: hideTrialPollScores ? "1.5px solid rgba(56, 189, 248, 0.5)" : "1.5px solid rgba(255, 255, 255, 0.2)",
+                  boxShadow: hideTrialPollScores ? "0 0 16px rgba(56, 189, 248, 0.15)" : "none",
+                  marginBottom: "16px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingHideScores ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={hideTrialPollScores}
+                    disabled={togglingHideScores}
+                    onChange={(e) => handleToggleHideScores(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingHideScores ? "not-allowed" : "pointer",
+                      accentColor: "#38bdf8",
+                    }}
+                  />
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <span
+                        style={{
+                          fontSize: "15px",
+                          fontWeight: "900",
+                          color: hideTrialPollScores ? "#38bdf8" : "#cbd5e1",
+                        }}
+                      >
+                        {hideTrialPollScores ? "🛡️ ปิดการมองเห็นคะแนนโพลล์ระหว่างโหวต (เปิดโหมดกันสปอยล์)" : "🔓 แสดงคะแนนโพลล์สดตามปกติ (ปิดโหมดกันสปอยล์)"}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: "800",
+                          padding: "2px 8px",
+                          borderRadius: "20px",
+                          background: hideTrialPollScores ? "rgba(56, 189, 248, 0.2)" : "rgba(255, 255, 255, 0.1)",
+                          color: hideTrialPollScores ? "#7dd3fc" : "#94a3b8",
+                          border: hideTrialPollScores ? "1px solid rgba(56, 189, 248, 0.4)" : "1px solid rgba(255, 255, 255, 0.2)",
+                        }}
+                      >
+                        {hideTrialPollScores ? "ซ่อนคะแนน/อันดับสดสำหรับผู้ชมทั่วไป" : "แสดงคะแนนจริง"}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", margin: "3px 0 0" }}>
+                      {hideTrialPollScores
+                        ? "ผู้ชมทั่วไปในหน้า /trial-foty จะเห็นคะแนนเป็น '🔒 รอสรุปผล' และไม่แสดงอันดับ เพื่อไม่ให้ชี้นำการโหวตและรักษาความตื่นเต้น (แอดมินยังคงเห็นคะแนนจริงในห้องนี้)"
+                        : "ผู้ชมทั่วไปสามารถมองเห็นคะแนน % และอันดับคะแนนสดได้ตามปกติ"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    type="button"
+                    disabled={togglingHideScores}
+                    onClick={() => handleToggleHideScores(!hideTrialPollScores)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: hideTrialPollScores ? "rgba(56, 189, 248, 0.2)" : "rgba(255, 255, 255, 0.1)",
+                      border: hideTrialPollScores ? "1px solid rgba(56, 189, 248, 0.5)" : "1px solid rgba(255, 255, 255, 0.3)",
+                      color: hideTrialPollScores ? "#7dd3fc" : "#ffffff",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingHideScores ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {togglingHideScores
+                      ? "⏳ กำลังบันทึก..."
+                      : hideTrialPollScores
+                      ? "🔓 ปิดโหมดกันสปอยล์"
+                      : "🛡️ เปิดโหมดกันสปอยล์"}
                   </button>
                 </div>
               </div>

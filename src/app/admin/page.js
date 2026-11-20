@@ -80,6 +80,8 @@ export default function AdminPage() {
   const [restrictPassword, setRestrictPassword] = useState("");
   const [showPollTable, setShowPollTable] = useState(true);
   const [showTrialPollTable, setShowTrialPollTable] = useState(true);
+  const [hidePollScoresDuringVote, setHidePollScoresDuringVote] = useState(true);
+  const [togglingHidePollScores, setTogglingHidePollScores] = useState(false);
   const [settingsNotice, setSettingsNotice] = useState("");
 
   // FOTY (/fan-of-the-year) & Tournament Current (/current) Protection & Nav States
@@ -615,6 +617,9 @@ export default function AdminPage() {
         if (data.showPollInNav !== undefined) {
           setShowPollInNav(Boolean(data.showPollInNav));
         }
+        if (data.hidePollScoresDuringVote !== undefined) {
+          setHidePollScoresDuringVote(Boolean(data.hidePollScoresDuringVote));
+        }
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -770,6 +775,24 @@ export default function AdminPage() {
       setTimeout(() => setPollNotice(""), 3000);
     } catch (err) {
       setPollNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+    }
+  };
+
+  const handleToggleHidePollScores = async (val) => {
+    setHidePollScoresDuringVote(val);
+    setTogglingHidePollScores(true);
+    try {
+      await fetch("/api/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_hide_poll_scores", hidePollScoresDuringVote: val }),
+      });
+      setPollNotice(`✅ ${val ? "เปิดระบบปิดการมองเห็นคะแนนโพลล์ระหว่างโหวต (กันสปอยล์) แล้ว" : "ปิดระบบกันสปอยล์ (แสดงคะแนนตามปกติ) แล้ว"}`);
+      setTimeout(() => setPollNotice(""), 3000);
+    } catch (err) {
+      setPollNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+    } finally {
+      setTogglingHidePollScores(false);
     }
   };
 
@@ -4826,6 +4849,16 @@ export default function AdminPage() {
                             style={{ width: "16px", height: "16px", accentColor: "#ffd700", cursor: "pointer" }}
                           />
                           <span>แสดงเมนู /poll บนแถบนำทาง (Navbar): {showPollInNav ? "👁️ แสดง" : "🙈 ซ่อน"}</span>
+                        </label>
+                        <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: hidePollScoresDuringVote ? "#38bdf8" : "rgba(255,255,255,0.6)" }}>
+                          <input
+                            type="checkbox"
+                            checked={hidePollScoresDuringVote}
+                            disabled={togglingHidePollScores}
+                            onChange={(e) => handleToggleHidePollScores(e.target.checked)}
+                            style={{ width: "16px", height: "16px", accentColor: "#38bdf8", cursor: "pointer" }}
+                          />
+                          <span>🛡️ ปิดการมองเห็นคะแนนโพลล์ระหว่างโหวต (กันสปอยล์): {hidePollScoresDuringVote ? "🟢 เปิดใช้งาน (ซ่อนคะแนนสด)" : "⚪ ปิด (แสดงตามปกติ)"}</span>
                         </label>
                         <button
                           type="button"

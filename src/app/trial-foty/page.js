@@ -310,6 +310,7 @@ export default function TrialFOTYPage() {
   const [activeTableTab, setActiveTableTab] = useState("standings"); // 'standings' | 'warmup' | 'poll'
   const [showWarmupTable, setShowWarmupTable] = useState(true);
   const [showPollTable, setShowPollTable] = useState(true);
+  const [isScoreHidden, setIsScoreHidden] = useState(false);
   const canViewPoll = showPollTable || isAdmin;
   const [sortBy, setSortBy] = useState("rank"); // 'rank' | 'order'
   const [searchQuery, setSearchQuery] = useState("");
@@ -347,6 +348,9 @@ export default function TrialFOTYPage() {
         }
         if (jsonPoll.votingOpen !== undefined) {
           setVotingOpen(Boolean(jsonPoll.votingOpen));
+        }
+        if (jsonPoll.isScoreHidden !== undefined) {
+          setIsScoreHidden(Boolean(jsonPoll.isScoreHidden));
         }
         if (jsonPoll.showWarmupTable !== undefined) {
           setShowWarmupTable(Boolean(jsonPoll.showWarmupTable));
@@ -3339,6 +3343,33 @@ export default function TrialFOTYPage() {
               </Link>
             </div>
 
+            {/* Spoiler Shield Alert Banner */}
+            {isScoreHidden && (
+              <div
+                style={{
+                  background: "linear-gradient(135deg, rgba(14, 165, 233, 0.16) 0%, rgba(2, 132, 199, 0.28) 100%)",
+                  border: "2px solid #38bdf8",
+                  borderRadius: "14px",
+                  padding: "16px 20px",
+                  marginBottom: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  boxShadow: "0 0 25px rgba(56, 189, 248, 0.22)",
+                }}
+              >
+                <span style={{ fontSize: "32px", flexShrink: 0 }}>🛡️</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "16px", fontWeight: "900", color: "#38bdf8" }}>
+                    ระบบปิดการมองเห็นคะแนนโพลล์ระหว่างโหวตเพื่อกันสปอยล์ (Official Spoiler Shield)
+                  </div>
+                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)", marginTop: "3px", lineHeight: "1.5" }}>
+                    เพื่อรักษาความตื่นเต้นและป้องกันการชี้นำคะแนน ระบบได้ทำการซ่อนคะแนน % สัดส่วนโหวต และอันดับสดไว้ชั่วคราวระหว่างเปิดรับโหวต โดยผลคะแนนโพลล์อย่างเป็นทางการ 100% (โหวต 70% + What If 30%) จะเปิดเผยพร้อมกันหลังปิดรับโหวต
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Poll Search Bar */}
             <div
               style={{
@@ -3522,8 +3553,8 @@ export default function TrialFOTYPage() {
                         (c.topic && item.topic && (c.topic.trim() === item.topic.trim() || item.topic.includes(c.topic) || c.topic.includes(item.topic)))
                     );
                     const photo = matchedContestant?.image || null;
-                    const isTop5 = item.pollRank <= 5;
-                    const isRank1 = item.pollRank === 1;
+                    const isTop5 = !isScoreHidden && Number(item.pollRank) <= 5;
+                    const isRank1 = !isScoreHidden && Number(item.pollRank) === 1;
 
                     const borderColor = isTop5 ? "#ffd700" : "rgba(255, 255, 255, 0.3)";
                     const glowShadow = isRank1
@@ -3534,7 +3565,7 @@ export default function TrialFOTYPage() {
 
                     return (
                       <div
-                        key={item.pollRank}
+                        key={item.id || item.name || index}
                         className="table-row-entrance"
                         onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
                         title="คลิกเพื่อดูสถิติเจาะลึก"
@@ -3579,12 +3610,12 @@ export default function TrialFOTYPage() {
                               transform: "skewX(16deg)",
                               fontStyle: "italic",
                               fontWeight: "900",
-                              fontSize: "24px",
+                              fontSize: isScoreHidden ? "18px" : "24px",
                               color: isTop5 ? "#000000" : "#ffffff",
                               textShadow: isTop5 ? "none" : "0 2px 6px rgba(0,0,0,0.8)",
                             }}
                           >
-                            {item.pollRank}
+                            {isScoreHidden ? "🛡️" : item.pollRank}
                           </span>
                         </div>
 
@@ -3712,11 +3743,11 @@ export default function TrialFOTYPage() {
                               transform: "skewX(16deg)",
                               fontStyle: "italic",
                               fontWeight: "900",
-                              fontSize: votingOpen ? "13px" : "17px",
+                              fontSize: (isScoreHidden || votingOpen) ? "13px" : "17px",
                               color: isTop5 ? "#000000" : "#ffd700",
                             }}
                           >
-                            {votingOpen ? "🔒 รอสรุปผล" : item.percent}
+                            {(isScoreHidden || votingOpen) ? "🔒 รอสรุปผล" : item.percent}
                           </span>
                         </div>
                       </div>
