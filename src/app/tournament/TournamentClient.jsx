@@ -1671,24 +1671,56 @@ export default function TournamentClient({
                 </div>
               </div>
 
-              <div
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "12px",
-                  background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
-                  border: "1.5px solid rgba(244, 63, 94, 0.4)",
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                  minWidth: "170px",
-                }}
-              >
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>จ่าฝูงกลุ่มปัจจุบัน</div>
-                <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff", marginTop: "4px" }}>
-                  A: <strong style={{ color: "#00e5ff" }}>ซ่า (12 LP)</strong>
-                </div>
-                <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff" }}>
-                  B: <strong style={{ color: "#ffd700" }}>พีม (11 LP)</strong>
-                </div>
-              </div>
+              {(() => {
+                const leaderA = (standings.groupA || []).find((c) => c.rank === 1) || standings.groupA?.[0];
+                const leaderB = (standings.groupB || []).find((c) => c.rank === 1) || standings.groupB?.[0];
+
+                const nameA = leaderA ? (leaderA.nickname || leaderA.name) : "-";
+                const lpA = leaderA ? (leaderA.leaguePoints ?? 0) : 0;
+
+                const nameB = leaderB ? (leaderB.nickname || leaderB.name) : "-";
+                const lpB = leaderB ? (leaderB.leaguePoints ?? 0) : 0;
+
+                return (
+                  <div
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "12px",
+                      background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                      border: "1.5px solid rgba(244, 63, 94, 0.4)",
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                      minWidth: "170px",
+                    }}
+                  >
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>จ่าฝูงกลุ่มปัจจุบัน</div>
+                    <div
+                      onClick={() => leaderA?.name && onSelectContestant(leaderA.name)}
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "900",
+                        color: "#ffffff",
+                        marginTop: "4px",
+                        cursor: leaderA?.name ? "pointer" : "default",
+                      }}
+                      title={leaderA?.name ? `คลิกเพื่อดูโปรไฟล์ ${leaderA.name}` : ""}
+                    >
+                      A: <strong style={{ color: "#00e5ff" }}>{nameA} ({lpA} LP)</strong>
+                    </div>
+                    <div
+                      onClick={() => leaderB?.name && onSelectContestant(leaderB.name)}
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "900",
+                        color: "#ffffff",
+                        cursor: leaderB?.name ? "pointer" : "default",
+                      }}
+                      title={leaderB?.name ? `คลิกเพื่อดูโปรไฟล์ ${leaderB.name}` : ""}
+                    >
+                      B: <strong style={{ color: "#ffd700" }}>{nameB} ({lpB} LP)</strong>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Tournament Honors & Penalties Banner (ผู้ถือครองรางวัลและบทลงโทษปัจจุบัน) */}
