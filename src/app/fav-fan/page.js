@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
+import { useAdminSession } from "@/lib/useAdminSession";
 
 const REQUIRED_SLOGAN = "เครื่องสำอางเทลมี ภูมิใจใช้เทลมี";
 
@@ -55,6 +56,9 @@ export default function FavFanPage() {
   const [submittedSuccess, setSubmittedSuccess] = useState(null);
   const [activeTab, setActiveTab] = useState("vote"); // 'vote' | 'results'
   const dropdownRef = useRef(null);
+
+  const { user } = useAdminSession("main");
+  const isAdmin = Boolean(user && (user.role === "admin" || user.role === "main_admin" || user.isMainAdmin));
 
   // Fetch data
   const fetchData = async () => {
@@ -492,22 +496,27 @@ export default function FavFanPage() {
           >
             ✍️ ส่งคะแนนโหวต (Vote)
           </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("results")}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "12px",
-              background: activeTab === "results" ? "linear-gradient(135deg, #ec4899 0%, #be185d 100%)" : "rgba(255,255,255,0.06)",
-              border: activeTab === "results" ? "1px solid #f472b6" : "1px solid rgba(255,255,255,0.12)",
-              color: activeTab === "results" ? "#ffffff" : "rgba(255,255,255,0.7)",
-              fontWeight: "800",
-              fontSize: "15px",
-              cursor: "pointer",
-            }}
-          >
-            📊 สรุปอันดับความนิยม ({contestants.length} หัวข้อ)
-          </button>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setActiveTab("results")}
+              style={{
+                padding: "12px 24px",
+                borderRadius: "12px",
+                background: activeTab === "results" ? "linear-gradient(135deg, #ec4899 0%, #be185d 100%)" : "rgba(255,255,255,0.06)",
+                border: activeTab === "results" ? "1px solid #f472b6" : "1px solid rgba(255,255,255,0.12)",
+                color: activeTab === "results" ? "#ffffff" : "rgba(255,255,255,0.7)",
+                fontWeight: "800",
+                fontSize: "15px",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              📊 สรุปอันดับความนิยม (Admin)
+            </button>
+          )}
         </div>
 
         {/* TAB 1: VOTING FORM */}
@@ -869,8 +878,8 @@ export default function FavFanPage() {
           </div>
         )}
 
-        {/* TAB 2: RESULTS / POPULARITY TABLE */}
-        {activeTab === "results" && (
+        {/* TAB 2: RESULTS / POPULARITY TABLE (Restricted to Main Admin & Admin) */}
+        {activeTab === "results" && isAdmin && (
           <div
             style={{
               background: "linear-gradient(145deg, rgba(16, 28, 54, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",

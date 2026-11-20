@@ -2,11 +2,6 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { getKVData, saveKVData } from "@/lib/kv";
-import {
-  appendBallotToSheet,
-  fetchAndAggregateSheetVotes,
-  testGoogleSheetsConnection,
-} from "@/lib/google-sheets";
 
 const POLL_FILE = path.join(process.cwd(), "src/app/data/trial-poll.json");
 const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
@@ -404,62 +399,6 @@ export async function POST(request) {
       current = getDefaultPoll();
     }
 
-    // Test Google Sheets Connection
-    if (body.action === "test_google_sheets") {
-      const testResult = await testGoogleSheetsConnection();
-      return NextResponse.json(testResult);
-    }
-
-    // Sync Google Sheets: Pull all ballots, aggregate votes, recalculate 70% + 30%, and update DB
-    if (body.action === "sync_google_sheets") {
-      try {
-        const { totalBallots, tally } = await fetchAndAggregateSheetVotes(current);
-
-        // Update each contestant's votes from tally
-        let updatedPoll = current.map((item) => {
-          const key = String(item.id);
-          const t = tally[key] || { points: 0, votes: 0, rankVotes: { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 }, championVotes: 0 };
-          return {
-            ...item,
-            votes: t.points || 0,
-            rankVotes: t.rankVotes || { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
-            championVotes: t.championVotes || 0,
-          };
-        });
-
-        // Recalculate percent using 70% votes + 30% What-If formula
-        updatedPoll = computePollPercentages(updatedPoll);
-        updatedPoll.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
-        updatedPoll = updatedPoll.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
-
-        await saveKVData("fpt_trial_poll", updatedPoll, writeLocalPoll);
-
-        // If requested to close voting simultaneously
-        if (body.closeVoting) {
-          const rawSettings = await getKVData("fpt_settings", readSettings);
-          const updatedSettings = { ...(rawSettings || {}), trialVotingOpen: false };
-          writeSettings(updatedSettings);
-          await saveKVData("fpt_settings", updatedSettings, writeSettings);
-        }
-
-        return NextResponse.json({
-          success: true,
-          totalBallots,
-          data: updatedPoll,
-          message: `ซิงค์คะแนนจาก Google Sheets สำเร็จ (${totalBallots} บัตรโหวต) และอัปเดตลงฐานข้อมูลเรียบร้อยแล้ว!`,
-        });
-      } catch (err) {
-        console.error("Error syncing Google Sheets:", err);
-        return NextResponse.json(
-          {
-            success: false,
-            error: "ไม่สามารถซิงค์คะแนนจาก Google Sheets ได้: " + (err.message || String(err)),
-          },
-          { status: 500 }
-        );
-      }
-    }
-
     // Check if voting is open before processing any vote action
     if (body.action === "ballot_vote" || body.action === "vote") {
       const isVotingOpen = await getVotingStatus();
@@ -475,50 +414,58 @@ export async function POST(request) {
     }
 
     // Ballot vote: 5 ranks (up to 5 contestants per rank) + 1 champion
-    // Sends row to Google Spreadsheet via Service Account, WITHOUT updating DB votes while open!
+    // Directly scores into KV & file so votes update immediately in the admin panel!
     if (body.action === "ballot_vote") {
       const ranks = body.ranks || {};
       const championId = body.champion ? String(body.champion) : null;
 
-      // Map IDs to human-readable names for Google Sheets
-      const findName = (id) => {
-        if (!id) return "-";
-        const c = current.find((item) => String(item.id) === String(id) || String(item.name) === String(id));
-        return c ? `${c.nickname || c.name} (${c.topic})` : `ID: ${id}`;
+      // Weight mapping for ranks 1-5
+      const rankWeights = {
+        "1": 5, // อันดับ 1 ได้ 5 คะแนนต่อคน
+        "2": 4, // อันดับ 2 ได้ 4 คะแนนต่อคน
+        "3": 3, // อันดับ 3 ได้ 3 คะแนนต่อคน
+        "4": 2, // อันดับ 4 ได้ 2 คะแนนต่อคน
+        "5": 1, // อันดับ 5 ได้ 1 คะแนนต่อคน
       };
 
-      const championName = championId ? findName(championId) : "-";
-      const rankNames = {};
-      Object.entries(ranks).forEach(([rStr, ids]) => {
-        const idList = Array.isArray(ids) ? ids : [ids];
-        rankNames[rStr] = idList.map((id) => findName(id));
+      // Add points for ranks 1-5
+      Object.entries(ranks).forEach(([rankStr, contestantIds]) => {
+        const weight = rankWeights[rankStr] || 0;
+        const ids = Array.isArray(contestantIds) ? contestantIds : [contestantIds];
+        ids.forEach((cId) => {
+          if (!cId) return;
+          const target = current.find(
+            (item) => String(item.id) === String(cId) || (item.name && String(item.name) === String(cId))
+          );
+          if (target) {
+            target.votes = (Number(target.votes) || 0) + weight;
+            if (!target.rankVotes) target.rankVotes = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
+            target.rankVotes[rankStr] = (target.rankVotes[rankStr] || 0) + 1;
+          }
+        });
       });
 
-      // Try appending to Google Sheet
-      try {
-        await appendBallotToSheet({
-          ballotId: `ballot_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-          timestamp: new Date().toLocaleString("th-TH", { timeZone: "Asia/Bangkok" }),
-          championName,
-          rankNames,
-          rawPayload: { ranks, champion: championId },
-        });
-      } catch (sheetErr) {
-        console.error("Google Sheets append error:", sheetErr);
-        // If sheet fails e.g. permission error, return helpful error
-        return NextResponse.json(
-          {
-            success: false,
-            error: "เกิดข้อผิดพลาดในการบันทึกคะแนนเข้า Google Sheets: " + (sheetErr.message || String(sheetErr)),
-          },
-          { status: 500 }
+      // Add champion vote (10 คะแนนพิเศษ)
+      if (championId) {
+        const champTarget = current.find(
+          (item) => String(item.id) === String(championId) || (item.name && String(item.name) === String(championId))
         );
+        if (champTarget) {
+          champTarget.votes = (Number(champTarget.votes) || 0) + 10; // เพิ่ม 10 คะแนนพิเศษสำหรับตำแหน่งแชมป์
+          champTarget.championVotes = (Number(champTarget.championVotes) || 0) + 1;
+        }
       }
 
-      // DO NOT update fpt_trial_poll in DB! Votes accumulate secretly in the Sheet until poll closure.
+      // Recalculate percent using 70% votes + 30% What-If formula
+      current = computePollPercentages(current);
+
+      // Sort by percent descending
+      current.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
+      current = current.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
+
+      await saveKVData("fpt_trial_poll", current, writeLocalPoll);
       return NextResponse.json({
         success: true,
-        savedToSheet: true,
         data: current,
         message: "บันทึกผลการโหวตของคุณเรียบร้อยแล้ว!",
       });

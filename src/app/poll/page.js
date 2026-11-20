@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
+import { useAdminSession } from "@/lib/useAdminSession";
 
 function getOptimizedImageUrl(url, size = 100) {
   if (!url) return "";
@@ -592,6 +593,9 @@ export default function PollPage() {
   const [activeTab, setActiveTab] = useState("vote"); // 'vote' | 'standings'
   const [searchTable, setSearchTable] = useState("");
 
+  const { user } = useAdminSession("main");
+  const isAdmin = Boolean(user && (user.role === "admin" || user.role === "main_admin" || user.isMainAdmin));
+
   const rankConfig = [
     { key: "1", label: "อันดับที่ 1 (1st Place)", icon: "🥇", color: "#ffd700", bg: "rgba(255, 215, 0, 0.15)" },
     { key: "2", label: "อันดับที่ 2 (2nd Place)", icon: "🥈", color: "#e2e8f0", bg: "rgba(226, 232, 240, 0.15)" },
@@ -1040,22 +1044,27 @@ export default function PollPage() {
           >
             🗳️ ใบลงคะแนนโหวต (Ballot)
           </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("standings")}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "12px",
-              background: activeTab === "standings" ? "linear-gradient(135deg, #00e5ff 0%, #0077b6 100%)" : "rgba(255,255,255,0.06)",
-              border: activeTab === "standings" ? "none" : "1px solid rgba(255,255,255,0.12)",
-              color: activeTab === "standings" ? "#ffffff" : "rgba(255,255,255,0.7)",
-              fontWeight: "900",
-              fontSize: "15px",
-              cursor: "pointer",
-            }}
-          >
-            📊 ตารางอันดับผลโพลล์ (Standings)
-          </button>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setActiveTab("standings")}
+              style={{
+                padding: "12px 24px",
+                borderRadius: "12px",
+                background: activeTab === "standings" ? "linear-gradient(135deg, #00e5ff 0%, #0077b6 100%)" : "rgba(255,255,255,0.06)",
+                border: activeTab === "standings" ? "none" : "1px solid rgba(255,255,255,0.12)",
+                color: activeTab === "standings" ? "#ffffff" : "rgba(255,255,255,0.7)",
+                fontWeight: "900",
+                fontSize: "15px",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              📊 ตารางอันดับโพลล์ (Admin)
+            </button>
+          )}
         </div>
 
         {/* TAB 1: BALLOT */}
@@ -1194,8 +1203,8 @@ export default function PollPage() {
           </div>
         )}
 
-        {/* TAB 2: STANDINGS TABLE */}
-        {activeTab === "standings" && (
+        {/* TAB 2: STANDINGS TABLE (Restricted to Main Admin & Admin) */}
+        {activeTab === "standings" && isAdmin && (
           <div
             style={{
               background: "linear-gradient(145deg, rgba(16, 28, 54, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",
