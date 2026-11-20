@@ -692,11 +692,6 @@ export default function TrialAdminPage() {
     }
   };
 
-  useEffect(() => {
-    fetchContestants();
-    loadTrialSettings();
-  }, []);
-
   const loadTrialSettings = async () => {
     try {
       const res = await fetch("/api/settings?admin=1");
@@ -724,6 +719,13 @@ export default function TrialAdminPage() {
       console.error(e);
     }
   };
+
+  const fetchData = fetchContestants;
+
+  useEffect(() => {
+    fetchContestants();
+    loadTrialSettings();
+  }, []);
 
   const handleToggleVoting = async (newStatus) => {
     const targetStatus = typeof newStatus === "boolean" ? newStatus : !votingOpen;
@@ -3030,7 +3032,7 @@ export default function TrialAdminPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <button
                     type="button"
-                    onClick={fetchData}
+                    onClick={fetchContestants}
                     style={{
                       padding: "9px 16px",
                       borderRadius: "8px",
