@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
 import TrialNavbar from "./components/TrialNavbar";
+import { useAdminSession } from "@/lib/useAdminSession";
 
 // ─── Score Pill Styles matching authentic page.js ────────────────────────────
 
@@ -296,6 +297,9 @@ function evaluatePlayerStatus(player, denseLeaderboard, targetTotalPlayers = 24)
 }
 
 export default function TrialFOTYPage() {
+  const { user } = useAdminSession("trial_foty");
+  const isAdmin = Boolean(user && (user.role === "admin" || user.role === "main_admin" || user.isMainAdmin));
+
   const [contestants, setContestants] = useState([]);
   const [pollList, setPollList] = useState([]);
   const [votingOpen, setVotingOpen] = useState(true);
@@ -306,6 +310,7 @@ export default function TrialFOTYPage() {
   const [activeTableTab, setActiveTableTab] = useState("standings"); // 'standings' | 'warmup' | 'poll'
   const [showWarmupTable, setShowWarmupTable] = useState(true);
   const [showPollTable, setShowPollTable] = useState(true);
+  const canViewPoll = showPollTable || isAdmin;
   const [sortBy, setSortBy] = useState("rank"); // 'rank' | 'order'
   const [searchQuery, setSearchQuery] = useState("");
   const [pollSearchQuery, setPollSearchQuery] = useState("");
@@ -349,7 +354,7 @@ export default function TrialFOTYPage() {
         if (jsonPoll.showPollTable !== undefined || jsonPoll.showTrialPollTable !== undefined) {
           const isPollVis = Boolean(jsonPoll.showTrialPollTable !== undefined ? jsonPoll.showTrialPollTable : jsonPoll.showPollTable);
           setShowPollTable(isPollVis);
-          if (!isPollVis) {
+          if (!isPollVis && !isAdmin) {
             setActiveTableTab((prev) => (prev === "poll" ? "standings" : prev));
           }
         }
@@ -751,7 +756,7 @@ export default function TrialFOTYPage() {
             }}
           >
             <img
-              src="/img/trial_foty_logo.png"
+              src="/img/trial_foty_logo.png?v=20261120"
               alt="THE TRIAL FAN OF THE YEAR 2026"
               style={{
                 width: "100%",
@@ -834,7 +839,7 @@ export default function TrialFOTYPage() {
               🏆 ตารางคะแนนแข่งขัน
             </a>
 
-            {showPollTable && (
+            {canViewPoll && (
               <button
                 type="button"
                 onClick={() => {
@@ -902,14 +907,14 @@ export default function TrialFOTYPage() {
               margin: "0 0 8px 0",
             }}
           >
-            {activeTableTab === "standings" || (!showPollTable && activeTableTab === "poll")
+            {activeTableTab === "standings" || (!canViewPoll && activeTableTab === "poll")
               ? "ตารางคะแนนการแข่งขัน งุ่นง่าน Of The Year 2026"
               : activeTableTab === "warmup"
                 ? "ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)"
                 : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
           </h2>
           <p style={{ fontSize: "15px", color: "rgba(255, 255, 255, 0.65)", margin: 0 }}>
-            {activeTableTab === "standings" || (!showPollTable && activeTableTab === "poll")
+            {activeTableTab === "standings" || (!canViewPoll && activeTableTab === "poll")
               ? "คะแนนสดอัปเดตแบบเรียลไทม์ 4 หมวดการแข่งขัน ตัดตัวผู้เข้าแข่งขัน 5 อันดับแรก"
               : activeTableTab === "warmup"
                 ? "คะแนนจากการลงสนามแข่งในห้องเกม (/game) เต็ม 100 คะแนน คิดเป็นสัดส่วน 30% ของตารางโพลล์มหาชน"
@@ -979,7 +984,7 @@ export default function TrialFOTYPage() {
             </button>
           )}
 
-          {showPollTable && (
+          {canViewPoll && (
             <button
               type="button"
               onClick={() => setActiveTableTab("poll")}
@@ -3274,7 +3279,7 @@ export default function TrialFOTYPage() {
         {/* ========================================================
             TAB 2: FAN POLL RANKINGS (Authentic 1:1 Matching page.js)
            ======================================================== */}
-        {activeTableTab === "poll" && showPollTable && (
+        {activeTableTab === "poll" && canViewPoll && (
           <div key="poll-tab-view" className="table-slide-down">
             {/* Vote CTA Banner */}
             <div

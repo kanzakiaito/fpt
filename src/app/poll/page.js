@@ -576,6 +576,8 @@ export default function PollPage() {
   const [pollList, setPollList] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [votingOpen, setVotingOpen] = useState(false);
+  const [showPollTable, setShowPollTable] = useState(true);
+  const canViewStandings = showPollTable || isAdmin;
   const [loading, setLoading] = useState(true);
 
   // Ballot State
@@ -613,6 +615,9 @@ export default function PollPage() {
         setPollList(data.data || []);
         setCandidates(data.candidates || []);
         setVotingOpen(Boolean(data.votingOpen));
+        if (data.showPollTable !== undefined) {
+          setShowPollTable(Boolean(data.showPollTable));
+        }
       }
     } catch (err) {
       console.error("Fetch poll error:", err);
@@ -1044,7 +1049,7 @@ export default function PollPage() {
           >
             🗳️ ใบลงคะแนนโหวต (Ballot)
           </button>
-          {isAdmin && (
+          {canViewStandings && (
             <button
               type="button"
               onClick={() => setActiveTab("standings")}
@@ -1062,7 +1067,7 @@ export default function PollPage() {
                 gap: "6px",
               }}
             >
-              📊 ตารางอันดับโพลล์ (Admin)
+              📊 ตารางอันดับโพลล์ (Standings)
             </button>
           )}
         </div>
@@ -1203,8 +1208,8 @@ export default function PollPage() {
           </div>
         )}
 
-        {/* TAB 2: STANDINGS TABLE (Restricted to Main Admin & Admin) */}
-        {activeTab === "standings" && isAdmin && (
+        {/* TAB 2: STANDINGS TABLE */}
+        {activeTab === "standings" && canViewStandings && (
           <div
             style={{
               background: "linear-gradient(145deg, rgba(16, 28, 54, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",

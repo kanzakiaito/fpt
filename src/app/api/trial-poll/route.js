@@ -139,7 +139,7 @@ export async function GET() {
   const votingOpen = rawSettings ? rawSettings.trialVotingOpen !== false : true;
   const showWarmupTable = rawSettings ? rawSettings.showWarmupTable !== false : true;
   const showTrialPollTable = rawSettings
-    ? (rawSettings.showTrialPollTable !== undefined ? rawSettings.showTrialPollTable !== false : rawSettings.showPollTable !== false)
+    ? (rawSettings.showTrialPollTable !== undefined ? rawSettings.showTrialPollTable !== false : true)
     : true;
   const showPollTable = showTrialPollTable;
 
@@ -233,7 +233,7 @@ export async function POST(request) {
     if (body.action === "toggle_poll_table" || body.action === "set_poll_table" || body.action === "toggle_trial_poll_table") {
       const rawSettings = await getKVData("fpt_settings", readSettings);
       const currentStatus = rawSettings
-        ? (rawSettings.showTrialPollTable !== undefined ? rawSettings.showTrialPollTable !== false : rawSettings.showPollTable !== false)
+        ? (rawSettings.showTrialPollTable !== undefined ? rawSettings.showTrialPollTable !== false : true)
         : true;
       const newStatus =
         body.showTrialPollTable !== undefined

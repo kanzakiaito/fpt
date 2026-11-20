@@ -2675,32 +2675,6 @@ export default function TrialAdminPage() {
             TAB: POLL RANKING MANAGEMENT (Matching Main Admin)
            ======================================================== */}
         {activeTab === "poll" && (
-          isMaintainer ? (
-            <div
-              style={{
-                background: "linear-gradient(145deg, rgba(20, 15, 30, 0.9) 0%, rgba(10, 8, 20, 0.95) 100%)",
-                border: "1.5px solid rgba(255, 75, 143, 0.4)",
-                borderRadius: "16px",
-                padding: "48px 24px",
-                textAlign: "center",
-                maxWidth: "600px",
-                margin: "40px auto",
-                boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
-              }}
-            >
-              <div style={{ fontSize: "56px", marginBottom: "16px" }}>🔒</div>
-              <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#f472b6", marginBottom: "8px" }}>
-                สิทธิ์การเข้าถึงจำกัด (Restricted Access)
-              </h3>
-              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.75)", lineHeight: "1.7", margin: 0 }}>
-                บัญชีของคุณมีสิทธิ์ระดับ <strong style={{ color: "#38bdf8" }}>🛠️ Maintainer</strong> จึงไม่สามารถเปิดดูผลโหวตหรือจัดการตารางอันดับโพลล์ได้
-                <br />
-                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
-                  (ส่วนนี้สงวนสิทธิ์เฉพาะ Admin หรือ Main Admin ของ The Trial เท่านั้น)
-                </span>
-              </p>
-            </div>
-          ) : (
           <div>
             {/* Header & Action Bar */}
             <div
@@ -3838,7 +3812,6 @@ export default function TrialAdminPage() {
               </div>
             </div>
           </div>
-          )
         )}
 
         {activeTab === "contestants" && (
