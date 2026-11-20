@@ -1938,7 +1938,7 @@ export default function AdminPage() {
               borderRadius: "6px 6px 0 0"
             }}
           >
-            📊 จัดการอันดับโพลล์ & ผลโหวต ({pollItems.length})
+            📊 จัดการอันดับโพลล์ & ผลโหวต ({isMaintainer ? "🔒" : pollItems.length})
           </button>
           <button
             onClick={() => setActiveTab("weekly")}
@@ -4704,6 +4704,31 @@ export default function AdminPage() {
             TAB 3: POLL RANKINGS & VOTING MANAGEMENT
            ======================================================== */}
         {activeTab === "poll" && (
+          isMaintainer ? (
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(30, 20, 50, 0.9) 0%, rgba(15, 10, 30, 0.95) 100%)",
+                border: "1.5px solid rgba(255, 77, 79, 0.4)",
+                borderRadius: "16px",
+                padding: "48px 24px",
+                textAlign: "center",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+              }}
+            >
+              <div style={{ fontSize: "56px", marginBottom: "16px" }}>🔒</div>
+              <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#fca5a5", marginBottom: "8px" }}>
+                สิทธิ์การเข้าถึงถูกจำกัด (Restricted Access)
+              </h3>
+              <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.7)", maxWidth: "540px", margin: "0 auto 16px auto", lineHeight: "1.6" }}>
+                โพลล์แห่งปี (FAN OF THE YEAR) และผลโหวตความนิยม สามารถเข้าถึงและจัดการได้เฉพาะ <strong>Admin</strong> หรือ <strong>Main Admin</strong> เท่านั้น
+                <br />
+                <span style={{ color: "#fca5a5", fontSize: "13px" }}>บทบาท Maintainer ไม่สามารถเข้าถึงหรือจัดการระบบโพลล์ได้เพื่อความปลอดภัยและป้องกันสปอยล์</span>
+              </p>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 16px", borderRadius: "20px", background: "rgba(255, 77, 79, 0.15)", border: "1px solid rgba(255, 77, 79, 0.4)", color: "#fca5a5", fontSize: "12px", fontWeight: "700" }}>
+                🛠️ สถานะบัญชีของคุณ: Maintainer (ผู้ดูแลข้อมูลการแข่งขัน)
+              </div>
+            </div>
+          ) : (
           <div>
             {/* Sub-tabs: 1. โพลล์แห่งปี (/poll) | 2. โหวตความนิยม Tellme (/fav-fan) */}
             <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid rgba(255,255,255,0.12)", marginBottom: "20px" }}>
@@ -5190,31 +5215,6 @@ export default function AdminPage() {
 
         {/* Subtab 2: Fav Fan Tellme (/fav-fan) */}
         {pollSubTab === "fav_fan" && (
-          isMaintainer ? (
-            <div
-              style={{
-                background: "linear-gradient(145deg, rgba(30, 20, 50, 0.9) 0%, rgba(15, 10, 30, 0.95) 100%)",
-                border: "1.5px solid rgba(255, 117, 143, 0.4)",
-                borderRadius: "16px",
-                padding: "48px 24px",
-                textAlign: "center",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-              }}
-            >
-              <div style={{ fontSize: "56px", marginBottom: "16px" }}>🔒</div>
-              <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#fca5a5", marginBottom: "8px" }}>
-                สิทธิ์การเข้าถึงถูกจำกัด (Restricted Access)
-              </h3>
-              <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.7)", maxWidth: "540px", margin: "0 auto 16px auto", lineHeight: "1.6" }}>
-                การตรวจสอบผลคะแนนโหวตสดจาก <strong>/fav-fan</strong> (เครื่องสำอาง Tellme) สามารถดูได้เฉพาะ <strong>Admin</strong> หรือ <strong>Main Admin</strong> เท่านั้น
-                <br />
-                <span style={{ color: "#fca5a5", fontSize: "13px" }}>บทบาท Maintainer ไม่สามารถกดดูผลคะแนนโหวตได้เพื่อความปลอดภัยและป้องกันสปอยล์</span>
-              </p>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 16px", borderRadius: "20px", background: "rgba(255, 117, 143, 0.15)", border: "1px solid rgba(255, 117, 143, 0.4)", color: "#fca5a5", fontSize: "12px", fontWeight: "700" }}>
-                🛠️ สถานะบัญชีของคุณ: Maintainer (ผู้ดูแลข้อมูลการแข่งขัน)
-              </div>
-            </div>
-          ) : (
           <div>
             {/* Fav Fan (/fav-fan) Tellme Card */}
             <div style={{
@@ -5421,10 +5421,10 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
-        )
-      )}
-    </div>
-  )}
+        )}
+      </div>
+      )
+    )}
 
         {/* ========================================================
             TAB: WEEKLY BROADCAST MATCHES (หน้าแรกแฟนพันธุ์แท้ 2026)
