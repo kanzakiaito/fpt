@@ -993,6 +993,11 @@ export default function TrialFotyBallotVotePage() {
 
   const isFormComplete = activeRanksCount === 5 && Boolean(championId);
 
+  const getCandidateById = (id) => {
+    if (!id) return null;
+    return pollList.find((c) => String(c.id) === String(id) || (c.name && String(c.name) === String(id)));
+  };
+
   // Submit Ballot
   const handleSubmitBallot = async () => {
     if (!votingOpen) {
@@ -1030,6 +1035,9 @@ export default function TrialFotyBallotVotePage() {
             JSON.stringify({ ranks: ballotRanks, champion: championId, date: new Date().toISOString() })
           );
         } catch (e) {}
+
+        const championCandidate = getCandidateById(championId);
+
         setFeedbackModal({
           open: true,
           type: "success",
@@ -1061,11 +1069,6 @@ export default function TrialFotyBallotVotePage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const getCandidateById = (id) => {
-    if (!id) return null;
-    return pollList.find((c) => String(c.id) === String(id) || (c.name && String(c.name) === String(id)));
   };
 
   const rankConfig = [
