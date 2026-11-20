@@ -596,7 +596,7 @@ function ChampionDropdownCard({
               border: "1px solid rgba(255, 215, 0, 0.5)",
             }}
           >
-            🏆 ผู้ที่คิดว่าจะเป็นสุดยอดแฟนพันธุ์แท้แห่งปี (The Champion)
+            🏆 ผู้ที่คิดว่าจะเป็นสุดยอดแฟนพันธุ์แท้แห่งปี (+15 คะแนนพิเศษ)
           </span>
         </div>
 
@@ -1085,11 +1085,11 @@ export default function TrialFotyBallotVotePage() {
   };
 
   const rankConfig = [
-    { key: "1", label: "อันดับที่ 1 (1st Place)", icon: "🥇", color: "#ffd700", bg: "rgba(255, 215, 0, 0.15)" },
-    { key: "2", label: "อันดับที่ 2 (2nd Place)", icon: "🥈", color: "#e2e8f0", bg: "rgba(226, 232, 240, 0.15)" },
-    { key: "3", label: "อันดับที่ 3 (3rd Place)", icon: "🥉", color: "#cd7f32", bg: "rgba(205, 127, 50, 0.15)" },
-    { key: "4", label: "อันดับที่ 4 (4th Place)", icon: "🎖️", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)" },
-    { key: "5", label: "อันดับที่ 5 (5th Place)", icon: "🎖️", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)" },
+    { key: "1", label: "อันดับที่ 1 (10 คะแนน)", icon: "🥇", color: "#ffd700", bg: "rgba(255, 215, 0, 0.15)" },
+    { key: "2", label: "อันดับที่ 2 (7 คะแนน)", icon: "🥈", color: "#e2e8f0", bg: "rgba(226, 232, 240, 0.15)" },
+    { key: "3", label: "อันดับที่ 3 (5 คะแนน)", icon: "🥉", color: "#cd7f32", bg: "rgba(205, 127, 50, 0.15)" },
+    { key: "4", label: "อันดับที่ 4 (3 คะแนน)", icon: "🎖️", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)" },
+    { key: "5", label: "อันดับที่ 5 (2 คะแนน)", icon: "🎖️", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)" },
   ];
 
   return (
@@ -1555,13 +1555,19 @@ export default function TrialFotyBallotVotePage() {
             <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
               <span style={{ color: "#ffd700", fontWeight: "900" }}>1.</span>
               <span>
-                <strong>เลือก 5 อันดับแรก:</strong> ในแต่ละอันดับ (อันดับ 1 ถึง อันดับ 5) <strong>สามารถเลือกผู้เข้าแข่งขันได้สูงสุดอันดับละ 5 คน</strong> โดยกดเลือกเพิ่มจาก Dropdown ได้ตามต้องการ
+                <strong>เลือก 5 อันดับแรก:</strong> ในแต่ละอันดับสามารถเลือกได้สูงสุดอันดับละ 5 คน (ที่ 1 ได้ 10 คะแนน, ที่ 2 ได้ 7 คะแนน, ที่ 3 ได้ 5 คะแนน, ที่ 4 ได้ 3 คะแนน, ที่ 5 ได้ 2 คะแนน)
               </span>
             </div>
             <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
               <span style={{ color: "#ffd700", fontWeight: "900" }}>2.</span>
               <span>
-                <strong>เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว
+                <strong>เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์เพียงคนเดียว (รับคะแนนพิเศษ +15 คะแนน)
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+              <span style={{ color: "#ffd700", fontWeight: "900" }}>3.</span>
+              <span>
+                <strong>ผู้เข้าแข่งขันคนอื่นๆ ในใบโหวตนี้:</strong> ผู้ที่ไม่ถูกเลือกในอันดับใดๆ เลย จะได้รับคนละ 1 คะแนน
               </span>
             </div>
           </div>

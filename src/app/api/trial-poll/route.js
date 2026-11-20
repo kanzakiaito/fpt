@@ -468,13 +468,13 @@ export async function POST(request) {
       const ranks = body.ranks || {};
       const championId = body.champion ? String(body.champion) : null;
 
-      // Weight mapping for ranks 1-5
+      // Weight mapping for ranks 1-5 (ที่ 1=10, ที่ 2=7, ที่ 3=5, ที่ 4=3, ที่ 5=2)
       const rankWeights = {
-        "1": 5, // อันดับ 1 ได้ 5 คะแนนต่อคน
-        "2": 4, // อันดับ 2 ได้ 4 คะแนนต่อคน
-        "3": 3, // อันดับ 3 ได้ 3 คะแนนต่อคน
-        "4": 2, // อันดับ 4 ได้ 2 คะแนนต่อคน
-        "5": 1, // อันดับ 5 ได้ 1 คะแนนต่อคน
+        "1": 10, // อันดับ 1 ได้ 10 คะแนนต่อคน
+        "2": 7,  // อันดับ 2 ได้ 7 คะแนนต่อคน
+        "3": 5,  // อันดับ 3 ได้ 5 คะแนนต่อคน
+        "4": 3,  // อันดับ 4 ได้ 3 คะแนนต่อคน
+        "5": 2,  // อันดับ 5 ได้ 2 คะแนนต่อคน
       };
 
       // Add points for ranks 1-5 (each contestant can only be selected in one rank)
@@ -499,16 +499,42 @@ export async function POST(request) {
         });
       });
 
-      // Add champion vote (10 คะแนนพิเศษ)
+      // Add champion vote (สุดยอดแฟนพันธุ์แท้ 15 คะแนนพิเศษ)
       if (championId) {
         const champTarget = current.find(
           (item) => String(item.id) === String(championId) || (item.name && String(item.name) === String(championId))
         );
         if (champTarget) {
-          champTarget.votes = (Number(champTarget.votes) || 0) + 10; // เพิ่ม 10 คะแนนพิเศษสำหรับตำแหน่งแชมป์
+          champTarget.votes = (Number(champTarget.votes) || 0) + 15; // เพิ่ม 15 คะแนนพิเศษสำหรับตำแหน่งแชมป์
           champTarget.championVotes = (Number(champTarget.championVotes) || 0) + 1;
         }
       }
+
+      // คนที่ไม่ถูกโหวตเลยในใบโหวตนั้นๆ จะได้คนละ 1 คะแนน
+      const votedIdsOrNames = new Set([...seenContestants]);
+      if (championId) {
+        votedIdsOrNames.add(String(championId));
+        const champObj = current.find(
+          (item) => String(item.id) === String(championId) || (item.name && String(item.name) === String(championId))
+        );
+        if (champObj?.name) votedIdsOrNames.add(String(champObj.name));
+        if (champObj?.id) votedIdsOrNames.add(String(champObj.id));
+      }
+
+      current.forEach((item) => {
+        const strId = String(item.id);
+        const strName = item.name ? String(item.name) : "";
+        const strNick = item.nickname ? String(item.nickname) : "";
+
+        const isVoted =
+          votedIdsOrNames.has(strId) ||
+          (strName && votedIdsOrNames.has(strName)) ||
+          (strNick && votedIdsOrNames.has(strNick));
+
+        if (!isVoted) {
+          item.votes = (Number(item.votes) || 0) + 1;
+        }
+      });
 
       // Recalculate percent using 70% votes + 30% What-If formula
       current = computePollPercentages(current);

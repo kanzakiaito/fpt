@@ -306,15 +306,15 @@ export default function TrialAdminPage() {
       currentRanks[rankKey] = num;
       item.rankVotes = currentRanks;
 
-      // Auto calculate total points (อันดับ 1=5, 2=4, 3=3, 4=2, 5=1, แชมป์=10)
+      // Auto calculate total points (อันดับ 1=10, 2=7, 3=5, 4=3, 5=2, แชมป์=15)
       const champ = Number(item.championVotes) || 0;
       const calcVotes =
-        (Number(currentRanks["1"]) || 0) * 5 +
-        (Number(currentRanks["2"]) || 0) * 4 +
-        (Number(currentRanks["3"]) || 0) * 3 +
-        (Number(currentRanks["4"]) || 0) * 2 +
-        (Number(currentRanks["5"]) || 0) * 1 +
-        champ * 10;
+        (Number(currentRanks["1"]) || 0) * 10 +
+        (Number(currentRanks["2"]) || 0) * 7 +
+        (Number(currentRanks["3"]) || 0) * 5 +
+        (Number(currentRanks["4"]) || 0) * 3 +
+        (Number(currentRanks["5"]) || 0) * 2 +
+        champ * 15;
 
       item.votes = calcVotes;
       updated[index] = item;
@@ -331,12 +331,12 @@ export default function TrialAdminPage() {
 
       const currentRanks = item.rankVotes || {};
       const calcVotes =
-        (Number(currentRanks["1"]) || 0) * 5 +
-        (Number(currentRanks["2"]) || 0) * 4 +
-        (Number(currentRanks["3"]) || 0) * 3 +
-        (Number(currentRanks["4"]) || 0) * 2 +
-        (Number(currentRanks["5"]) || 0) * 1 +
-        num * 10;
+        (Number(currentRanks["1"]) || 0) * 10 +
+        (Number(currentRanks["2"]) || 0) * 7 +
+        (Number(currentRanks["3"]) || 0) * 5 +
+        (Number(currentRanks["4"]) || 0) * 3 +
+        (Number(currentRanks["5"]) || 0) * 2 +
+        num * 15;
 
       item.votes = calcVotes;
       updated[index] = item;
@@ -3467,12 +3467,12 @@ export default function TrialAdminPage() {
                     <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "45px", color: "#80d0ff" }}>ลบ</th>
                   </tr>
                   <tr style={{ background: "rgba(255, 215, 0, 0.06)", borderBottom: "1px solid rgba(0, 229, 255, 0.2)" }}>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#ffd700", fontSize: "12px", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="อันดับ 1 (5 คะแนน)">🥇 #1</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#e2e8f0", fontSize: "12px" }} title="อันดับ 2 (4 คะแนน)">🥈 #2</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#cd7f32", fontSize: "12px" }} title="อันดับ 3 (3 คะแนน)">🥉 #3</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#38bdf8", fontSize: "12px" }} title="อันดับ 4 (2 คะแนน)">🎖️ #4</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#a855f7", fontSize: "12px" }} title="อันดับ 5 (1 คะแนน)">🎖️ #5</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#ffd700", fontSize: "12px" }} title="สุดยอดแฟนพันธุ์แท้ (10 คะแนน)">🏆 แชมป์</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#ffd700", fontSize: "12px", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="อันดับ 1 (10 คะแนน)">🥇 #1</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#e2e8f0", fontSize: "12px" }} title="อันดับ 2 (7 คะแนน)">🥈 #2</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#cd7f32", fontSize: "12px" }} title="อันดับ 3 (5 คะแนน)">🥉 #3</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#38bdf8", fontSize: "12px" }} title="อันดับ 4 (3 คะแนน)">🎖️ #4</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#a855f7", fontSize: "12px" }} title="อันดับ 5 (2 คะแนน)">🎖️ #5</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#ffd700", fontSize: "12px" }} title="สุดยอดแฟนพันธุ์แท้ (15 คะแนน)">🏆 แชมป์</th>
                     <th style={{ padding: "6px 4px", textAlign: "center", width: "70px", color: "#67e8f9", fontSize: "12px", borderRight: "1px solid rgba(255, 215, 0, 0.3)", fontWeight: "800" }} title="คะแนนรวมดิบเฉพาะจากการโหวตมหาชน">🗳️ รวมโหวต</th>
                   </tr>
                 </thead>
@@ -3783,7 +3783,7 @@ export default function TrialAdminPage() {
                             min="0"
                             value={item.championVotes ?? 0}
                             onChange={(e) => handleChampionVoteChange(index, e.target.value)}
-                            title="จำนวนคนโหวตให้เป็นสุดยอดแฟนพันธุ์แท้ (10 คะแนนพิเศษ)"
+                            title="จำนวนคนโหวตให้เป็นสุดยอดแฟนพันธุ์แท้ (15 คะแนนพิเศษ)"
                             style={{
                               width: "46px",
                               padding: "6px 2px",
