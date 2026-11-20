@@ -446,7 +446,7 @@ function ChampionSelectorCard({ championId, contestants = [], onSelect, onClear 
           </span>
         </div>
         <div style={{ fontSize: "12px", color: "#ffd700", fontWeight: "700" }}>
-          (เลือกเพียง 1 คนเท่านั้น • ให้คะแนนพิเศษ +15 คะแนน)
+          (เลือกเพียง 1 คนเท่านั้น)
         </div>
       </div>
 
@@ -644,11 +644,11 @@ export default function PollPage() {
   const isAdmin = Boolean(user && (user.role === "admin" || user.role === "main_admin" || user.isMainAdmin));
 
   const rankConfig = [
-    { key: "1", label: "อันดับที่ 1 (10 คะแนน)", icon: "🥇", color: "#ffd700", bg: "rgba(255, 215, 0, 0.15)" },
-    { key: "2", label: "อันดับที่ 2 (7 คะแนน)", icon: "🥈", color: "#e2e8f0", bg: "rgba(226, 232, 240, 0.15)" },
-    { key: "3", label: "อันดับที่ 3 (5 คะแนน)", icon: "🥉", color: "#cd7f32", bg: "rgba(205, 127, 50, 0.15)" },
-    { key: "4", label: "อันดับที่ 4 (3 คะแนน)", icon: "🎖️", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)" },
-    { key: "5", label: "อันดับที่ 5 (2 คะแนน)", icon: "🎖️", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)" },
+    { key: "1", label: "อันดับที่ 1 (1st Place)", icon: "🥇", color: "#ffd700", bg: "rgba(255, 215, 0, 0.15)" },
+    { key: "2", label: "อันดับที่ 2 (2nd Place)", icon: "🥈", color: "#e2e8f0", bg: "rgba(226, 232, 240, 0.15)" },
+    { key: "3", label: "อันดับที่ 3 (3rd Place)", icon: "🥉", color: "#cd7f32", bg: "rgba(205, 127, 50, 0.15)" },
+    { key: "4", label: "อันดับที่ 4 (4th Place)", icon: "🎖️", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)" },
+    { key: "5", label: "อันดับที่ 5 (5th Place)", icon: "🎖️", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)" },
   ];
 
   const fetchPollData = async () => {
@@ -1149,13 +1149,10 @@ export default function PollPage() {
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", color: "rgba(255,255,255,0.85)", lineHeight: 1.6 }}>
                 <div>
-                  <strong style={{ color: "#ffd700" }}>1. เลือก 5 อันดับแรก:</strong> ในแต่ละอันดับสามารถเลือกได้สูงสุดอันดับละ 5 คน (ที่ 1 ได้ 10 คะแนน, ที่ 2 ได้ 7 คะแนน, ที่ 3 ได้ 5 คะแนน, ที่ 4 ได้ 3 คะแนน, ที่ 5 ได้ 2 คะแนน)
+                  <strong style={{ color: "#ffd700" }}>1. เลือก 5 อันดับแรก:</strong> ในแต่ละอันดับ (อันดับ 1 ถึง อันดับ 5) สามารถเลือกผู้เข้าแข่งขันได้สูงสุดอันดับละ 5 คน (โดยผู้เข้าแข่งขัน 1 คนเลือกได้เพียง 1 อันดับ)
                 </div>
                 <div>
-                  <strong style={{ color: "#ffd700" }}>2. เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์เพียงคนเดียว (รับคะแนนพิเศษ +15 คะแนน)
-                </div>
-                <div>
-                  <strong style={{ color: "#ffd700" }}>3. ผู้เข้าแข่งขันคนอื่นๆ ในใบโหวตนี้:</strong> ผู้ที่ไม่ถูกเลือกในอันดับใดๆ เลย จะได้รับคนละ 1 คะแนน
+                  <strong style={{ color: "#ffd700" }}>2. เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว
                 </div>
               </div>
             </div>
