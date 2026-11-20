@@ -477,14 +477,19 @@ export async function POST(request) {
         "5": 1, // อันดับ 5 ได้ 1 คะแนนต่อคน
       };
 
-      // Add points for ranks 1-5
+      // Add points for ranks 1-5 (each contestant can only be selected in one rank)
+      const seenContestants = new Set();
       Object.entries(ranks).forEach(([rankStr, contestantIds]) => {
         const weight = rankWeights[rankStr] || 0;
         const ids = Array.isArray(contestantIds) ? contestantIds : [contestantIds];
         ids.forEach((cId) => {
           if (!cId) return;
+          const strId = String(cId);
+          if (seenContestants.has(strId)) return; // Disallow duplicate selection across ranks
+          seenContestants.add(strId);
+
           const target = current.find(
-            (item) => String(item.id) === String(cId) || (item.name && String(item.name) === String(cId))
+            (item) => String(item.id) === strId || (item.name && String(item.name) === strId)
           );
           if (target) {
             target.votes = (Number(target.votes) || 0) + weight;

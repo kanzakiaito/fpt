@@ -388,6 +388,12 @@ function RankMultiSelectCard({
                     if (isSelectedInThisRank) {
                       onRemoveContestant(cId);
                     } else {
+                      if (alreadyInRank) {
+                        alert(
+                          `ไม่สามารถเลือก ${c.nickname || c.name} ในอันดับนี้ได้ เนื่องจากถูกเลือกในอันดับ #${alreadyInRank} ไปแล้วครับ (ผู้เข้าแข่งขัน 1 คนเลือกได้เพียง 1 อันดับ)`
+                        );
+                        return;
+                      }
                       if (selectedIds.length >= maxQuota) {
                         alert("คุณเลือกครบโควตา 5 คนในอันดับนี้แล้วครับ");
                         return;
@@ -404,24 +410,25 @@ function RankMultiSelectCard({
                     gap: "10px",
                     padding: "10px 14px",
                     borderBottom: "1px solid rgba(255,255,255,0.05)",
-                    cursor: "pointer",
+                    cursor: alreadyInRank && !isSelectedInThisRank ? "not-allowed" : "pointer",
+                    opacity: alreadyInRank && !isSelectedInThisRank ? 0.45 : 1,
                     background: isSelectedInThisRank
                       ? "rgba(16, 185, 129, 0.18)"
                       : alreadyInRank
-                      ? "rgba(255, 215, 0, 0.04)"
+                      ? "rgba(239, 68, 68, 0.05)"
                       : "transparent",
-                    transition: "background 0.12s ease",
+                    transition: "all 0.12s ease",
                   }}
                   onMouseEnter={(e) => {
+                    if (alreadyInRank && !isSelectedInThisRank) return;
                     e.currentTarget.style.background = isSelectedInThisRank
                       ? "rgba(16, 185, 129, 0.26)"
                       : "rgba(0, 229, 255, 0.18)";
                   }}
                   onMouseLeave={(e) => {
+                    if (alreadyInRank && !isSelectedInThisRank) return;
                     e.currentTarget.style.background = isSelectedInThisRank
                       ? "rgba(16, 185, 129, 0.18)"
-                      : alreadyInRank
-                      ? "rgba(255, 215, 0, 0.04)"
                       : "transparent";
                   }}
                 >
@@ -479,22 +486,27 @@ function RankMultiSelectCard({
                   {alreadyInRank && !isSelectedInThisRank && (
                     <span
                       style={{
-                        fontSize: "10px",
-                        padding: "2px 6px",
-                        borderRadius: "4px",
-                        background: "rgba(255, 215, 0, 0.15)",
-                        color: "#ffd700",
-                        border: "1px solid rgba(255, 215, 0, 0.3)",
+                        fontSize: "11px",
+                        padding: "3px 8px",
+                        borderRadius: "6px",
+                        background: "rgba(239, 68, 68, 0.16)",
+                        color: "#fca5a5",
+                        border: "1px solid rgba(239, 68, 68, 0.35)",
+                        fontWeight: "700",
                         flexShrink: 0,
                       }}
                     >
-                      เลือกในอันดับ #{alreadyInRank} แล้ว
+                      🔒 อยู่ในอันดับ #{alreadyInRank} แล้ว
                     </span>
                   )}
 
                   {isSelectedInThisRank ? (
                     <span style={{ color: "#34d399", fontSize: "12px", fontWeight: "800", flexShrink: 0 }}>
                       ✓ เลือกแล้ว
+                    </span>
+                  ) : alreadyInRank ? (
+                    <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "11.5px", fontWeight: "700", flexShrink: 0 }}>
+                      ห้ามเลือกซ้ำ
                     </span>
                   ) : (
                     <span style={{ color: badgeColor, fontSize: "13px", fontWeight: "800", flexShrink: 0 }}>
@@ -945,9 +957,20 @@ export default function TrialFotyBallotVotePage() {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  // Add contestant to a rank (max 5)
+  // Add contestant to a rank (max 5, must not be in any other rank)
   const handleAddContestant = (rankKey, contestantId) => {
     setBallotRanks((prev) => {
+      let existingRank = null;
+      Object.entries(prev).forEach(([rk, list]) => {
+        if (rk !== rankKey && Array.isArray(list) && list.includes(contestantId)) {
+          existingRank = rk;
+        }
+      });
+      if (existingRank) {
+        showToast(`⚠️ ผู้เข้าแข่งขันคนนี้ถูกเลือกในอันดับ #${existingRank} แล้ว (ห้ามเลือกซ้ำ)`);
+        return prev;
+      }
+
       const currentList = prev[rankKey] || [];
       if (currentList.includes(contestantId)) return prev;
       if (currentList.length >= 5) return prev;
