@@ -311,7 +311,7 @@ export default function TrialFOTYPage() {
   const [showWarmupTable, setShowWarmupTable] = useState(true);
   const [showPollTable, setShowPollTable] = useState(true);
   const [isScoreHidden, setIsScoreHidden] = useState(false);
-  const canViewPoll = showPollTable || isAdmin;
+  const canViewPoll = showPollTable;
   const [sortBy, setSortBy] = useState("rank"); // 'rank' | 'order'
   const [searchQuery, setSearchQuery] = useState("");
   const [pollSearchQuery, setPollSearchQuery] = useState("");
@@ -353,12 +353,22 @@ export default function TrialFOTYPage() {
           setIsScoreHidden(Boolean(jsonPoll.isScoreHidden));
         }
         if (jsonPoll.showWarmupTable !== undefined) {
-          setShowWarmupTable(Boolean(jsonPoll.showWarmupTable));
+          const isWarmupVis = Boolean(jsonPoll.showWarmupTable);
+          setShowWarmupTable(isWarmupVis);
+          try {
+            localStorage.setItem("fpt_trial_show_warmup_table", String(isWarmupVis));
+          } catch (e) {}
+          if (!isWarmupVis) {
+            setActiveTableTab((prev) => (prev === "warmup" ? "standings" : prev));
+          }
         }
         if (jsonPoll.showPollTable !== undefined || jsonPoll.showTrialPollTable !== undefined) {
           const isPollVis = Boolean(jsonPoll.showTrialPollTable !== undefined ? jsonPoll.showTrialPollTable : jsonPoll.showPollTable);
           setShowPollTable(isPollVis);
-          if (!isPollVis && !isAdmin) {
+          try {
+            localStorage.setItem("fpt_trial_show_poll_table", String(isPollVis));
+          } catch (e) {}
+          if (!isPollVis) {
             setActiveTableTab((prev) => (prev === "poll" ? "standings" : prev));
           }
         }
@@ -381,6 +391,22 @@ export default function TrialFOTYPage() {
       if (cachedP) {
         const parsedP = JSON.parse(cachedP);
         if (Array.isArray(parsedP) && parsedP.length > 0) setPollList(parsedP);
+      }
+      const cachedShowPoll = localStorage.getItem("fpt_trial_show_poll_table");
+      if (cachedShowPoll !== null) {
+        const isPollVis = cachedShowPoll === "true";
+        setShowPollTable(isPollVis);
+        if (!isPollVis) {
+          setActiveTableTab((prev) => (prev === "poll" ? "standings" : prev));
+        }
+      }
+      const cachedShowWarmup = localStorage.getItem("fpt_trial_show_warmup_table");
+      if (cachedShowWarmup !== null) {
+        const isWarmupVis = cachedShowWarmup === "true";
+        setShowWarmupTable(isWarmupVis);
+        if (!isWarmupVis) {
+          setActiveTableTab((prev) => (prev === "warmup" ? "standings" : prev));
+        }
       }
     } catch (e) {}
 
@@ -843,7 +869,7 @@ export default function TrialFOTYPage() {
               🏆 ตารางคะแนนแข่งขัน
             </a>
 
-            {canViewPoll && (
+            {showPollTable && (
               <button
                 type="button"
                 onClick={() => {
@@ -899,7 +925,9 @@ export default function TrialFOTYPage() {
               marginBottom: "10px",
             }}
           >
-            THE TRIAL FAN OF THE YEAR 2026 STANDINGS & POLL
+            {showPollTable
+              ? "THE TRIAL FAN OF THE YEAR 2026 STANDINGS & POLL"
+              : "THE TRIAL FAN OF THE YEAR 2026 STANDINGS"}
           </div>
           <h2
             style={{
@@ -911,14 +939,14 @@ export default function TrialFOTYPage() {
               margin: "0 0 8px 0",
             }}
           >
-            {activeTableTab === "standings" || (!canViewPoll && activeTableTab === "poll")
+            {activeTableTab === "standings" || (!showPollTable && activeTableTab === "poll")
               ? "ตารางคะแนนการแข่งขัน งุ่นง่าน Of The Year 2026"
               : activeTableTab === "warmup"
                 ? "ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)"
                 : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
           </h2>
           <p style={{ fontSize: "15px", color: "rgba(255, 255, 255, 0.65)", margin: 0 }}>
-            {activeTableTab === "standings" || (!canViewPoll && activeTableTab === "poll")
+            {activeTableTab === "standings" || (!showPollTable && activeTableTab === "poll")
               ? "คะแนนสดอัปเดตแบบเรียลไทม์ 4 หมวดการแข่งขัน ตัดตัวผู้เข้าแข่งขัน 5 อันดับแรก"
               : activeTableTab === "warmup"
                 ? "คะแนนจากการลงสนามแข่งในห้องเกม (/game) เต็ม 100 คะแนน คิดเป็นสัดส่วน 30% ของตารางโพลล์มหาชน"
@@ -988,7 +1016,7 @@ export default function TrialFOTYPage() {
             </button>
           )}
 
-          {canViewPoll && (
+          {showPollTable && (
             <button
               type="button"
               onClick={() => setActiveTableTab("poll")}
@@ -3283,7 +3311,7 @@ export default function TrialFOTYPage() {
         {/* ========================================================
             TAB 2: FAN POLL RANKINGS (Authentic 1:1 Matching page.js)
            ======================================================== */}
-        {activeTableTab === "poll" && canViewPoll && (
+        {activeTableTab === "poll" && showPollTable && (
           <div key="poll-tab-view" className="table-slide-down">
             {/* Vote CTA Banner */}
             <div
