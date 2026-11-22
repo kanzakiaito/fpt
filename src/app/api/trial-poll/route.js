@@ -209,6 +209,9 @@ export async function GET(req) {
       showTrialPollTable,
       isScoreHidden,
       hideTrialPollScoresDuringVote,
+      trialSubtitle:
+        rawSettings?.trialSubtitle ||
+        "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก",
     },
     {
       headers: {
@@ -222,6 +225,25 @@ export async function GET(req) {
 export async function POST(request) {
   try {
     const body = await request.json();
+
+    // Update Trial Subtitle action
+    if (body.action === "update_trial_subtitle" || body.action === "update_subtitle") {
+      const rawSettings = await getKVData("fpt_settings", readSettings);
+      const newSubtitle = String(body.trialSubtitle || body.subtitle || "").trim();
+      const updatedSettings = {
+        ...(rawSettings || {}),
+        trialSubtitle:
+          newSubtitle ||
+          "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก",
+      };
+      writeSettings(updatedSettings);
+      await saveKVData("fpt_settings", updatedSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        trialSubtitle: updatedSettings.trialSubtitle,
+        message: "บันทึกคำเปรยของ Trial FOTY เรียบร้อยแล้ว",
+      });
+    }
 
     // Toggle / Set voting open status
     if (body.action === "toggle_voting" || body.action === "set_voting_open") {

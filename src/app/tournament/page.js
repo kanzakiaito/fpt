@@ -20,6 +20,8 @@ export default async function TournamentPage() {
   let cutoff = "all";
   let awardOverride = "auto";
   let penaltyOverride = "auto";
+  let tournamentSubtitle =
+    "การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ) 2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป";
   try {
     const rawSettings = await getKVData("fpt_settings", () => {
       const p = path.join(process.cwd(), "src/app/data/settings.json");
@@ -34,6 +36,9 @@ export default async function TournamentPage() {
     }
     if (rawSettings && rawSettings.tournamentPenaltyOverride) {
       penaltyOverride = rawSettings.tournamentPenaltyOverride;
+    }
+    if (rawSettings && rawSettings.tournamentSubtitle) {
+      tournamentSubtitle = rawSettings.tournamentSubtitle;
     }
   } catch (e) {}
 
@@ -68,6 +73,7 @@ export default async function TournamentPage() {
       cutoffMatch={cutoff}
       awardOverride={awardOverride}
       penaltyOverride={penaltyOverride}
+      tournamentSubtitle={tournamentSubtitle}
     />
   );
 }

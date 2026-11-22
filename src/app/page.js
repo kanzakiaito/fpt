@@ -44,6 +44,9 @@ export default function MainPage() {
   const [showWarmupTable, setShowWarmupTable] = useState(true);
   const [showFavFanInNav, setShowFavFanInNav] = useState(false);
   const [showPollInNav, setShowPollInNav] = useState(false);
+  const [fotySubtitle, setFotySubtitle] = useState(
+    "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)"
+  );
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedSpotlight, setSelectedSpotlight] = useState(null);
@@ -114,6 +117,9 @@ export default function MainPage() {
         }
         if (settingsData.fotyBroadcastCustoms) {
           setFotyBroadcastCustoms(settingsData.fotyBroadcastCustoms);
+        }
+        if (settingsData.fotySubtitle) {
+          setFotySubtitle(settingsData.fotySubtitle);
         }
         if (Array.isArray(settingsData.weeklyMatches)) {
           setWeeklyMatches(settingsData.weeklyMatches);
@@ -1455,7 +1461,7 @@ export default function MainPage() {
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "650px", margin: "0 auto" }}>
               {activeFotyHomeTab === "standings" && showFotyQualifyingOnHome
-                ? "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)"
+                ? fotySubtitle || "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)"
                 : "อันดับผลสำรวจความนิยมและความคาดหวังของผู้เข้าแข่งขัน แฟนพันธุ์แท้แห่งปี 2026 จากแฟนรายการ"}
             </p>
           </div>

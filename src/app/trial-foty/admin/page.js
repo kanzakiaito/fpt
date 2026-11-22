@@ -130,6 +130,10 @@ export default function TrialAdminPage() {
   const [hideTrialPollScores, setHideTrialPollScores] = useState(true);
   const [togglingHideScores, setTogglingHideScores] = useState(false);
   const [syncingGameScores, setSyncingGameScores] = useState(false);
+  const [trialSubtitle, setTrialSubtitle] = useState(
+    "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก"
+  );
+  const [savingSubtitle, setSavingSubtitle] = useState(false);
 
   // ── Trial Info & Staff Q&A States ─────────────────────────────────────────
   const [infoKeywords, setInfoKeywords] = useState([]);
@@ -237,6 +241,9 @@ export default function TrialAdminPage() {
         }
         if (jsonPoll.hideTrialPollScoresDuringVote !== undefined) {
           setHideTrialPollScores(Boolean(jsonPoll.hideTrialPollScoresDuringVote));
+        }
+        if (jsonPoll.trialSubtitle) {
+          setTrialSubtitle(jsonPoll.trialSubtitle);
         }
       }
       if (resInfo.ok) {
@@ -722,9 +729,39 @@ export default function TrialAdminPage() {
         if (data.hideTrialPollScoresDuringVote !== undefined) {
           setHideTrialPollScores(Boolean(data.hideTrialPollScoresDuringVote));
         }
+        if (data.trialSubtitle) {
+          setTrialSubtitle(data.trialSubtitle);
+        }
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleSaveTrialSubtitle = async (customValue) => {
+    const targetText = typeof customValue === "string" ? customValue : trialSubtitle;
+    setSavingSubtitle(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_subtitles",
+          trialSubtitle: targetText.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTrialSubtitle(data.trialSubtitle || targetText.trim());
+        showToast("🟢 บันทึกข้อความคำเปรยของ Trial FOTY สำเร็จแล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการบันทึกคำเปรย", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setSavingSubtitle(false);
     }
   };
 
@@ -4767,6 +4804,111 @@ export default function TrialAdminPage() {
                       : showMainPollTable
                       ? "🔒 คลิกเพื่อปิดซ่อน"
                       : "🔓 คลิกเพื่อเปิดแสดง"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Trial Subtitle Customization Box */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.35)",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "20px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "8px",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: "900",
+                    color: "#00e5ff",
+                    margin: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <span>📝</span> ปรับแต่งข้อความคำเปรยหน้าแรก (Hero Subtitle / คำแนะนำ)
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const def =
+                      "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก";
+                    setTrialSubtitle(def);
+                    handleSaveTrialSubtitle(def);
+                  }}
+                  style={{
+                    padding: "4px 12px",
+                    borderRadius: "6px",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    color: "rgba(255,255,255,0.7)",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  ↺ รีเซ็ตเป็นค่าเริ่มต้น
+                </button>
+              </div>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 14px", lineHeight: "1.6" }}>
+                ข้อความนี้จะแสดงอยู่ใต้หัวข้อ <strong>"งุ่นง่าน Of The Year 2026"</strong> บนหน้าแรกของ <code>/trial-foty</code>
+              </p>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <textarea
+                  rows={3}
+                  value={trialSubtitle}
+                  onChange={(e) => setTrialSubtitle(e.target.value)}
+                  placeholder="พิมพ์ข้อความคำเปรยของหน้า Trial FOTY..."
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: "10px",
+                    background: "rgba(0, 15, 30, 0.9)",
+                    border: "1px solid rgba(0, 229, 255, 0.4)",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    lineHeight: "1.6",
+                    resize: "vertical",
+                  }}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
+                    💡 ผู้ชมทั่วไปจะเห็นข้อความที่พิมพ์นี้บนหน้า <code>/trial-foty</code> ทันทีหลังกดบันทึก
+                  </div>
+                  <button
+                    type="button"
+                    disabled={savingSubtitle}
+                    onClick={() => handleSaveTrialSubtitle(trialSubtitle)}
+                    style={{
+                      padding: "9px 22px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                      border: "none",
+                      color: "#030814",
+                      fontSize: "14px",
+                      fontWeight: "900",
+                      cursor: savingSubtitle ? "not-allowed" : "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)",
+                    }}
+                  >
+                    {savingSubtitle ? "⏳ กำลังบันทึก..." : "💾 บันทึกคำเปรย"}
                   </button>
                 </div>
               </div>

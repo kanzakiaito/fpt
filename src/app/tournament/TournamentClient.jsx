@@ -115,6 +115,7 @@ export default function TournamentClient({
   cutoffMatch = "all",
   awardOverride = "auto",
   penaltyOverride = "auto",
+  tournamentSubtitle,
 }) {
   const [data, setData] = useState(initialData || defaultTournamentData);
   const [activeAwardOverride, setActiveAwardOverride] = useState(awardOverride);
@@ -1632,7 +1633,12 @@ export default function TournamentClient({
                 textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)",
               }}
             >
-              การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ)<br></br>2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป
+              {tournamentSubtitle || (
+                <>
+                  การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ)
+                  <br></br>2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป
+                </>
+              )}
             </p>
 
             {/* Stat Badges Row */}

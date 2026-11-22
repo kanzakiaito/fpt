@@ -312,6 +312,9 @@ export default function TrialFOTYPage() {
   const [showPollTable, setShowPollTable] = useState(true);
   const [isScoreHidden, setIsScoreHidden] = useState(false);
   const canViewPoll = showPollTable;
+  const [trialSubtitle, setTrialSubtitle] = useState(
+    "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก"
+  );
   const [sortBy, setSortBy] = useState("rank"); // 'rank' | 'order'
   const [searchQuery, setSearchQuery] = useState("");
   const [pollSearchQuery, setPollSearchQuery] = useState("");
@@ -372,6 +375,12 @@ export default function TrialFOTYPage() {
             setActiveTableTab((prev) => (prev === "poll" ? "standings" : prev));
           }
         }
+        if (jsonPoll.trialSubtitle) {
+          setTrialSubtitle(jsonPoll.trialSubtitle);
+          try {
+            localStorage.setItem("fpt_trial_subtitle", jsonPoll.trialSubtitle);
+          } catch (e) {}
+        }
       }
     } catch (e) {
       console.error("Failed to load trial data:", e);
@@ -382,6 +391,8 @@ export default function TrialFOTYPage() {
 
   useEffect(() => {
     try {
+      const cachedSub = localStorage.getItem("fpt_trial_subtitle");
+      if (cachedSub) setTrialSubtitle(cachedSub);
       const cachedC = localStorage.getItem("fpt_trial_contestants_cache");
       if (cachedC) {
         const parsed = JSON.parse(cachedC);
@@ -838,7 +849,8 @@ export default function TrialFOTYPage() {
               lineHeight: "1.6",
             }}
           >
-            ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก
+            {trialSubtitle ||
+              "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก"}
           </p>
 
           {/* Action Buttons */}

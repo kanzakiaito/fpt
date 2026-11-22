@@ -617,6 +617,10 @@ export default function AdminTournamentPage() {
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsNotice, setSettingsNotice] = useState("");
+  const [tournamentSubtitle, setTournamentSubtitle] = useState(
+    "การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ) 2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป"
+  );
+  const [savingTournamentSubtitle, setSavingTournamentSubtitle] = useState(false);
 
   // Match Edit Modal State
   const [editingMatch, setEditingMatch] = useState(null);
@@ -686,11 +690,42 @@ export default function AdminTournamentPage() {
         setProtectCurrent(Boolean(sJson.protectCurrent));
         setCurrentPassword(sJson.currentPassword || "");
         setShowCurrentInNav(sJson.showCurrentInNav !== false);
+        if (sJson.tournamentSubtitle) {
+          setTournamentSubtitle(sJson.tournamentSubtitle);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch tournament data:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveTournamentSubtitle = async (customVal) => {
+    const targetText = typeof customVal === "string" ? customVal : tournamentSubtitle;
+    setSavingTournamentSubtitle(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_subtitles",
+          tournamentSubtitle: targetText.trim(),
+        }),
+      });
+      const resData = await res.json();
+      if (resData.success) {
+        setTournamentSubtitle(resData.tournamentSubtitle || targetText.trim());
+        setSettingsNotice("✅ บันทึกข้อความคำเปรยทัวร์นาเมนต์เรียบร้อยแล้ว");
+        setTimeout(() => setSettingsNotice(""), 3500);
+      } else {
+        alert(resData.error || "เกิดข้อผิดพลาดในการบันทึก");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+    } finally {
+      setSavingTournamentSubtitle(false);
     }
   };
 
@@ -2856,6 +2891,89 @@ export default function AdminTournamentPage() {
                 {settingsNotice}
               </div>
             )}
+
+            {/* Tournament Subtitle Customization Box */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: "1.5px solid rgba(255, 136, 0, 0.35)",
+                borderRadius: "16px",
+                padding: "24px",
+                marginBottom: "24px",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "10px" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: "800", color: "#ffa940", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span>📝</span> ปรับแต่งข้อความคำเปรยหน้าแรกทัวร์นาเมนต์ (Hero Subtitle)
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const def = "การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ) 2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป";
+                    setTournamentSubtitle(def);
+                    handleSaveTournamentSubtitle(def);
+                  }}
+                  style={{
+                    padding: "4px 12px",
+                    borderRadius: "6px",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    color: "rgba(255,255,255,0.7)",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  ↺ รีเซ็ตเป็นค่าเริ่มต้น
+                </button>
+              </div>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: "0 0 14px", lineHeight: "1.6" }}>
+                ข้อความนี้จะแสดงอยู่ใต้หัวข้อใหญ่ <strong>"การแข่งขันระบบ League Phase"</strong> บนหน้าแรกของ <code>/tournament</code>
+              </p>
+              <textarea
+                rows={2}
+                value={tournamentSubtitle}
+                onChange={(e) => setTournamentSubtitle(e.target.value)}
+                placeholder="พิมพ์ข้อความคำเปรยของทัวร์นาเมนต์..."
+                style={{
+                  width: "100%",
+                  padding: "12px 14px",
+                  borderRadius: "10px",
+                  background: "rgba(0, 15, 30, 0.9)",
+                  border: "1px solid rgba(255, 136, 0, 0.4)",
+                  color: "#ffffff",
+                  fontSize: "14px",
+                  lineHeight: "1.6",
+                  resize: "vertical",
+                  marginBottom: "12px",
+                }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
+                  💡 ผู้ชมทั่วไปจะเห็นข้อความที่พิมพ์นี้บนหน้า <code>/tournament</code> ทันทีหลังกดบันทึก
+                </div>
+                <button
+                  type="button"
+                  disabled={savingTournamentSubtitle}
+                  onClick={() => handleSaveTournamentSubtitle(tournamentSubtitle)}
+                  style={{
+                    padding: "9px 22px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(90deg, #ff8800 0%, #e65100 100%)",
+                    border: "none",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    fontWeight: "900",
+                    cursor: savingTournamentSubtitle ? "not-allowed" : "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    boxShadow: "0 0 15px rgba(255, 136, 0, 0.3)",
+                  }}
+                >
+                  {savingTournamentSubtitle ? "⏳ กำลังบันทึก..." : "💾 บันทึกคำเปรยทัวร์นาเมนต์"}
+                </button>
+              </div>
+            </div>
 
             {/* Section 1: Cutoff & Overrides */}
             <div

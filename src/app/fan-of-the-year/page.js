@@ -509,6 +509,9 @@ export default function MainPage() {
   // Tab State: 'standings' | 'poll'
   const [activeTableTab, setActiveTableTab] = useState("standings");
   const [showPollTable, setShowPollTable] = useState(true);
+  const [fotySubtitle, setFotySubtitle] = useState(
+    "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)"
+  );
 
   // Search, Filter & Spotlight Interactive States
   const [searchQuery, setSearchQuery] = useState("");
@@ -576,6 +579,9 @@ export default function MainPage() {
         }
         if (settingsData.showCurrentInNav !== undefined) {
           setShowCurrentInNav(Boolean(settingsData.showCurrentInNav));
+        }
+        if (settingsData.fotySubtitle) {
+          setFotySubtitle(settingsData.fotySubtitle);
         }
         setIsArchived(Boolean(settingsData.isArchived));
         setCurrentPhase(settingsData.currentPhase || "qualifying");
@@ -1406,12 +1412,22 @@ export default function MainPage() {
             fontSize: "26px",
             fontWeight: "800",
             color: "#e0f2fe",
-            marginBottom: "30px",
+            marginBottom: "12px",
             textShadow: "0 2px 14px rgba(0,0,0,0.9)",
             letterSpacing: "1px"
           }}>
             แฟนพันธุ์แท้แห่งปี 2026
           </h2>
+
+          <p style={{
+            fontSize: "15px",
+            color: "rgba(255, 255, 255, 0.75)",
+            maxWidth: "680px",
+            margin: "0 auto 30px",
+            lineHeight: "1.6",
+          }}>
+            {fotySubtitle || "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)"}
+          </p>
 
             {/* Action Buttons */}
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>

@@ -84,6 +84,12 @@ export default function AdminPage() {
   const [togglingHidePollScores, setTogglingHidePollScores] = useState(false);
   const [settingsNotice, setSettingsNotice] = useState("");
 
+  // Subtitles / Slogans states
+  const [fotySubtitle, setFotySubtitle] = useState("รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)");
+  const [tournamentSubtitle, setTournamentSubtitle] = useState("การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ) 2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป");
+  const [trialSubtitle, setTrialSubtitle] = useState("ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก");
+  const [savingSubtitles, setSavingSubtitles] = useState(false);
+
   // FOTY (/fan-of-the-year) & Tournament Current (/current) Protection & Nav States
   const [protectFoty, setProtectFoty] = useState(false);
   const [fotyPassword, setFotyPassword] = useState("");
@@ -620,9 +626,43 @@ export default function AdminPage() {
         if (data.hidePollScoresDuringVote !== undefined) {
           setHidePollScoresDuringVote(Boolean(data.hidePollScoresDuringVote));
         }
+        if (data.fotySubtitle) setFotySubtitle(data.fotySubtitle);
+        if (data.tournamentSubtitle) setTournamentSubtitle(data.tournamentSubtitle);
+        if (data.trialSubtitle) setTrialSubtitle(data.trialSubtitle);
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
+    }
+  };
+
+  const handleSaveSubtitles = async () => {
+    setSavingSubtitles(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_subtitles",
+          fotySubtitle: fotySubtitle.trim(),
+          tournamentSubtitle: tournamentSubtitle.trim(),
+          trialSubtitle: trialSubtitle.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.fotySubtitle) setFotySubtitle(data.fotySubtitle);
+        if (data.tournamentSubtitle) setTournamentSubtitle(data.tournamentSubtitle);
+        if (data.trialSubtitle) setTrialSubtitle(data.trialSubtitle);
+        setSettingsNotice("✅ บันทึกข้อความคำเปรยเรียบร้อยแล้ว");
+        setTimeout(() => setSettingsNotice(""), 3500);
+      } else {
+        alert(data.error || "เกิดข้อผิดพลาดในการบันทึก");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+    } finally {
+      setSavingSubtitles(false);
     }
   };
 
@@ -6372,6 +6412,136 @@ export default function AdminPage() {
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
                   หากปิดใช้งาน หน้า <code>/trial-foty</code> จะซ่อนแท็บสลับและตารางอันดับโพลล์มหาชน
                 </p>
+              </div>
+
+              {/* Custom Subtitles / Slogans Section */}
+              <div style={{ height: "1px", background: "rgba(255,255,255,0.1)", margin: "24px 0" }}></div>
+
+              <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#00e5ff", marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>📝</span> ปรับแต่งข้อความคำเปรย / สโลแกนหน้าเว็บ (Subtitles & Slogans)
+              </h3>
+
+              {/* FOTY Subtitle */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: "1px solid rgba(0, 229, 255, 0.35)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "16px"
+              }}>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "800", color: "#00e5ff", marginBottom: "6px" }}>
+                  🏆 คำเปรย แฟนพันธุ์แท้แห่งปี 2026 (/fan-of-the-year และหน้าแรก)
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "0 0 10px 0" }}>
+                  แสดงอยู่ใต้หัวข้อการแข่งขันแฟนพันธุ์แท้แห่งปี 2026
+                </p>
+                <textarea
+                  rows={2}
+                  value={fotySubtitle}
+                  onChange={(e) => setFotySubtitle(e.target.value)}
+                  placeholder="พิมพ์คำเปรยแฟนพันธุ์แท้แห่งปี..."
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    background: "rgba(0, 15, 30, 0.9)",
+                    border: "1px solid rgba(0, 229, 255, 0.4)",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    lineHeight: "1.5",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+
+              {/* Tournament Subtitle */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: "1px solid rgba(255, 136, 0, 0.35)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "16px"
+              }}>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "800", color: "#ffa940", marginBottom: "6px" }}>
+                  ⚔️ คำเปรย แฟนพันธุ์แท้ ทัวร์นาเมนต์ (/tournament)
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "0 0 10px 0" }}>
+                  แสดงอยู่ใต้หัวข้อใหญ่ในหน้าแรกของทัวร์นาเมนต์
+                </p>
+                <textarea
+                  rows={2}
+                  value={tournamentSubtitle}
+                  onChange={(e) => setTournamentSubtitle(e.target.value)}
+                  placeholder="พิมพ์คำเปรยทัวร์นาเมนต์..."
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    background: "rgba(0, 15, 30, 0.9)",
+                    border: "1px solid rgba(255, 136, 0, 0.4)",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    lineHeight: "1.5",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+
+              {/* Trial FOTY Subtitle */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: "1px solid rgba(255, 215, 0, 0.35)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "16px"
+              }}>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "800", color: "#ffd700", marginBottom: "6px" }}>
+                  🌟 คำเปรย งุ่นง่าน Of The Year (/trial-foty)
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "0 0 10px 0" }}>
+                  แสดงอยู่ใต้หัวข้อใหญ่ในหน้าแรกของ Trial FOTY (สามารถแก้ไขจากหน้า /trial-foty/admin ได้เช่นกัน)
+                </p>
+                <textarea
+                  rows={2}
+                  value={trialSubtitle}
+                  onChange={(e) => setTrialSubtitle(e.target.value)}
+                  placeholder="พิมพ์คำเปรย Trial FOTY..."
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    background: "rgba(0, 15, 30, 0.9)",
+                    border: "1px solid rgba(255, 215, 0, 0.4)",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    lineHeight: "1.5",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "22px" }}>
+                <button
+                  type="button"
+                  disabled={savingSubtitles}
+                  onClick={handleSaveSubtitles}
+                  style={{
+                    padding: "10px 24px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                    border: "none",
+                    color: "#030814",
+                    fontSize: "14px",
+                    fontWeight: "900",
+                    cursor: savingSubtitles ? "not-allowed" : "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)",
+                  }}
+                >
+                  {savingSubtitles ? "⏳ กำลังบันทึก..." : "💾 บันทึกคำเปรยทั้งหมด"}
+                </button>
               </div>
 
               {/* Tellme Popular Vote & FOTY Poll Section */}

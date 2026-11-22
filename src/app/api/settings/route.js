@@ -55,6 +55,9 @@ const DEFAULT_SETTINGS = {
   fotyRevealUpToOrder: "all",
   fotyRevealCategory: "attribute",
   fotyReveal3SecPartial: 0,
+  trialSubtitle: "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก",
+  fotySubtitle: "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)",
+  tournamentSubtitle: "การแข่งขันลีกสุดดุเดือด แบ่งสาย Group A และ Group B พร้อมหมวดคำถาม 4 รูปแบบ ชิงชัยเพื่อครองบัลลังก์เจ้าแห่งทัวร์นาเมนต์",
 };
 
 function readSettings() {
@@ -140,6 +143,9 @@ export async function GET(request) {
       fotyRevealUpToOrder: settings.fotyRevealUpToOrder !== undefined ? settings.fotyRevealUpToOrder : "all",
       fotyRevealCategory: settings.fotyRevealCategory || "attribute",
       fotyReveal3SecPartial: settings.fotyReveal3SecPartial !== undefined ? Number(settings.fotyReveal3SecPartial) : 0,
+      trialSubtitle: settings.trialSubtitle || DEFAULT_SETTINGS.trialSubtitle,
+      fotySubtitle: settings.fotySubtitle || DEFAULT_SETTINGS.fotySubtitle,
+      tournamentSubtitle: settings.tournamentSubtitle || DEFAULT_SETTINGS.tournamentSubtitle,
     });
   }
 
@@ -184,6 +190,9 @@ export async function GET(request) {
     fotyRevealUpToOrder: settings.fotyRevealUpToOrder !== undefined ? settings.fotyRevealUpToOrder : "all",
     fotyRevealCategory: settings.fotyRevealCategory || "attribute",
     fotyReveal3SecPartial: settings.fotyReveal3SecPartial !== undefined ? Number(settings.fotyReveal3SecPartial) : 0,
+    trialSubtitle: settings.trialSubtitle || DEFAULT_SETTINGS.trialSubtitle,
+    fotySubtitle: settings.fotySubtitle || DEFAULT_SETTINGS.fotySubtitle,
+    tournamentSubtitle: settings.tournamentSubtitle || DEFAULT_SETTINGS.tournamentSubtitle,
   });
 }
 
@@ -365,6 +374,15 @@ export async function POST(request) {
       if (body.showChampionsOnHome !== undefined) {
         newSettings.showChampionsOnHome = Boolean(body.showChampionsOnHome);
       }
+      if (body.trialSubtitle !== undefined) {
+        newSettings.trialSubtitle = String(body.trialSubtitle).trim();
+      }
+      if (body.fotySubtitle !== undefined) {
+        newSettings.fotySubtitle = String(body.fotySubtitle).trim();
+      }
+      if (body.tournamentSubtitle !== undefined) {
+        newSettings.tournamentSubtitle = String(body.tournamentSubtitle).trim();
+      }
       if (body.favFanVotingOpen !== undefined) {
         newSettings.favFanVotingOpen = Boolean(body.favFanVotingOpen);
       }
@@ -445,7 +463,27 @@ export async function POST(request) {
           weeklyMatches: newSettings.weeklyMatches || [],
           tournamentWeeklyMatches: newSettings.tournamentWeeklyMatches || [],
           showChampionsOnHome: newSettings.showChampionsOnHome !== false,
+          trialSubtitle: newSettings.trialSubtitle || DEFAULT_SETTINGS.trialSubtitle,
+          fotySubtitle: newSettings.fotySubtitle || DEFAULT_SETTINGS.fotySubtitle,
+          tournamentSubtitle: newSettings.tournamentSubtitle || DEFAULT_SETTINGS.tournamentSubtitle,
         },
+      });
+    }
+
+    // Update subtitle blurbs action
+    if (body.action === "update_subtitles" || body.action === "update_subtitle") {
+      const updated = { ...current };
+      if (body.trialSubtitle !== undefined) updated.trialSubtitle = String(body.trialSubtitle).trim();
+      if (body.fotySubtitle !== undefined) updated.fotySubtitle = String(body.fotySubtitle).trim();
+      if (body.tournamentSubtitle !== undefined) updated.tournamentSubtitle = String(body.tournamentSubtitle).trim();
+      writeSettings(updated);
+      await saveKVData("fpt_settings", updated, writeSettings);
+      return NextResponse.json({
+        success: true,
+        trialSubtitle: updated.trialSubtitle || DEFAULT_SETTINGS.trialSubtitle,
+        fotySubtitle: updated.fotySubtitle || DEFAULT_SETTINGS.fotySubtitle,
+        tournamentSubtitle: updated.tournamentSubtitle || DEFAULT_SETTINGS.tournamentSubtitle,
+        message: "บันทึกข้อความคำเปรยเรียบร้อยแล้ว",
       });
     }
 
