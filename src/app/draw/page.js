@@ -1651,7 +1651,7 @@ export default function BallDrawPage() {
                     animation: "fingerTapPrompt 1.2s infinite ease-in-out"
                   }}
                 >
-                  <span style={{ fontSize: "20px" }}>👆</span> แตะเพื่อเปิดไข่เดี๋ยวนี้!
+                  <span style={{ fontSize: "20px" }}>🤟</span> แตะเพื่อเปิดไข่เดี๋ยวนี้!
                 </button>
               </div>
             )}

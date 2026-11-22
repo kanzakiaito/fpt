@@ -2727,7 +2727,7 @@ export default function TrialAdminPage() {
                   color: "rgba(255,255,255,0.6)",
                 }}
               >
-                <div style={{ fontSize: "40px", marginBottom: "12px" }}>👆</div>
+                <div style={{ fontSize: "40px", marginBottom: "12px" }}>🤟</div>
                 <div style={{ fontSize: "16px", fontWeight: "700", color: "#ffffff" }}>
                   กรุณาเลือกผู้เข้าแข่งขันจากช่องด้านบน
                 </div>
