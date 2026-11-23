@@ -414,6 +414,14 @@ function ChampionSelectorCard({ championId, contestants = [], onSelect, onClear 
     );
   }, [contestants, search]);
 
+  const handleToggleOpen = () => {
+    if (contestants.length === 0) {
+      alert("กรุณาเลือกผู้เข้าแข่งขันใน 5 อันดับแรก (ส่วนที่ 1) ก่อน จึงจะสามารถเลือกสุดยอดแฟนพันธุ์แท้แห่งปีได้ครับ");
+      return;
+    }
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div
       ref={dropdownRef}
@@ -445,8 +453,8 @@ function ChampionSelectorCard({ championId, contestants = [], onSelect, onClear 
             👑 สุดยอดแฟนพันธุ์แท้แห่งปี 2026 (Champion)
           </span>
         </div>
-        <div style={{ fontSize: "12px", color: "#ffd700", fontWeight: "700" }}>
-          (เลือกเพียง 1 คนเท่านั้น)
+        <div style={{ fontSize: "12px", color: "rgba(255, 215, 0, 0.8)", fontWeight: "700" }}>
+          (เลือก 1 คนจากผู้ที่คุณโหวตใน 5 อันดับแรกเท่านั้น)
         </div>
       </div>
 
@@ -481,8 +489,25 @@ function ChampionSelectorCard({ championId, contestants = [], onSelect, onClear 
               )}
             </div>
             <div>
-              <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
-                {selectedChampion.nickname ? `${selectedChampion.nickname} (${selectedChampion.name})` : selectedChampion.name}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
+                  {selectedChampion.nickname ? `${selectedChampion.nickname} (${selectedChampion.name})` : selectedChampion.name}
+                </span>
+                {selectedChampion.votedRank && (
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      padding: "2px 7px",
+                      borderRadius: "5px",
+                      background: "rgba(255, 215, 0, 0.2)",
+                      color: "#ffd700",
+                      border: "1px solid rgba(255, 215, 0, 0.5)",
+                      fontWeight: "800",
+                    }}
+                  >
+                    อันดับ #{selectedChampion.votedRank}
+                  </span>
+                )}
               </div>
               <div style={{ fontSize: "13px", color: "#ffffff" }}>
                 แฟนพันธุ์แท้: {selectedChampion.topic}
@@ -510,20 +535,22 @@ function ChampionSelectorCard({ championId, contestants = [], onSelect, onClear 
         <div>
           <button
             type="button"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={handleToggleOpen}
             style={{
               width: "100%",
               padding: "14px",
               borderRadius: "12px",
-              background: "rgba(255, 215, 0, 0.08)",
-              border: "1.5px dashed rgba(255, 215, 0, 0.6)",
-              color: "#ffd700",
+              background: contestants.length === 0 ? "rgba(239, 68, 68, 0.08)" : "rgba(255, 215, 0, 0.08)",
+              border: contestants.length === 0 ? "1.5px dashed rgba(239, 68, 68, 0.5)" : "1.5px dashed rgba(255, 215, 0, 0.6)",
+              color: contestants.length === 0 ? "#fca5a5" : "#ffd700",
               fontWeight: "800",
               fontSize: "15px",
               cursor: "pointer",
             }}
           >
-            👑 คลิกเพื่อเลือก &quot;สุดยอดแฟนพันธุ์แท้แห่งปี 2026&quot;
+            {contestants.length === 0
+              ? "⚠️ กรุณาเลือกผู้เข้าแข่งขันใน 5 อันดับแรกก่อน จึงจะสามารถเลือกแชมป์ได้"
+              : "👑 คลิกเพื่อเลือก \"สุดยอดแฟนพันธุ์แท้แห่งปี 2026\" (เลือกจาก 5 อันดับแรกที่คุณโหวต)"}
           </button>
 
           {isOpen && (
@@ -561,52 +588,78 @@ function ChampionSelectorCard({ championId, contestants = [], onSelect, onClear 
                 }}
                 onClick={(e) => e.stopPropagation()}
               />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "6px" }}>
-                {filteredContestants.map((c) => (
-                  <div
-                    key={c.id}
-                    onClick={() => {
-                      onSelect(String(c.id || c.name));
-                      setIsOpen(false);
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      padding: "8px 10px",
-                      borderRadius: "10px",
-                      background: "rgba(255, 215, 0, 0.05)",
-                      border: "1px solid rgba(255, 215, 0, 0.2)",
-                      cursor: "pointer",
-                    }}
-                  >
+              {filteredContestants.length === 0 ? (
+                <div style={{ padding: "16px", textAlign: "center", color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
+                  {contestants.length === 0
+                    ? "⚠️ ยังไม่มีผู้เข้าแข่งขันใน 5 อันดับแรก กรุณาเลือกในส่วนที่ 1 ก่อนครับ"
+                    : "ไม่พบผู้เข้าแข่งขันที่คุณค้นหา"}
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "6px" }}>
+                  {filteredContestants.map((c) => (
                     <div
+                      key={c.id}
+                      onClick={() => {
+                        onSelect(String(c.id || c.name));
+                        setIsOpen(false);
+                      }}
                       style={{
-                        width: "34px",
-                        height: "34px",
-                        borderRadius: "50%",
-                        overflow: "hidden",
-                        border: "1.5px solid #ffd700",
-                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        padding: "8px 10px",
+                        borderRadius: "10px",
+                        background: "rgba(255, 215, 0, 0.05)",
+                        border: "1px solid rgba(255, 215, 0, 0.2)",
+                        cursor: "pointer",
                       }}
                     >
-                      {c.image ? (
-                        <img src={getOptimizedImageUrl(c.image, 68)} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : (
-                        <span style={{ fontSize: "16px" }}>👑</span>
-                      )}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "13px", fontWeight: "800", color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {c.nickname ? `${c.nickname} (${c.name})` : c.name}
+                      <div
+                        style={{
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "50%",
+                          overflow: "hidden",
+                          border: "1.5px solid #ffd700",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {c.image ? (
+                          <img src={getOptimizedImageUrl(c.image, 68)} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : (
+                          <span style={{ fontSize: "16px" }}>👑</span>
+                        )}
                       </div>
-                      <div style={{ fontSize: "11px", color: "#ffd700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {c.topic}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {c.nickname ? `${c.nickname} (${c.name})` : c.name}
+                          </span>
+                          {c.votedRank && (
+                            <span
+                              style={{
+                                fontSize: "10px",
+                                padding: "1px 5px",
+                                borderRadius: "4px",
+                                background: "rgba(255, 215, 0, 0.18)",
+                                color: "#ffd700",
+                                border: "1px solid rgba(255, 215, 0, 0.4)",
+                                fontWeight: "800",
+                                flexShrink: 0,
+                              }}
+                            >
+                              #{c.votedRank}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: "11px", color: "#ffd700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {c.topic}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -709,6 +762,35 @@ export default function PollPage() {
     }));
   };
 
+  // Candidates selected in ranks 1-5 only (with their voted rank)
+  const selectedRankContestants = useMemo(() => {
+    const list = [];
+    ["1", "2", "3", "4", "5"].forEach((rk) => {
+      const ids = ballotRanks[rk] || [];
+      ids.forEach((id) => {
+        const found = candidates.find(
+          (c) => String(c.id) === String(id) || (c.name && String(c.name) === String(id))
+        );
+        if (found) {
+          list.push({ ...found, votedRank: rk });
+        }
+      });
+    });
+    return list;
+  }, [ballotRanks, candidates]);
+
+  // If the selected champion is removed from ranks 1-5, auto-clear championId
+  useEffect(() => {
+    if (championId) {
+      const isStillInRanks = selectedRankContestants.some(
+        (c) => String(c.id) === String(championId) || (c.name && String(c.name) === String(championId))
+      );
+      if (!isStillInRanks) {
+        setChampionId("");
+      }
+    }
+  }, [championId, selectedRankContestants]);
+
   const activeRanksCount = ["1", "2", "3", "4", "5"].filter(
     (k) => ballotRanks[k] && ballotRanks[k].length > 0
   ).length;
@@ -718,7 +800,14 @@ export default function PollPage() {
     0
   );
 
-  const isFormComplete = activeRanksCount === 5 && Boolean(championId);
+  const isChampionInRanks = Boolean(
+    championId &&
+      selectedRankContestants.some(
+        (c) => String(c.id) === String(championId) || (c.name && String(c.name) === String(championId))
+      )
+  );
+
+  const isFormComplete = activeRanksCount === 5 && isChampionInRanks;
 
   const handleSubmitBallot = async () => {
     if (!votingOpen) {
@@ -726,7 +815,7 @@ export default function PollPage() {
       return;
     }
     if (!isFormComplete) {
-      alert("กรุณาเลือกผู้เข้าแข่งขันอย่างน้อย 1 คนในแต่ละอันดับ (1-5) และระบุสุดยอดแฟนพันธุ์แท้ 1 คนครับ");
+      alert("กรุณาเลือกผู้เข้าแข่งขันอย่างน้อย 1 คนในแต่ละอันดับ (1-5) และเลือกสุดยอดแฟนพันธุ์แท้จากผู้ที่คุณโหวตใน 5 อันดับแรกครับ");
       return;
     }
 
@@ -1152,7 +1241,7 @@ export default function PollPage() {
                   <strong style={{ color: "#ffd700" }}>1. เลือก 5 อันดับแรก:</strong> ในแต่ละอันดับ (อันดับ 1 ถึง อันดับ 5) สามารถเลือกผู้เข้าแข่งขันได้สูงสุดอันดับละ 5 คน (โดยผู้เข้าแข่งขัน 1 คนเลือกได้เพียง 1 อันดับ)
                 </div>
                 <div>
-                  <strong style={{ color: "#ffd700" }}>2. เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว
+                  <strong style={{ color: "#ffd700" }}>2. เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว (ต้องเลือกจากผู้เข้าแข่งขันที่คุณโหวตใน 5 อันดับแรกเท่านั้น)
                 </div>
               </div>
             </div>
@@ -1180,7 +1269,7 @@ export default function PollPage() {
             <div style={{ marginBottom: "32px" }}>
               <ChampionSelectorCard
                 championId={championId}
-                contestants={candidates}
+                contestants={selectedRankContestants}
                 onSelect={(id) => setChampionId(id)}
                 onClear={() => setChampionId("")}
               />

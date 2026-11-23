@@ -560,6 +560,14 @@ function ChampionDropdownCard({
     );
   }, [contestants, search]);
 
+  const handleToggleOpen = () => {
+    if (contestants.length === 0) {
+      alert("กรุณาเลือกผู้เข้าแข่งขันใน 5 อันดับแรก (ส่วนที่ 1) ก่อน จึงจะสามารถเลือกสุดยอดแฟนพันธุ์แท้แห่งปีได้ครับ");
+      return;
+    }
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div
       ref={dropdownRef}
@@ -598,6 +606,9 @@ function ChampionDropdownCard({
           >
             🏆 ผู้ที่คิดว่าจะเป็นสุดยอดแฟนพันธุ์แท้แห่งปี (The Champion)
           </span>
+          <span style={{ fontSize: "12px", color: "rgba(255, 215, 0, 0.75)", fontWeight: "700" }}>
+            (เลือกจากผู้ที่คุณโหวตใน 5 อันดับแรกเท่านั้น)
+          </span>
         </div>
 
         {selectedContestant && (
@@ -623,7 +634,7 @@ function ChampionDropdownCard({
       </div>
 
       <div
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggleOpen}
         style={{
           display: "flex",
           alignItems: "center",
@@ -632,7 +643,11 @@ function ChampionDropdownCard({
           padding: "10px 14px",
           borderRadius: "10px",
           background: "rgba(3, 8, 18, 0.85)",
-          border: isOpen ? "1.5px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.4)",
+          border: isOpen
+            ? "1.5px solid #ffd700"
+            : contestants.length === 0
+            ? "1px dashed rgba(239, 68, 68, 0.5)"
+            : "1px solid rgba(255, 215, 0, 0.4)",
           cursor: "pointer",
           boxShadow: isOpen ? "0 0 16px rgba(255, 215, 0, 0.35)" : "none",
           minHeight: "56px",
@@ -640,8 +655,21 @@ function ChampionDropdownCard({
         }}
       >
         {!selectedContestant ? (
-          <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "14px" }}>
-            -- คลิกเพื่อเลือกผู้ที่จะคว้าตำแหน่งสุดยอดแฟนพันธุ์แท้แห่งปีเพียง 1 คน --
+          <span
+            style={{
+              color: contestants.length === 0 ? "#fca5a5" : "rgba(255,255,255,0.55)",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <span>{contestants.length === 0 ? "⚠️" : "👑"}</span>
+            <span>
+              {contestants.length === 0
+                ? "กรุณาเลือกผู้เข้าแข่งขันใน 5 อันดับแรก (ส่วนที่ 1) ก่อน จึงจะสามารถเลือกแชมป์ได้"
+                : "-- คลิกเพื่อเลือกสุดยอดแฟนพันธุ์แท้แห่งปี (เลือกจาก 5 อันดับแรกที่คุณโหวต) --"}
+            </span>
           </span>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1, minWidth: 0 }}>
@@ -673,13 +701,28 @@ function ChampionDropdownCard({
             </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <strong style={{ fontSize: "15px", color: "#ffd700" }}>
                   {selectedContestant.nickname || selectedContestant.name}
                 </strong>
                 {selectedContestant.nickname && (
                   <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
                     ({selectedContestant.name})
+                  </span>
+                )}
+                {selectedContestant.votedRank && (
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      padding: "2px 7px",
+                      borderRadius: "5px",
+                      background: "rgba(255, 215, 0, 0.18)",
+                      color: "#ffd700",
+                      border: "1px solid rgba(255, 215, 0, 0.4)",
+                      fontWeight: "800",
+                    }}
+                  >
+                    อันดับ #{selectedContestant.votedRank}
                   </span>
                 )}
               </div>
@@ -760,7 +803,9 @@ function ChampionDropdownCard({
 
           {filteredContestants.length === 0 ? (
             <div style={{ padding: "20px", textAlign: "center", color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
-              ไม่พบผู้เข้าแข่งขัน
+              {contestants.length === 0
+                ? "⚠️ ยังไม่มีผู้เข้าแข่งขันใน 5 อันดับแรก กรุณาเลือกในส่วนที่ 1 ก่อนครับ"
+                : "ไม่พบผู้เข้าแข่งขันที่คุณค้นหา"}
             </div>
           ) : (
             filteredContestants.map((c) => {
@@ -824,6 +869,21 @@ function ChampionDropdownCard({
                       </strong>
                       {c.nickname && (
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>({c.name})</span>
+                      )}
+                      {c.votedRank && (
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            background: "rgba(255, 215, 0, 0.16)",
+                            color: "#ffd700",
+                            border: "1px solid rgba(255, 215, 0, 0.35)",
+                            fontWeight: "800",
+                          }}
+                        >
+                          อันดับ #{c.votedRank}
+                        </span>
                       )}
                     </div>
                     <div
@@ -992,6 +1052,35 @@ export default function TrialFotyBallotVotePage() {
     });
   };
 
+  // Candidates selected in ranks 1-5 only (with their voted rank)
+  const selectedRankContestants = useMemo(() => {
+    const list = [];
+    ["1", "2", "3", "4", "5"].forEach((rk) => {
+      const ids = ballotRanks[rk] || [];
+      ids.forEach((id) => {
+        const found = pollList.find(
+          (c) => String(c.id) === String(id) || (c.name && String(c.name) === String(id))
+        );
+        if (found) {
+          list.push({ ...found, votedRank: rk });
+        }
+      });
+    });
+    return list;
+  }, [ballotRanks, pollList]);
+
+  // If the selected champion is removed from ranks 1-5, auto-clear championId
+  useEffect(() => {
+    if (championId) {
+      const isStillInRanks = selectedRankContestants.some(
+        (c) => String(c.id) === String(championId) || (c.name && String(c.name) === String(championId))
+      );
+      if (!isStillInRanks) {
+        setChampionId("");
+      }
+    }
+  }, [championId, selectedRankContestants]);
+
   // Check how many ranks have at least 1 person
   const activeRanksCount = ["1", "2", "3", "4", "5"].filter(
     (k) => ballotRanks[k] && ballotRanks[k].length > 0
@@ -1002,7 +1091,14 @@ export default function TrialFotyBallotVotePage() {
     0
   );
 
-  const isFormComplete = activeRanksCount === 5 && Boolean(championId);
+  const isChampionInRanks = Boolean(
+    championId &&
+      selectedRankContestants.some(
+        (c) => String(c.id) === String(championId) || (c.name && String(c.name) === String(championId))
+      )
+  );
+
+  const isFormComplete = activeRanksCount === 5 && isChampionInRanks;
 
   const getCandidateById = (id) => {
     if (!id) return null;
@@ -1016,7 +1112,7 @@ export default function TrialFotyBallotVotePage() {
       return;
     }
     if (!isFormComplete) {
-      alert("กรุณาเลือกผู้เข้าแข่งขันอย่างน้อย 1 คนในแต่ละอันดับ (1 ถึง 5) และระบุสุดยอดแฟนพันธุ์แท้ 1 คนครับ");
+      alert("กรุณาเลือกผู้เข้าแข่งขันอย่างน้อย 1 คนในแต่ละอันดับ (1 ถึง 5) และเลือกสุดยอดแฟนพันธุ์แท้จากผู้ที่คุณโหวตใน 5 อันดับแรกครับ");
       return;
     }
 
@@ -1561,7 +1657,7 @@ export default function TrialFotyBallotVotePage() {
             <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
               <span style={{ color: "#ffd700", fontWeight: "900" }}>2.</span>
               <span>
-                <strong>เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว
+                <strong>เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว (ต้องเลือกจากผู้เข้าแข่งขันที่คุณโหวตใน 5 อันดับแรกเท่านั้น)
               </span>
             </div>
           </div>
@@ -1673,7 +1769,7 @@ export default function TrialFotyBallotVotePage() {
                 gap: "8px",
               }}
             >
-              <span>🏆</span> ส่วนที่ 2: สุดยอดแฟนพันธุ์แท้แห่งปี (The Ultimate Champion)
+              <span>🏆</span> ส่วนที่ 2: สุดยอดแฟนพันธุ์แท้แห่งปี (The Champion - ต้องเลือกจาก 5 อันดับแรกที่คุณโหวต)
             </h3>
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
               {championId ? "✓ เลือกแล้ว" : "ยังไม่ได้เลือก"}
@@ -1682,7 +1778,7 @@ export default function TrialFotyBallotVotePage() {
 
           <ChampionDropdownCard
             selectedId={championId}
-            contestants={pollList}
+            contestants={selectedRankContestants}
             onSelect={(id) => setChampionId(id)}
             onClear={() => setChampionId("")}
           />

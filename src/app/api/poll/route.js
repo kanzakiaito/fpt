@@ -293,28 +293,37 @@ export async function POST(request) {
         });
       });
 
-      // Add champion vote (15 คะแนนพิเศษ)
+      // Add champion vote (15 คะแนนพิเศษ) - ต้องเป็นคนจาก 5 อันดับแรกเท่านั้น
+      let validChampionId = null;
       if (championId) {
+        const champStr = String(championId);
         const champTarget = current.find(
           (item) =>
-            String(item.id) === String(championId) ||
-            (item.name && String(item.name) === String(championId)) ||
-            (item.nickname && String(item.nickname) === String(championId))
+            String(item.id) === champStr ||
+            (item.name && String(item.name) === champStr) ||
+            (item.nickname && String(item.nickname) === champStr)
         );
-        if (champTarget) {
+        const isPresentInRanks =
+          champTarget &&
+          (seenContestants.has(String(champTarget.id)) ||
+            (champTarget.name && seenContestants.has(String(champTarget.name))) ||
+            seenContestants.has(champStr));
+
+        if (isPresentInRanks && champTarget) {
+          validChampionId = champTarget.id;
           champTarget.votes = (Number(champTarget.votes) || 0) + 15;
         }
       }
 
       // คนที่ไม่ถูกโหวตเลยในใบโหวตนั้นๆ จะได้คนละ 1 คะแนน
       const votedIdsOrNames = new Set([...seenContestants]);
-      if (championId) {
-        votedIdsOrNames.add(String(championId));
+      if (validChampionId) {
+        votedIdsOrNames.add(String(validChampionId));
         const champObj = current.find(
           (item) =>
-            String(item.id) === String(championId) ||
-            (item.name && String(item.name) === String(championId)) ||
-            (item.nickname && String(item.nickname) === String(championId))
+            String(item.id) === String(validChampionId) ||
+            (item.name && String(item.name) === String(validChampionId)) ||
+            (item.nickname && String(item.nickname) === String(validChampionId))
         );
         if (champObj?.name) votedIdsOrNames.add(String(champObj.name));
         if (champObj?.id) votedIdsOrNames.add(String(champObj.id));
