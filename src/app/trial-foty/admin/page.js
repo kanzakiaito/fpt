@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import DiscordMarkdown from "@/app/components/DiscordMarkdown";
 import AdminUserMenu from "@/app/components/admin/AdminUserMenu";
@@ -132,6 +132,35 @@ export default function TrialAdminPage() {
   const [hideTrialPollScores, setHideTrialPollScores] = useState(true);
   const [adminRevealPollScores, setAdminRevealPollScores] = useState(false);
   const isPollScoreMasked = Boolean(hideTrialPollScores && !adminRevealPollScores);
+
+  // When spoiler shield is active, sort strictly by What If score descending
+  // so that row ordering in admin matches What If standings and doesn't spoil vote outcomes!
+  const displayedPollItems = useMemo(() => {
+    if (!isPollScoreMasked) {
+      return pollItems.map((item, originalIndex) => ({
+        ...item,
+        _originalIndex: originalIndex,
+      }));
+    }
+
+    const clone = pollItems.map((item, originalIndex) => ({
+      ...item,
+      _originalIndex: originalIndex,
+    }));
+
+    clone.sort((a, b) => {
+      const wB = Number(b.whatIfScore) || 0;
+      const wA = Number(a.whatIfScore) || 0;
+      if (wB !== wA) return wB - wA;
+      return (Number(a.id) || 0) - (Number(b.id) || 0);
+    });
+
+    return clone.map((item, idx) => ({
+      ...item,
+      maskedRank: idx + 1,
+    }));
+  }, [pollItems, isPollScoreMasked]);
+
   const [togglingHideScores, setTogglingHideScores] = useState(false);
   const [syncingGameScores, setSyncingGameScores] = useState(false);
   const [trialSubtitle, setTrialSubtitle] = useState(
@@ -3690,7 +3719,9 @@ export default function TrialAdminPage() {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "1280px", fontSize: "14px" }}>
                 <thead>
                   <tr style={{ background: "rgba(0, 229, 255, 0.12)", borderBottom: "1px solid rgba(0, 229, 255, 0.3)" }}>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "70px", color: "#ffd700", fontWeight: "800" }}>อันดับ</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "90px", color: isPollScoreMasked ? "#ffa940" : "#ffd700", fontWeight: "800" }}>
+                      {isPollScoreMasked ? "อันดับ (What If)" : "อันดับ"}
+                    </th>
                     <th rowSpan={2} style={{ padding: "10px 4px", textAlign: "center", width: "48px", color: "#80d0ff" }}>รูป</th>
                     <th rowSpan={2} style={{ padding: "10px 10px", textAlign: "left", minWidth: "160px", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "140px", minWidth: "140px", color: "#80d0ff" }}>ชื่อเล่น</th>
@@ -3723,8 +3754,10 @@ export default function TrialAdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pollItems.map((item, index) => {
-                    const isTop5 = Number(item.pollRank) <= 5;
+                  {displayedPollItems.map((item, displayIdx) => {
+                    const targetIdx = item._originalIndex !== undefined ? item._originalIndex : displayIdx;
+                    const currentRank = isPollScoreMasked ? item.maskedRank : item.pollRank;
+                    const isTop5 = Number(currentRank) <= 5;
                     const matchedContestant = contestants.find(
                       (c) =>
                         (c.name && item.name && c.name.trim() === item.name.trim()) ||
@@ -3734,10 +3767,10 @@ export default function TrialAdminPage() {
 
                     return (
                       <tr
-                        key={item.id ? `${item.id}-${index}` : `${item.pollRank}-${index}`}
+                        key={item.id ? `${item.id}-${targetIdx}` : `${currentRank}-${targetIdx}`}
                         style={{
                           borderBottom: "1px solid rgba(255,255,255,0.06)",
-                          background: index % 2 === 0 ? "rgba(0,0,0,0.15)" : "transparent",
+                          background: displayIdx % 2 === 0 ? "rgba(0,0,0,0.15)" : "transparent",
                         }}
                       >
                         {/* Poll Rank Badge */}
@@ -3749,13 +3782,20 @@ export default function TrialAdminPage() {
                               borderRadius: "8px",
                               fontWeight: "800",
                               fontSize: "13px",
-                              background: isPollScoreMasked ? "rgba(239, 68, 68, 0.2)" : (isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)"),
-                              color: isPollScoreMasked ? "#fca5a5" : (isTop5 ? "#ffd700" : "#67e8f9"),
-                              border: isPollScoreMasked ? "1px solid #ef4444" : (isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)"),
-                              boxShadow: isTop5 && !isPollScoreMasked ? "0 0 8px rgba(255, 215, 0, 0.25)" : "none",
+                              background: isPollScoreMasked
+                                ? (isTop5 ? "rgba(255, 136, 0, 0.22)" : "rgba(255, 170, 0, 0.12)")
+                                : (isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)"),
+                              color: isPollScoreMasked
+                                ? (isTop5 ? "#ffaa00" : "#fb923c")
+                                : (isTop5 ? "#ffd700" : "#67e8f9"),
+                              border: isPollScoreMasked
+                                ? (isTop5 ? "1px solid #ff8800" : "1px solid rgba(255, 136, 0, 0.35)")
+                                : (isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)"),
+                              boxShadow: isTop5 ? (isPollScoreMasked ? "0 0 8px rgba(255, 136, 0, 0.3)" : "0 0 8px rgba(255, 215, 0, 0.25)") : "none",
                             }}
+                            title={isPollScoreMasked ? `อันดับที่ ${currentRank} (จัดตามคะแนนรอบเก็บ What If)` : `อันดับที่ ${currentRank}`}
                           >
-                            {isPollScoreMasked ? "🛡️" : (isTop5 ? `⭐ #${item.pollRank}` : `#${item.pollRank}`)}
+                            {isTop5 ? `⭐ #${currentRank}` : `#${currentRank}`}
                           </span>
                         </td>
 
@@ -3765,7 +3805,7 @@ export default function TrialAdminPage() {
                             onClick={() => {
                               const newUrl = window.prompt(`ใส่ URL รูปภาพสำหรับ ${item.nickname || item.name}:`, photo || "");
                               if (newUrl !== null) {
-                                handlePollFieldChange(index, "image", newUrl.trim());
+                                handlePollFieldChange(targetIdx, "image", newUrl.trim());
                               }
                             }}
                             title="คลิกเพื่อแก้ไข/เปลี่ยนรูปภาพโพลล์"
@@ -3801,7 +3841,7 @@ export default function TrialAdminPage() {
                           <input
                             type="text"
                             value={item.name || ""}
-                            onChange={(e) => handlePollFieldChange(index, "name", e.target.value)}
+                            onChange={(e) => handlePollFieldChange(targetIdx, "name", e.target.value)}
                             placeholder="ชื่อ-นามสกุล..."
                             style={{
                               width: "100%",
@@ -3820,7 +3860,7 @@ export default function TrialAdminPage() {
                           <input
                             type="text"
                             value={item.nickname || ""}
-                            onChange={(e) => handlePollFieldChange(index, "nickname", e.target.value)}
+                            onChange={(e) => handlePollFieldChange(targetIdx, "nickname", e.target.value)}
                             placeholder="ชื่อเล่น..."
                             style={{
                               width: "100%",
@@ -3840,7 +3880,7 @@ export default function TrialAdminPage() {
                           <input
                             type="text"
                             value={item.topic || ""}
-                            onChange={(e) => handlePollFieldChange(index, "topic", e.target.value)}
+                            onChange={(e) => handlePollFieldChange(targetIdx, "topic", e.target.value)}
                             placeholder="หัวข้อแฟนพันธุ์แท้..."
                             style={{
                               width: "100%",
@@ -3859,7 +3899,7 @@ export default function TrialAdminPage() {
                           <input
                             type="text"
                             value={item.warmupSchedule || ""}
-                            onChange={(e) => handlePollFieldChange(index, "warmupSchedule", e.target.value)}
+                            onChange={(e) => handlePollFieldChange(targetIdx, "warmupSchedule", e.target.value)}
                             placeholder="เช่น พุธ 12 พ.ย. 20:00 น."
                             title="ระบุวัน-เวลาแข่งรอบอุ่นเครื่อง (หากระบุไว้ จะขึ้นแสดงชื่อในตารางรอบอุ่นเครื่องทันที)"
                             style={{
@@ -3885,7 +3925,7 @@ export default function TrialAdminPage() {
                               value={item.whatIfScore ?? 0}
                               onChange={(e) => {
                                 const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                handlePollFieldChange(index, "whatIfScore", val);
+                                handlePollFieldChange(targetIdx, "whatIfScore", val);
                               }}
                               title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100 คะแนน คิดเป็น 30% ของคะแนนรวม)"
                               style={{
@@ -3921,7 +3961,7 @@ export default function TrialAdminPage() {
                               type="number"
                               min="0"
                               value={item.rankVotes?.["1"] ?? item.rankVotes?.[1] ?? 0}
-                              onChange={(e) => handleRankVoteChange(index, "1", e.target.value)}
+                              onChange={(e) => handleRankVoteChange(targetIdx, "1", e.target.value)}
                               title="จำนวนคนโหวตให้อยู่อันดับ 1 (5 คะแนน)"
                               style={{
                                 width: "46px",
@@ -3947,7 +3987,7 @@ export default function TrialAdminPage() {
                               type="number"
                               min="0"
                               value={item.rankVotes?.["2"] ?? item.rankVotes?.[2] ?? 0}
-                              onChange={(e) => handleRankVoteChange(index, "2", e.target.value)}
+                              onChange={(e) => handleRankVoteChange(targetIdx, "2", e.target.value)}
                               title="จำนวนคนโหวตให้อยู่อันดับ 2 (4 คะแนน)"
                               style={{
                                 width: "46px",
@@ -3973,7 +4013,7 @@ export default function TrialAdminPage() {
                               type="number"
                               min="0"
                               value={item.rankVotes?.["3"] ?? item.rankVotes?.[3] ?? 0}
-                              onChange={(e) => handleRankVoteChange(index, "3", e.target.value)}
+                              onChange={(e) => handleRankVoteChange(targetIdx, "3", e.target.value)}
                               title="จำนวนคนโหวตให้อยู่อันดับ 3 (3 คะแนน)"
                               style={{
                                 width: "46px",
@@ -3999,7 +4039,7 @@ export default function TrialAdminPage() {
                               type="number"
                               min="0"
                               value={item.rankVotes?.["4"] ?? item.rankVotes?.[4] ?? 0}
-                              onChange={(e) => handleRankVoteChange(index, "4", e.target.value)}
+                              onChange={(e) => handleRankVoteChange(targetIdx, "4", e.target.value)}
                               title="จำนวนคนโหวตให้อยู่อันดับ 4 (2 คะแนน)"
                               style={{
                                 width: "46px",
@@ -4025,7 +4065,7 @@ export default function TrialAdminPage() {
                               type="number"
                               min="0"
                               value={item.rankVotes?.["5"] ?? item.rankVotes?.[5] ?? 0}
-                              onChange={(e) => handleRankVoteChange(index, "5", e.target.value)}
+                              onChange={(e) => handleRankVoteChange(targetIdx, "5", e.target.value)}
                               title="จำนวนคนโหวตให้อยู่อันดับ 5 (1 คะแนน)"
                               style={{
                                 width: "46px",
@@ -4051,7 +4091,7 @@ export default function TrialAdminPage() {
                               type="number"
                               min="0"
                               value={item.championVotes ?? 0}
-                              onChange={(e) => handleChampionVoteChange(index, e.target.value)}
+                              onChange={(e) => handleChampionVoteChange(targetIdx, e.target.value)}
                               title="จำนวนคนโหวตให้เป็นสุดยอดแฟนพันธุ์แท้ (15 คะแนนพิเศษ)"
                               style={{
                                 width: "46px",
@@ -4077,7 +4117,7 @@ export default function TrialAdminPage() {
                               type="number"
                               min="0"
                               value={item.votes ?? 0}
-                              onChange={(e) => handlePollFieldChange(index, "votes", Math.max(0, parseInt(e.target.value) || 0))}
+                              onChange={(e) => handlePollFieldChange(targetIdx, "votes", Math.max(0, parseInt(e.target.value) || 0))}
                               title="คะแนนดิบจากการโหวตมหาชน (คำนวณจากจำนวนคนโหวตอัตโนมัติ หรือแก้ไขได้)"
                               style={{
                                 width: "56px",
@@ -4131,7 +4171,7 @@ export default function TrialAdminPage() {
                             <input
                               type="text"
                               value={item.percent || ""}
-                              onChange={(e) => handlePollFieldChange(index, "percent", e.target.value)}
+                              onChange={(e) => handlePollFieldChange(targetIdx, "percent", e.target.value)}
                               placeholder="0.00%"
                               style={{
                                 width: "80px",
@@ -4179,43 +4219,43 @@ export default function TrialAdminPage() {
                           <div style={{ display: "flex", gap: "4px", justifyContent: "center" }}>
                             <button
                               type="button"
-                              onClick={() => handleMovePoll(index, -1)}
-                              disabled={index === 0}
+                              onClick={() => handleMovePoll(targetIdx, -1)}
+                              disabled={isPollScoreMasked || targetIdx === 0}
                               style={{
                                 width: "30px",
                                 height: "30px",
                                 borderRadius: "6px",
-                                background: index === 0 ? "rgba(255,255,255,0.04)" : "rgba(0, 229, 255, 0.15)",
-                                border: index === 0 ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0, 229, 255, 0.4)",
-                                color: index === 0 ? "rgba(255,255,255,0.2)" : "#00e5ff",
-                                cursor: index === 0 ? "not-allowed" : "pointer",
+                                background: isPollScoreMasked || targetIdx === 0 ? "rgba(255,255,255,0.04)" : "rgba(0, 229, 255, 0.15)",
+                                border: isPollScoreMasked || targetIdx === 0 ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0, 229, 255, 0.4)",
+                                color: isPollScoreMasked || targetIdx === 0 ? "rgba(255,255,255,0.2)" : "#00e5ff",
+                                cursor: isPollScoreMasked || targetIdx === 0 ? "not-allowed" : "pointer",
                                 fontSize: "14px",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
                               }}
-                              title="เลื่อนขึ้น"
+                              title={isPollScoreMasked ? "โหมดกันสปอยล์กำลังเปิดอยู่ (ตารางเรียงตาม What If อัตโนมัติ)" : "เลื่อนขึ้น"}
                             >
                               ⬆️
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleMovePoll(index, 1)}
-                              disabled={index === pollItems.length - 1}
+                              onClick={() => handleMovePoll(targetIdx, 1)}
+                              disabled={isPollScoreMasked || targetIdx === pollItems.length - 1}
                               style={{
                                 width: "30px",
                                 height: "30px",
                                 borderRadius: "6px",
-                                background: index === pollItems.length - 1 ? "rgba(255,255,255,0.04)" : "rgba(0, 229, 255, 0.15)",
-                                border: index === pollItems.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0, 229, 255, 0.4)",
-                                color: index === pollItems.length - 1 ? "rgba(255,255,255,0.2)" : "#00e5ff",
-                                cursor: index === pollItems.length - 1 ? "not-allowed" : "pointer",
+                                background: isPollScoreMasked || targetIdx === pollItems.length - 1 ? "rgba(255,255,255,0.04)" : "rgba(0, 229, 255, 0.15)",
+                                border: isPollScoreMasked || targetIdx === pollItems.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0, 229, 255, 0.4)",
+                                color: isPollScoreMasked || targetIdx === pollItems.length - 1 ? "rgba(255,255,255,0.2)" : "#00e5ff",
+                                cursor: isPollScoreMasked || targetIdx === pollItems.length - 1 ? "not-allowed" : "pointer",
                                 fontSize: "14px",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
                               }}
-                              title="เลื่อนลง"
+                              title={isPollScoreMasked ? "โหมดกันสปอยล์กำลังเปิดอยู่ (ตารางเรียงตาม What If อัตโนมัติ)" : "เลื่อนลง"}
                             >
                               ⬇️
                             </button>
@@ -4226,7 +4266,7 @@ export default function TrialAdminPage() {
                         <td style={{ padding: "8px 10px", textAlign: "center" }}>
                           <button
                             type="button"
-                            onClick={() => handleDeletePollItem(index)}
+                            onClick={() => handleDeletePollItem(targetIdx)}
                             style={{
                               width: "30px",
                               height: "30px",
