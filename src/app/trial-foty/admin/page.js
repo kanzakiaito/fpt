@@ -4410,7 +4410,7 @@ export default function TrialAdminPage() {
                         </div>
                       </div>
                       <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: "13px", fontWeight: "800", color: "#ff8800" }}>คะแนนรอบ What-If รวม (30%):</span>
+                        <span style={{ fontSize: "13px", fontWeight: "800", color: "#ff8800" }}>คะแนนเก็บโพลล์รวม (30%):</span>
                         <input
                           type="number"
                           value={pollCandidateForm.whatIfScore}
