@@ -130,6 +130,8 @@ export default function TrialAdminPage() {
   const [showMainPollTable, setShowMainPollTable] = useState(true);
   const [togglingMainPollTable, setTogglingMainPollTable] = useState(false);
   const [hideTrialPollScores, setHideTrialPollScores] = useState(true);
+  const [adminRevealPollScores, setAdminRevealPollScores] = useState(false);
+  const isPollScoreMasked = Boolean(hideTrialPollScores && !adminRevealPollScores);
   const [togglingHideScores, setTogglingHideScores] = useState(false);
   const [syncingGameScores, setSyncingGameScores] = useState(false);
   const [trialSubtitle, setTrialSubtitle] = useState(
@@ -3622,6 +3624,59 @@ export default function TrialAdminPage() {
               )}
             </div>
 
+            {/* Admin Spoiler Shield Status & Reveal Toggle */}
+            {hideTrialPollScores && (
+              <div
+                style={{
+                  background: "linear-gradient(90deg, rgba(239, 68, 68, 0.14) 0%, rgba(30, 15, 15, 0.9) 100%)",
+                  border: "1.5px dashed #ef4444",
+                  borderRadius: "14px",
+                  padding: "12px 18px",
+                  marginBottom: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                  boxShadow: "0 0 16px rgba(239, 68, 68, 0.2)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span style={{ fontSize: "24px" }}>🛡️</span>
+                  <div>
+                    <div style={{ fontSize: "14px", fontWeight: "900", color: "#fca5a5" }}>
+                      โหมดกันสปอยล์ฝั่งแอดมินกำลังทำงาน (Admin Spoiler Shield Active)
+                    </div>
+                    <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.75)" }}>
+                      {adminRevealPollScores
+                        ? "👁️ กำลังเปิดเผยตัวเลขคะแนนจริงชั่วคราวเพื่อการตรวจสอบ/แก้ไข"
+                        : "ตัวเลขคะแนนโหวตและอันดับทั้งหมดถูกซ่อนไว้ เพื่อไม่ให้ทีมงาน/แอดมินเห็นผลสปอยล์"}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setAdminRevealPollScores(!adminRevealPollScores)}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: "10px",
+                    background: adminRevealPollScores ? "rgba(239, 68, 68, 0.3)" : "rgba(255, 215, 0, 0.18)",
+                    border: adminRevealPollScores ? "1px solid #ef4444" : "1px solid #ffd700",
+                    color: adminRevealPollScores ? "#fca5a5" : "#ffd700",
+                    fontSize: "13px",
+                    fontWeight: "800",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  {adminRevealPollScores ? "🙈 ซ่อนคะแนนจริง (เปิดม่านกันสปอยล์)" : "👁️ เผยคะแนนชั่วคราว (Peek Real Scores)"}
+                </button>
+              </div>
+            )}
+
             {/* Poll Table Editor */}
             <div
               style={{
@@ -3694,13 +3749,13 @@ export default function TrialAdminPage() {
                               borderRadius: "8px",
                               fontWeight: "800",
                               fontSize: "13px",
-                              background: isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)",
-                              color: isTop5 ? "#ffd700" : "#67e8f9",
-                              border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)",
-                              boxShadow: isTop5 ? "0 0 8px rgba(255, 215, 0, 0.25)" : "none",
+                              background: isPollScoreMasked ? "rgba(239, 68, 68, 0.2)" : (isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)"),
+                              color: isPollScoreMasked ? "#fca5a5" : (isTop5 ? "#ffd700" : "#67e8f9"),
+                              border: isPollScoreMasked ? "1px solid #ef4444" : (isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)"),
+                              boxShadow: isTop5 && !isPollScoreMasked ? "0 0 8px rgba(255, 215, 0, 0.25)" : "none",
                             }}
                           >
-                            {isTop5 ? `⭐ #${item.pollRank}` : `#${item.pollRank}`}
+                            {isPollScoreMasked ? "🛡️" : (isTop5 ? `⭐ #${item.pollRank}` : `#${item.pollRank}`)}
                           </span>
                         </td>
 
@@ -3822,198 +3877,232 @@ export default function TrialAdminPage() {
 
                         {/* What If Score Input (เต็ม 100, คิดเป็น 30%) */}
                         <td style={{ padding: "6px 4px", textAlign: "center", background: "rgba(255, 136, 0, 0.05)", borderLeft: "1px solid rgba(255, 136, 0, 0.3)" }}>
-                          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "#ffa940", fontWeight: "800" }}>🔒 ซ่อน</span>
+                          ) : (
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={item.whatIfScore ?? 0}
+                                onChange={(e) => {
+                                  const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                  handlePollFieldChange(index, "whatIfScore", val);
+                                }}
+                                title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100 คะแนน คิดเป็น 30% ของคะแนนรวม)"
+                                style={{
+                                  width: "56px",
+                                  padding: "6px 2px",
+                                  borderRadius: "6px",
+                                  background: "#050b14",
+                                  border: "1px solid rgba(255, 136, 0, 0.7)",
+                                  color: "#ff8800",
+                                  fontSize: "13px",
+                                  fontWeight: "900",
+                                  textAlign: "center",
+                                }}
+                              />
+                              {(() => {
+                                const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
+                                const whatIfPct30 = totalWhatIf > 0 ? ((Number(item.whatIfScore) || 0) / totalWhatIf) * 30 : 0;
+                                return (
+                                  <span style={{ fontSize: "10px", color: "#fb923c", fontWeight: "700" }} title="สัดส่วนในโควต้า 30% ของโพลล์ (คะแนนคนนี้ ÷ คะแนนรวมทุกคน x 30%)">
+                                    = {whatIfPct30.toFixed(2)}%
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Rank 1 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center", borderLeft: "1px solid rgba(255, 215, 0, 0.15)" }}>
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>🔒</span>
+                          ) : (
                             <input
                               type="number"
                               min="0"
-                              max="100"
-                              value={item.whatIfScore ?? 0}
-                              onChange={(e) => {
-                                const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                handlePollFieldChange(index, "whatIfScore", val);
-                              }}
-                              title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100 คะแนน คิดเป็น 30% ของคะแนนรวม)"
+                              value={item.rankVotes?.["1"] ?? item.rankVotes?.[1] ?? 0}
+                              onChange={(e) => handleRankVoteChange(index, "1", e.target.value)}
+                              title="จำนวนคนโหวตให้อยู่อันดับ 1 (5 คะแนน)"
                               style={{
-                                width: "56px",
+                                width: "46px",
                                 padding: "6px 2px",
                                 borderRadius: "6px",
                                 background: "#050b14",
-                                border: "1px solid rgba(255, 136, 0, 0.7)",
-                                color: "#ff8800",
+                                border: "1px solid rgba(255, 215, 0, 0.4)",
+                                color: "#ffd700",
+                                fontSize: "13px",
+                                fontWeight: "800",
+                                textAlign: "center",
+                              }}
+                            />
+                          )}
+                        </td>
+
+                        {/* Rank 2 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>🔒</span>
+                          ) : (
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.rankVotes?.["2"] ?? item.rankVotes?.[2] ?? 0}
+                              onChange={(e) => handleRankVoteChange(index, "2", e.target.value)}
+                              title="จำนวนคนโหวตให้อยู่อันดับ 2 (4 คะแนน)"
+                              style={{
+                                width: "46px",
+                                padding: "6px 2px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(226, 232, 240, 0.3)",
+                                color: "#e2e8f0",
+                                fontSize: "13px",
+                                fontWeight: "700",
+                                textAlign: "center",
+                              }}
+                            />
+                          )}
+                        </td>
+
+                        {/* Rank 3 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>🔒</span>
+                          ) : (
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.rankVotes?.["3"] ?? item.rankVotes?.[3] ?? 0}
+                              onChange={(e) => handleRankVoteChange(index, "3", e.target.value)}
+                              title="จำนวนคนโหวตให้อยู่อันดับ 3 (3 คะแนน)"
+                              style={{
+                                width: "46px",
+                                padding: "6px 2px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(205, 127, 50, 0.3)",
+                                color: "#cd7f32",
+                                fontSize: "13px",
+                                fontWeight: "700",
+                                textAlign: "center",
+                              }}
+                            />
+                          )}
+                        </td>
+
+                        {/* Rank 4 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>🔒</span>
+                          ) : (
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.rankVotes?.["4"] ?? item.rankVotes?.[4] ?? 0}
+                              onChange={(e) => handleRankVoteChange(index, "4", e.target.value)}
+                              title="จำนวนคนโหวตให้อยู่อันดับ 4 (2 คะแนน)"
+                              style={{
+                                width: "46px",
+                                padding: "6px 2px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(56, 189, 248, 0.3)",
+                                color: "#38bdf8",
+                                fontSize: "13px",
+                                fontWeight: "700",
+                                textAlign: "center",
+                              }}
+                            />
+                          )}
+                        </td>
+
+                        {/* Rank 5 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>🔒</span>
+                          ) : (
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.rankVotes?.["5"] ?? item.rankVotes?.[5] ?? 0}
+                              onChange={(e) => handleRankVoteChange(index, "5", e.target.value)}
+                              title="จำนวนคนโหวตให้อยู่อันดับ 5 (1 คะแนน)"
+                              style={{
+                                width: "46px",
+                                padding: "6px 2px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(168, 85, 247, 0.3)",
+                                color: "#a855f7",
+                                fontSize: "13px",
+                                fontWeight: "700",
+                                textAlign: "center",
+                              }}
+                            />
+                          )}
+                        </td>
+
+                        {/* Champion votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>🔒</span>
+                          ) : (
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.championVotes ?? 0}
+                              onChange={(e) => handleChampionVoteChange(index, e.target.value)}
+                              title="จำนวนคนโหวตให้เป็นสุดยอดแฟนพันธุ์แท้ (15 คะแนนพิเศษ)"
+                              style={{
+                                width: "46px",
+                                padding: "6px 2px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(255, 215, 0, 0.5)",
+                                color: "#ffd700",
                                 fontSize: "13px",
                                 fontWeight: "900",
                                 textAlign: "center",
                               }}
                             />
-                            {(() => {
-                              const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
-                              const whatIfPct30 = totalWhatIf > 0 ? ((Number(item.whatIfScore) || 0) / totalWhatIf) * 30 : 0;
-                              return (
-                                <span style={{ fontSize: "10px", color: "#fb923c", fontWeight: "700" }} title="สัดส่วนในโควต้า 30% ของโพลล์ (คะแนนคนนี้ ÷ คะแนนรวมทุกคน x 30%)">
-                                  = {whatIfPct30.toFixed(2)}%
-                                </span>
-                              );
-                            })()}
-                          </div>
-                        </td>
-
-                        {/* Rank 1 votes */}
-                        <td style={{ padding: "6px 2px", textAlign: "center", borderLeft: "1px solid rgba(255, 215, 0, 0.15)" }}>
-                          <input
-                            type="number"
-                            min="0"
-                            value={item.rankVotes?.["1"] ?? item.rankVotes?.[1] ?? 0}
-                            onChange={(e) => handleRankVoteChange(index, "1", e.target.value)}
-                            title="จำนวนคนโหวตให้อยู่อันดับ 1 (5 คะแนน)"
-                            style={{
-                              width: "46px",
-                              padding: "6px 2px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(255, 215, 0, 0.4)",
-                              color: "#ffd700",
-                              fontSize: "13px",
-                              fontWeight: "800",
-                              textAlign: "center",
-                            }}
-                          />
-                        </td>
-
-                        {/* Rank 2 votes */}
-                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
-                          <input
-                            type="number"
-                            min="0"
-                            value={item.rankVotes?.["2"] ?? item.rankVotes?.[2] ?? 0}
-                            onChange={(e) => handleRankVoteChange(index, "2", e.target.value)}
-                            title="จำนวนคนโหวตให้อยู่อันดับ 2 (4 คะแนน)"
-                            style={{
-                              width: "46px",
-                              padding: "6px 2px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(226, 232, 240, 0.3)",
-                              color: "#e2e8f0",
-                              fontSize: "13px",
-                              fontWeight: "700",
-                              textAlign: "center",
-                            }}
-                          />
-                        </td>
-
-                        {/* Rank 3 votes */}
-                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
-                          <input
-                            type="number"
-                            min="0"
-                            value={item.rankVotes?.["3"] ?? item.rankVotes?.[3] ?? 0}
-                            onChange={(e) => handleRankVoteChange(index, "3", e.target.value)}
-                            title="จำนวนคนโหวตให้อยู่อันดับ 3 (3 คะแนน)"
-                            style={{
-                              width: "46px",
-                              padding: "6px 2px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(205, 127, 50, 0.3)",
-                              color: "#cd7f32",
-                              fontSize: "13px",
-                              fontWeight: "700",
-                              textAlign: "center",
-                            }}
-                          />
-                        </td>
-
-                        {/* Rank 4 votes */}
-                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
-                          <input
-                            type="number"
-                            min="0"
-                            value={item.rankVotes?.["4"] ?? item.rankVotes?.[4] ?? 0}
-                            onChange={(e) => handleRankVoteChange(index, "4", e.target.value)}
-                            title="จำนวนคนโหวตให้อยู่อันดับ 4 (2 คะแนน)"
-                            style={{
-                              width: "46px",
-                              padding: "6px 2px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(56, 189, 248, 0.3)",
-                              color: "#38bdf8",
-                              fontSize: "13px",
-                              fontWeight: "700",
-                              textAlign: "center",
-                            }}
-                          />
-                        </td>
-
-                        {/* Rank 5 votes */}
-                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
-                          <input
-                            type="number"
-                            min="0"
-                            value={item.rankVotes?.["5"] ?? item.rankVotes?.[5] ?? 0}
-                            onChange={(e) => handleRankVoteChange(index, "5", e.target.value)}
-                            title="จำนวนคนโหวตให้อยู่อันดับ 5 (1 คะแนน)"
-                            style={{
-                              width: "46px",
-                              padding: "6px 2px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(168, 85, 247, 0.3)",
-                              color: "#a855f7",
-                              fontSize: "13px",
-                              fontWeight: "700",
-                              textAlign: "center",
-                            }}
-                          />
-                        </td>
-
-                        {/* Champion votes */}
-                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
-                          <input
-                            type="number"
-                            min="0"
-                            value={item.championVotes ?? 0}
-                            onChange={(e) => handleChampionVoteChange(index, e.target.value)}
-                            title="จำนวนคนโหวตให้เป็นสุดยอดแฟนพันธุ์แท้ (15 คะแนนพิเศษ)"
-                            style={{
-                              width: "46px",
-                              padding: "6px 2px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(255, 215, 0, 0.5)",
-                              color: "#ffd700",
-                              fontSize: "13px",
-                              fontWeight: "900",
-                              textAlign: "center",
-                            }}
-                          />
+                          )}
                         </td>
 
                         {/* Raw Vote Sum */}
                         <td style={{ padding: "6px 4px", textAlign: "center", borderRight: "1px solid rgba(255, 215, 0, 0.2)" }}>
-                          <input
-                            type="number"
-                            min="0"
-                            value={item.votes ?? 0}
-                            onChange={(e) => handlePollFieldChange(index, "votes", Math.max(0, parseInt(e.target.value) || 0))}
-                            title="คะแนนดิบจากการโหวตมหาชน (คำนวณจากจำนวนคนโหวตอัตโนมัติ หรือแก้ไขได้)"
-                            style={{
-                              width: "56px",
-                              padding: "6px 2px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(0, 229, 255, 0.4)",
-                              color: "#67e8f9",
-                              fontSize: "13px",
-                              fontWeight: "800",
-                              textAlign: "center",
-                            }}
-                          />
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "#67e8f9", fontWeight: "800" }}>🔒 ซ่อน</span>
+                          ) : (
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.votes ?? 0}
+                              onChange={(e) => handlePollFieldChange(index, "votes", Math.max(0, parseInt(e.target.value) || 0))}
+                              title="คะแนนดิบจากการโหวตมหาชน (คำนวณจากจำนวนคนโหวตอัตโนมัติ หรือแก้ไขได้)"
+                              style={{
+                                width: "56px",
+                                padding: "6px 2px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(0, 229, 255, 0.4)",
+                                color: "#67e8f9",
+                                fontSize: "13px",
+                                fontWeight: "800",
+                                textAlign: "center",
+                              }}
+                            />
+                          )}
                         </td>
 
                         {/* Total Combined Score (Vote 70% + What If 30%) */}
                         <td style={{ padding: "6px 6px", textAlign: "center", background: "rgba(255, 215, 0, 0.04)", borderLeft: "1px solid rgba(255, 215, 0, 0.2)" }}>
-                          {(() => {
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "#ffd700", fontWeight: "800" }}>🔒 ซ่อนคะแนน</span>
+                          ) : (() => {
                             const w = Number(item.whatIfScore) || 0;
                             const v = Number(item.votes) || 0;
                             const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
@@ -4040,23 +4129,27 @@ export default function TrialAdminPage() {
 
                         {/* Percent Input */}
                         <td style={{ padding: "8px 6px", textAlign: "center" }}>
-                          <input
-                            type="text"
-                            value={item.percent || ""}
-                            onChange={(e) => handlePollFieldChange(index, "percent", e.target.value)}
-                            placeholder="0.00%"
-                            style={{
-                              width: "80px",
-                              padding: "6px 4px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(0, 229, 255, 0.4)",
-                              color: "#67e8f9",
-                              fontSize: "13px",
-                              fontWeight: "800",
-                              textAlign: "center",
-                            }}
-                          />
+                          {isPollScoreMasked ? (
+                            <span style={{ fontSize: "12px", color: "#67e8f9", fontWeight: "800" }}>🔒 รอสรุปผล</span>
+                          ) : (
+                            <input
+                              type="text"
+                              value={item.percent || ""}
+                              onChange={(e) => handlePollFieldChange(index, "percent", e.target.value)}
+                              placeholder="0.00%"
+                              style={{
+                                width: "80px",
+                                padding: "6px 4px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(0, 229, 255, 0.4)",
+                                color: "#67e8f9",
+                                fontSize: "13px",
+                                fontWeight: "800",
+                                textAlign: "center",
+                              }}
+                            />
+                          )}
                         </td>
 
                         {/* Profile & Video Modal Button */}
