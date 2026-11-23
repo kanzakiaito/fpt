@@ -36,11 +36,66 @@
         "isMainAdmin": false
       },
       "trial_foty": {
+        "access": false,
+        "isMainAdmin": false
+      }
+    },
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-11-17T09:40:20.256Z"
+  },
+  {
+    "id": "usr_1794907489848_hktpg",
+    "username": "trialfanstaff2026",
+    "passwordHash": "a3cea68cf1563ec0152515f4baa473fc64dfa03982ddd87534175b020d55a934",
+    "name": "แอดมินงุ่นง่าน '26",
+    "permissions": {
+      "tournament": {
+        "access": false,
+        "isMainAdmin": false
+      },
+      "trial_foty": {
         "access": true,
         "isMainAdmin": true
       }
     },
-    "createdAt": "2026-01-01T00:00:00.000Z",
-    "updatedAt": "2026-11-17T09:17:06.667Z"
+    "createdAt": "2026-11-17T09:24:49.848Z",
+    "updatedAt": "2026-11-17T10:29:16.561Z"
+  },
+  {
+    "id": "usr_1794911475820_gmkgi",
+    "username": "fanpantae_fanmade",
+    "passwordHash": "e7adb6218ca266739926ab52b45c0600db6d14824fcc5edeb98323cded15fb49",
+    "name": "Fanpantae Fanmade",
+    "permissions": {
+      "main": {
+        "access": true,
+        "isMainAdmin": true
+      }
+    },
+    "createdAt": "2026-11-17T10:31:15.820Z",
+    "updatedAt": "2026-11-17T10:31:15.820Z"
+  },
+  {
+    "id": "usr_1794924490507_5xxrp",
+    "username": "pks_aito",
+    "passwordHash": "1462b59a9c3eb675d276e50326fec8638e820ece4a9f192c6c75f5fad06b4a9c",
+    "name": "Kanzaki Aito",
+    "permissions": {
+      "tournament": {
+        "access": true,
+        "isMainAdmin": true
+      },
+      "main": {
+        "access": true,
+        "isMainAdmin": false,
+        "role": "maintainer"
+      },
+      "trial_foty": {
+        "access": true,
+        "isMainAdmin": true
+      }
+    },
+    "createdAt": "2026-11-17T14:08:10.507Z",
+    "updatedAt": "2026-11-17T16:18:58.116Z"
   }
 ]
