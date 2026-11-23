@@ -77,8 +77,23 @@ export default function TournamentLandingClient({ initialTournamentData }) {
       }
     }
     loadSettings();
-    const timer = setInterval(loadSettings, 5000);
-    return () => clearInterval(timer);
+    // Poll every 15 seconds (pauses when tab is hidden to save Vercel CPU)
+    const timer = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      loadSettings();
+    }, 15000);
+
+    const handleVisibility = () => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        loadSettings();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   const visibleMatches = useMemo(() => {

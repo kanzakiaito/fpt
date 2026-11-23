@@ -475,8 +475,23 @@ export default function TrialFOTYPage() {
     } catch (e) {}
 
     fetchData();
-    const interval = setInterval(() => fetchData(false), 8000);
-    return () => clearInterval(interval);
+    // Poll every 12 seconds (pauses when tab is hidden to save Vercel CPU)
+    const interval = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      fetchData(false);
+    }, 12000);
+
+    const handleVisibility = () => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchData(false);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   // Compute 6 Floating Hero Columns (using real contestants data, avoiding stale build-time fallbacks)
@@ -3463,7 +3478,7 @@ export default function TrialFOTYPage() {
                       ข้อมูลและทำความรู้จัก 40 ผู้เข้าแข่งขัน The Trial (งุ่นง่าน 2026)
                     </div>
                     <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)" }}>
-                      คลิกที่การ์ดผู้เข้าแข่งขันเพื่อดูประวัติ ข้อมูลคะแนนรอบอุ่นเครื่อง (What If?) และรับชมคลิปวิดีโอแนะนำตัว
+                      คลิกที่การ์ดผู้เข้าแข่งขันเพื่อดูประวัติ ข้อมูลคะแนนรอบเก็บโพลล์ และรับชมคลิปวิดีโอแนะนำตัว
                     </div>
                     <div style={{ fontSize: "12px", color: "#67e8f9", marginTop: "4px", fontWeight: "700" }}>
                       🎬 มีคลิปแนะนำตัว & ข้อมูลครบถ้วน
@@ -3818,7 +3833,7 @@ export default function TrialFOTYPage() {
                         <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.55)" }}>
                           {votingOpen
                             ? "สัดส่วนโพลล์"
-                            : (itemTotalScore > 0 ? "คะแนน What If" : "สถานะ")}
+                            : (itemTotalScore > 0 ? "คะแนนเก็บโพลล์" : "สถานะ")}
                         </span>
                         <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700" }}>
                           {votingOpen
@@ -4408,7 +4423,7 @@ export default function TrialFOTYPage() {
                 }}
               >
                 <div>
-                  <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.65)" }}>คะแนนรอบ What-If รวม:</div>
+                  <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.65)" }}>คะแนนเก็บโพลล์รวม:</div>
                   <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff" }}>
                     {selectedSpotlight.rank ? `อันดับที่ #${selectedSpotlight.rank}` : selectedSpotlight.pollRank ? `อันดับโพลล์ #${selectedSpotlight.pollRank}` : "ยังไม่มีอันดับทางการ"}
                   </div>

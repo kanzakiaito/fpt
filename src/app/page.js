@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, Fragment } from "react";
+import { useState, useEffect, useMemo, useRef, Fragment } from "react";
 import Link from "next/link";
 import historyData from "./data/history.json";
 
@@ -92,30 +92,40 @@ export default function MainPage() {
   const [activeFotyHomeTab, setActiveFotyHomeTab] = useState("standings");
   const [fotySearchQuery, setFotySearchQuery] = useState("");
 
-  // Load data & settings
+  // Load data & settings (optimized: history loaded once, polling pauses on background tab)
+  const historyLoadedRef = useRef(false);
+
   const fetchData = async () => {
+    // Skip polling if tab is inactive/hidden to save serverless CPU & bandwidth
+    if (typeof document !== "undefined" && document.hidden && dataLoaded) {
+      return;
+    }
+
     try {
-      const [scoresRes, settingsRes, historyRes, pollRes] = await Promise.all([
+      const promises = [
         fetch(`/api/scores?t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" }),
-        fetch(`/api/history?t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/poll?t=${Date.now()}`, { cache: "no-store" }),
-      ]);
-      const scoresData = await scoresRes.json();
-      const settingsData = await settingsRes.json();
-      const historyResData = await historyRes.json();
-      const pollData = await pollRes.json();
+      ];
 
-      if (scoresData.success && Array.isArray(scoresData.data)) {
-        setLeaderboard(scoresData.data);
-        try {
-          localStorage.setItem("fpt_leaderboard_cache", JSON.stringify(scoresData.data));
-        } catch (e) {}
+      // History is static; only load once on first mount
+      if (!historyLoadedRef.current) {
+        promises.push(fetch(`/api/history?t=${Date.now()}`, { cache: "no-store" }));
       }
-      if (historyResData.success && historyResData.data) {
-        setHistoryState(historyResData.data);
-      } else {
-        setHistoryState(historyData);
+
+      const results = await Promise.all(promises);
+      const scoresData = await results[0].json();
+      const settingsData = await results[1].json();
+      const pollData = await results[2].json();
+
+      if (!historyLoadedRef.current && results[3]) {
+        historyLoadedRef.current = true;
+        const historyResData = await results[3].json();
+        if (historyResData.success && historyResData.data) {
+          setHistoryState(historyResData.data);
+        } else {
+          setHistoryState(historyData);
+        }
       }
       if (pollData.success && Array.isArray(pollData.data)) {
         setPollList(pollData.data);
@@ -183,8 +193,24 @@ export default function MainPage() {
     } catch (e) {}
 
     fetchData();
-    const timer = setInterval(fetchData, 4000);
-    return () => clearInterval(timer);
+    // Poll every 12 seconds instead of 4 seconds to conserve serverless CPU
+    const timer = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      fetchData();
+    }, 12000);
+
+    // Refresh immediately when user returns to this tab
+    const handleVisibilityChange = () => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchData();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   // 6 columns of contestant photos for the hero background wall

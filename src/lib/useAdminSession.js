@@ -80,7 +80,7 @@ export function useAdminSession(section = "main") {
       }
 
       // 2. Verify server-side token validity and permissions for this specific section
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/admin-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
