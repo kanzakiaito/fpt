@@ -29,6 +29,30 @@ export function getYouTubeId(url) {
   return match && match[1] ? match[1] : null;
 }
 
+export function getEmbedVideoUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== "string") return null;
+  const url = rawUrl.trim();
+  if (!url) return null;
+
+  // Google Drive
+  const driveFileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://drive.google.com/file/d/${driveFileMatch[1]}/preview`;
+  }
+  const driveIdMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (url.includes("drive.google.com") && driveIdMatch && driveIdMatch[1]) {
+    return `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+  }
+
+  // YouTube
+  const ytId = getYouTubeId(url);
+  if (ytId) {
+    return `https://www.youtube-nocookie.com/embed/${ytId}`;
+  }
+
+  return url;
+}
+
 function TopicSetCard({ setObj, setLabel }) {
   const isPlayed = Boolean(setObj?.played);
   return (
@@ -2805,12 +2829,25 @@ export default function TournamentClient({
                 .map((contestant) => (
                   <div
                     key={contestant.id || contestant.name}
+                    onClick={() => handleSelectContestant(contestant)}
                     style={{
                       background: "linear-gradient(150deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
                       borderRadius: "18px",
                       border: "1px solid rgba(0, 229, 255, 0.25)",
                       padding: "20px",
                       boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+                      cursor: "pointer",
+                      transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.borderColor = "#00e5ff";
+                      e.currentTarget.style.boxShadow = "0 12px 30px rgba(0, 229, 255, 0.25)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.borderColor = "rgba(0, 229, 255, 0.25)";
+                      e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)";
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
@@ -2984,6 +3021,62 @@ export default function TournamentClient({
                 </div>
               );
             })()}
+
+            {/* Embedded Video (Google Drive / YouTube) */}
+            {selectedContestant.videoUrl ? (
+              <div style={{ marginBottom: "20px" }}>
+                <div style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>🎬</span> คลิปแนะนำตัว / ผลงาน (Google Drive Video)
+                </div>
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    paddingTop: "56.25%",
+                    borderRadius: "14px",
+                    overflow: "hidden",
+                    background: "#000",
+                    border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7)",
+                  }}
+                >
+                  <iframe
+                    src={getEmbedVideoUrl(selectedContestant.videoUrl)}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      border: "none",
+                    }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    allowFullScreen
+                    title={selectedContestant.name}
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            {/* Description */}
+            {selectedContestant.description ? (
+              <div
+                style={{
+                  background: "rgba(0, 229, 255, 0.05)",
+                  border: "1px solid rgba(0, 229, 255, 0.2)",
+                  borderRadius: "12px",
+                  padding: "14px 18px",
+                  marginBottom: "20px",
+                }}
+              >
+                <div style={{ fontSize: "13px", fontWeight: "800", color: "#00e5ff", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>📝</span> ข้อมูลผู้เข้าแข่งขัน
+                </div>
+                <p style={{ margin: 0, fontSize: "14px", color: "rgba(255, 255, 255, 0.9)", lineHeight: "1.6", whiteSpace: "pre-line" }}>
+                  {selectedContestant.description}
+                </p>
+              </div>
+            ) : null}
 
             {/* Stats Summary Banner */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "24px" }}>

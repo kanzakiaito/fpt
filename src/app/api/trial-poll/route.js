@@ -179,8 +179,11 @@ export async function GET(req) {
       nickname: (matched && matched.nickname) ? matched.nickname : (item.nickname || ""),
       topic: (matched && matched.topic) ? matched.topic : (item.topic || "-"),
       warmupSchedule: (matched && matched.warmupSchedule) ? matched.warmupSchedule : (item.warmupSchedule || ""),
-      gameScores: matchedGame?.scores || null,
-      gameTotalScore: matchedGame?.totalScore !== undefined ? matchedGame.totalScore : Number(item.whatIfScore || 0),
+      description: item.description || matched?.description || "",
+      videoUrl: item.videoUrl || matched?.videoUrl || "",
+      scores: item.scores || matchedGame?.scores || matched?.scores || { "3sec": null, qa: null, jigsaw: null, attribute: null },
+      gameScores: matchedGame?.scores || matched?.scores || null,
+      gameTotalScore: matchedGame?.totalScore !== undefined ? matchedGame.totalScore : Number(item.whatIfScore || matched?.totalScore || 0),
     };
   });
 
@@ -414,6 +417,9 @@ export async function POST(request) {
               : { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
           image: item.image || matched?.image || "",
           warmupSchedule: String(item.warmupSchedule || matched?.warmupSchedule || "").trim(),
+          description: item.description !== undefined ? String(item.description) : (matched?.description || ""),
+          videoUrl: item.videoUrl !== undefined ? String(item.videoUrl) : (matched?.videoUrl || ""),
+          scores: item.scores || matched?.scores || null,
         };
       });
 
@@ -421,7 +427,7 @@ export async function POST(request) {
       sanitized.sort((a, b) => a.pollRank - b.pollRank);
       await saveKVData("fpt_trial_poll", sanitized, writeLocalPoll);
 
-      // Also sync warmupSchedule to fpt_trial contestants
+      // Also sync warmupSchedule, description, videoUrl, scores to fpt_trial contestants
       try {
         let tData = await getKVData("fpt_trial", readTrialData);
         if (Array.isArray(tData)) {
@@ -433,13 +439,30 @@ export async function POST(request) {
                 (p.name && c.name && p.name.trim() === c.name.trim()) ||
                 (p.nickname && c.nickname && p.nickname.trim() === c.nickname.trim())
             );
-            if (m && m.warmupSchedule !== undefined && m.warmupSchedule !== c.warmupSchedule) {
-              tChanged = true;
-              return { ...c, warmupSchedule: m.warmupSchedule };
+            if (m) {
+              let updated = { ...c };
+              if (m.warmupSchedule !== undefined && m.warmupSchedule !== c.warmupSchedule) {
+                tChanged = true;
+                updated.warmupSchedule = m.warmupSchedule;
+              }
+              if (m.description !== undefined && m.description !== c.description) {
+                tChanged = true;
+                updated.description = m.description;
+              }
+              if (m.videoUrl !== undefined && m.videoUrl !== c.videoUrl) {
+                tChanged = true;
+                updated.videoUrl = m.videoUrl;
+              }
+              if (m.scores !== undefined && JSON.stringify(m.scores) !== JSON.stringify(c.scores)) {
+                tChanged = true;
+                updated.scores = m.scores;
+              }
+              return updated;
             }
             return c;
           });
           if (tChanged) {
+            writeTrialData(tData);
             await saveKVData("fpt_trial", tData, writeTrialData);
           }
         }
@@ -449,6 +472,67 @@ export async function POST(request) {
         success: true,
         data: sanitized,
         message: "บันทึกผลโพลล์ Trial FoTY ทั้งหมดเรียบร้อยแล้ว",
+      });
+    }
+
+    // Update Candidate Details (Admin: description, videoUrl, scores, whatIfScore, warmupSchedule)
+    if (body.action === "save_candidate_details" || body.action === "update_candidate_details") {
+      const { id, name, nickname, description, videoUrl, scores, whatIfScore, warmupSchedule } = body;
+      let found = false;
+      current = current.map((item) => {
+        const matchesId = id && String(item.id) === String(id);
+        const matchesName = name && item.name && item.name.trim() === String(name).trim();
+        const matchesNick = nickname && item.nickname && item.nickname.trim() === String(nickname).trim();
+        if (matchesId || matchesName || matchesNick) {
+          found = true;
+          return {
+            ...item,
+            description: description !== undefined ? String(description) : (item.description || ""),
+            videoUrl: videoUrl !== undefined ? String(videoUrl) : (item.videoUrl || ""),
+            scores: scores !== undefined ? scores : (item.scores || null),
+            whatIfScore: whatIfScore !== undefined ? Number(whatIfScore) : (item.whatIfScore || 0),
+            warmupSchedule: warmupSchedule !== undefined ? String(warmupSchedule) : (item.warmupSchedule || ""),
+          };
+        }
+        return item;
+      });
+
+      // Recalculate percent
+      current = computePollPercentages(current);
+      await saveKVData("fpt_trial_poll", current, writeLocalPoll);
+
+      // Also sync to fpt_trial contestants
+      try {
+        let tData = await getKVData("fpt_trial", readTrialData);
+        if (Array.isArray(tData)) {
+          let tChanged = false;
+          tData = tData.map((c) => {
+            const matchesId = id && String(c.id) === String(id);
+            const matchesName = name && c.name && c.name.trim() === String(name).trim();
+            const matchesNick = nickname && c.nickname && c.nickname.trim() === String(nickname).trim();
+            if (matchesId || matchesName || matchesNick) {
+              tChanged = true;
+              return {
+                ...c,
+                description: description !== undefined ? String(description) : (c.description || ""),
+                videoUrl: videoUrl !== undefined ? String(videoUrl) : (c.videoUrl || ""),
+                scores: scores !== undefined ? scores : (c.scores || null),
+                warmupSchedule: warmupSchedule !== undefined ? String(warmupSchedule) : (c.warmupSchedule || ""),
+              };
+            }
+            return c;
+          });
+          if (tChanged) {
+            writeTrialData(tData);
+            await saveKVData("fpt_trial", tData, writeTrialData);
+          }
+        }
+      } catch (e) {}
+
+      return NextResponse.json({
+        success: true,
+        data: current,
+        message: "บันทึกข้อมูลและคลิปของผู้เข้าแข่งขันเรียบร้อยแล้ว",
       });
     }
 

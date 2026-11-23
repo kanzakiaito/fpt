@@ -90,6 +90,38 @@ function getOptimizedImageUrl(src, targetSize = 120) {
   return s;
 }
 
+export function getYouTubeId(url) {
+  if (!url || typeof url !== "string") return null;
+  const clean = url.trim();
+  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|live|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = clean.match(regExp);
+  return match && match[1] ? match[1] : null;
+}
+
+export function getEmbedVideoUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== "string") return null;
+  const url = rawUrl.trim();
+  if (!url) return null;
+
+  // Google Drive
+  const driveFileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://drive.google.com/file/d/${driveFileMatch[1]}/preview`;
+  }
+  const driveIdMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (url.includes("drive.google.com") && driveIdMatch && driveIdMatch[1]) {
+    return `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+  }
+
+  // YouTube
+  const ytId = getYouTubeId(url);
+  if (ytId) {
+    return `https://www.youtube-nocookie.com/embed/${ytId}`;
+  }
+
+  return url;
+}
+
 // ─── Thai Date-Time Parser for Scheduled Warm-up Matches ─────────────────────
 
 const THAI_MONTH_MAP = {
@@ -319,6 +351,7 @@ export default function TrialFOTYPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [pollSearchQuery, setPollSearchQuery] = useState("");
   const [warmupSearchQuery, setWarmupSearchQuery] = useState("");
+  const [pollViewMode, setPollViewMode] = useState("cards"); // 'cards' | 'table'
   const [selectedSpotlight, setSelectedSpotlight] = useState(null);
 
   // Fetch Data from /api/trial and /api/trial-poll
@@ -3457,8 +3490,243 @@ export default function TrialFOTYPage() {
               )}
             </div>
 
-            {/* Poll Tournament Graphic Layout */}
-            <div style={{ overflowX: "auto", padding: "12px 24px 28px 24px" }}>
+            {/* View Switcher: Cards vs Table */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                พบผู้เข้าแข่งขัน <strong style={{ color: "#ffd700" }}>{filteredPoll.length}</strong> คน
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  type="button"
+                  onClick={() => setPollViewMode("cards")}
+                  style={{
+                    padding: "7px 15px",
+                    borderRadius: "8px",
+                    background: pollViewMode === "cards" ? "rgba(255, 215, 0, 0.22)" : "rgba(255, 255, 255, 0.05)",
+                    border: pollViewMode === "cards" ? "1.5px solid #ffd700" : "1px solid rgba(255, 255, 255, 0.15)",
+                    color: pollViewMode === "cards" ? "#ffd700" : "rgba(255,255,255,0.6)",
+                    fontSize: "13px",
+                    fontWeight: "800",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <span>🎴</span> รูปแบบการ์ด (Cards)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPollViewMode("table")}
+                  style={{
+                    padding: "7px 15px",
+                    borderRadius: "8px",
+                    background: pollViewMode === "table" ? "rgba(255, 215, 0, 0.22)" : "rgba(255, 255, 255, 0.05)",
+                    border: pollViewMode === "table" ? "1.5px solid #ffd700" : "1px solid rgba(255, 255, 255, 0.15)",
+                    color: pollViewMode === "table" ? "#ffd700" : "rgba(255,255,255,0.6)",
+                    fontSize: "13px",
+                    fontWeight: "800",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <span>📊</span> รูปแบบตาราง (Table)
+                </button>
+              </div>
+            </div>
+
+            {/* 1. CARDS VIEW */}
+            {pollViewMode === "cards" && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                  gap: "18px",
+                  marginBottom: "30px",
+                }}
+              >
+                {filteredPoll.map((item, index) => {
+                  const matchedContestant = contestants.find(
+                    (c) =>
+                      (c.name && item.name && (c.name.trim() === item.name.trim() || c.name.includes(item.name) || item.name.includes(c.name))) ||
+                      (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim()) ||
+                      (c.topic && item.topic && (c.topic.trim() === item.topic.trim() || item.topic.includes(c.topic) || c.topic.includes(item.topic)))
+                  );
+                  const photo = item.image || matchedContestant?.image || null;
+                  const isTop5 = !isScoreHidden && Number(item.pollRank) <= 5;
+                  const hasVideo = Boolean(item.videoUrl || matchedContestant?.videoUrl);
+                  const itemDescription = item.description || matchedContestant?.description || "";
+                  const itemVideo = item.videoUrl || matchedContestant?.videoUrl || "";
+                  const itemScores = item.scores || matchedContestant?.scores || item.gameScores || {};
+                  const itemTotalScore = item.whatIfScore ?? matchedContestant?.totalScore ?? item.totalScore ?? 0;
+
+                  return (
+                    <div
+                      key={item.id || item.name || index}
+                      onClick={() =>
+                        setSelectedSpotlight({
+                          ...(matchedContestant || {}),
+                          ...item,
+                          image: photo,
+                          description: itemDescription,
+                          videoUrl: itemVideo,
+                          scores: itemScores,
+                          totalScore: itemTotalScore,
+                        })
+                      }
+                      style={{
+                        background: "linear-gradient(150deg, rgba(16, 28, 52, 0.85) 0%, rgba(8, 14, 28, 0.95) 100%)",
+                        border: isTop5 ? "1.5px solid rgba(255, 215, 0, 0.55)" : "1.5px solid rgba(0, 229, 255, 0.25)",
+                        borderRadius: "16px",
+                        padding: "18px",
+                        display: "flex",
+                        flexDirection: "column",
+                        cursor: "pointer",
+                        position: "relative",
+                        transition: "all 0.2s ease",
+                        boxShadow: isTop5 ? "0 8px 24px rgba(255, 215, 0, 0.15)" : "0 4px 16px rgba(0, 0, 0, 0.4)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.borderColor = "#00e5ff";
+                        e.currentTarget.style.boxShadow = "0 12px 30px rgba(0, 229, 255, 0.25)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.borderColor = isTop5 ? "rgba(255, 215, 0, 0.55)" : "rgba(0, 229, 255, 0.25)";
+                        e.currentTarget.style.boxShadow = isTop5 ? "0 8px 24px rgba(255, 215, 0, 0.15)" : "0 4px 16px rgba(0, 0, 0, 0.4)";
+                      }}
+                    >
+                      {/* Top Badges */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                        <span
+                          style={{
+                            padding: "3px 10px",
+                            borderRadius: "20px",
+                            fontSize: "12px",
+                            fontWeight: "900",
+                            background: isTop5 ? "linear-gradient(90deg, #ffd700, #ff9900)" : "rgba(0, 229, 255, 0.15)",
+                            color: isTop5 ? "#030812" : "#67e8f9",
+                            border: isTop5 ? "none" : "1px solid rgba(0, 229, 255, 0.4)",
+                          }}
+                        >
+                          {isScoreHidden ? "🛡️ ซ่อนอันดับ" : `#${item.pollRank} ${isTop5 ? "⭐ Top 5" : ""}`}
+                        </span>
+                        {hasVideo && (
+                          <span
+                            style={{
+                              padding: "3px 8px",
+                              borderRadius: "6px",
+                              fontSize: "11px",
+                              fontWeight: "700",
+                              background: "rgba(239, 68, 68, 0.2)",
+                              color: "#fca5a5",
+                              border: "1px solid rgba(239, 68, 68, 0.4)",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                            }}
+                          >
+                            <span>🎬</span> มีคลิป
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Contestant Photo */}
+                      <div
+                        style={{
+                          width: "92px",
+                          height: "92px",
+                          borderRadius: "50%",
+                          margin: "0 auto 12px auto",
+                          overflow: "hidden",
+                          border: isTop5 ? "2.5px solid #ffd700" : "2px solid #00e5ff",
+                          boxShadow: isTop5 ? "0 0 16px rgba(255, 215, 0, 0.3)" : "0 0 12px rgba(0, 229, 255, 0.25)",
+                          background: "#081020",
+                          flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {photo ? (
+                          <img
+                            src={getOptimizedImageUrl(photo, 180)}
+                            alt={item.name}
+                            referrerPolicy="no-referrer"
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
+                        ) : (
+                          <span style={{ fontSize: "36px" }}>👤</span>
+                        )}
+                      </div>
+
+                      {/* Name & Nickname */}
+                      <div style={{ textAlign: "center", marginBottom: "8px" }}>
+                        <div style={{ fontSize: "15px", fontWeight: "900", color: "#ffffff", lineHeight: "1.3" }}>
+                          {item.name}
+                        </div>
+                        {item.nickname && (
+                          <div style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700", marginTop: "2px" }}>
+                            ({item.nickname})
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Topic */}
+                      <div
+                        style={{
+                          background: "rgba(0, 0, 0, 0.35)",
+                          border: "1px solid rgba(0, 229, 255, 0.15)",
+                          borderRadius: "8px",
+                          padding: "8px 10px",
+                          textAlign: "center",
+                          fontSize: "12px",
+                          color: "rgba(255, 255, 255, 0.85)",
+                          marginBottom: "10px",
+                          minHeight: "46px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <span>{item.topic || "-"}</span>
+                      </div>
+
+                      {/* Warmup match badge if scheduled */}
+                      {item.warmupSchedule && (
+                        <div style={{ fontSize: "11px", color: "#ffa940", background: "rgba(255, 136, 0, 0.12)", border: "1px dashed #ffa940", borderRadius: "6px", padding: "4px 8px", textAlign: "center", marginBottom: "10px" }}>
+                          🗓️ {item.warmupSchedule}
+                        </div>
+                      )}
+
+                      {/* Score / Percent */}
+                      <div style={{ marginTop: "auto", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.55)" }}>
+                          {item.whatIfScore ? `What If: ${item.whatIfScore}` : "สัดส่วนโพลล์"}
+                        </span>
+                        <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700" }}>
+                          {(isScoreHidden || votingOpen) ? "🔒 รอสรุปผล" : item.percent}
+                        </span>
+                      </div>
+
+                      {/* Click Hint */}
+                      <div style={{ marginTop: "10px", textAlign: "center" }}>
+                        <span style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>
+                          🔍 แตะเพื่อดูคลิป & สถิติคะแนน
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* 2. SLANTED TABLE VIEW */}
+            {pollViewMode === "table" && (
+              <div style={{ overflowX: "auto", padding: "12px 24px 28px 24px" }}>
               <div style={{ minWidth: "980px", padding: "0 14px", boxSizing: "border-box" }}>
                 {/* Top Main Tournament Banner Pill */}
                 <div
@@ -3796,6 +4064,7 @@ export default function TrialFOTYPage() {
                 )}
               </div>
             </div>
+            )}
           </div>
         )}
 
@@ -3824,9 +4093,11 @@ export default function TrialFOTYPage() {
                 background: "linear-gradient(150deg, #0a1b33 0%, #030814 100%)",
                 border: "2px solid #00e5ff",
                 borderRadius: "24px",
-                maxWidth: "500px",
+                maxWidth: "680px",
                 width: "100%",
-                padding: "28px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                padding: "26px",
                 boxShadow: "0 0 50px rgba(0, 229, 255, 0.4)",
                 color: "#ffffff",
                 position: "relative",
@@ -3836,11 +4107,11 @@ export default function TrialFOTYPage() {
               }}
             >
               {/* Modal Header */}
-              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px", borderBottom: "1px solid rgba(0,229,255,0.2)", paddingBottom: "16px" }}>
                 <div
                   style={{
-                    width: "72px",
-                    height: "72px",
+                    width: "76px",
+                    height: "76px",
                     borderRadius: "50%",
                     overflow: "hidden",
                     border: "2.5px solid #00e5ff",
@@ -3896,6 +4167,62 @@ export default function TrialFOTYPage() {
                   ✕
                 </button>
               </div>
+
+              {/* Embedded Video (Google Drive / YouTube) */}
+              {selectedSpotlight.videoUrl ? (
+                <div style={{ marginBottom: "20px" }}>
+                  <div style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>🎬</span> คลิปแนะนำตัว / ผลงาน (Google Drive Video)
+                  </div>
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      paddingTop: "56.25%",
+                      borderRadius: "14px",
+                      overflow: "hidden",
+                      background: "#000",
+                      border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                      boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7)",
+                    }}
+                  >
+                    <iframe
+                      src={getEmbedVideoUrl(selectedSpotlight.videoUrl)}
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                      }}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                      allowFullScreen
+                      title={selectedSpotlight.name}
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Description (Admin ใส่เอง) */}
+              {selectedSpotlight.description ? (
+                <div
+                  style={{
+                    background: "rgba(0, 229, 255, 0.05)",
+                    border: "1px solid rgba(0, 229, 255, 0.2)",
+                    borderRadius: "12px",
+                    padding: "14px 18px",
+                    marginBottom: "18px",
+                  }}
+                >
+                  <div style={{ fontSize: "13px", fontWeight: "800", color: "#00e5ff", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>📝</span> ข้อมูลผู้เข้าแข่งขัน
+                  </div>
+                  <p style={{ margin: 0, fontSize: "14px", color: "rgba(255, 255, 255, 0.9)", lineHeight: "1.6", whiteSpace: "pre-line" }}>
+                    {selectedSpotlight.description}
+                  </p>
+                </div>
+              ) : null}
 
               {/* Scheduled Match Time Banner (if present) */}
               {selectedSpotlight.warmupSchedule && (
@@ -3962,17 +4289,59 @@ export default function TrialFOTYPage() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  marginBottom: "16px",
                 }}
               >
                 <div>
-                  <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.65)" }}>คะแนนรวมสุทธิ:</div>
+                  <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.65)" }}>คะแนนรอบ What-If รวม:</div>
                   <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff" }}>
                     {selectedSpotlight.rank ? `อันดับที่ #${selectedSpotlight.rank}` : selectedSpotlight.pollRank ? `อันดับโพลล์ #${selectedSpotlight.pollRank}` : "ยังไม่มีอันดับทางการ"}
                   </div>
                 </div>
-                <div style={{ fontSize: "32px", fontWeight: "900", color: "#ffd700" }}>
+                <div style={{ fontSize: "30px", fontWeight: "900", color: "#ffd700" }}>
                   {selectedSpotlight.totalScore ?? 0} <span style={{ fontSize: "16px", color: "rgba(255,255,255,0.5)" }}>/ 100</span>
                 </div>
+              </div>
+
+              {/* Action / Vote CTA Button */}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSpotlight(null)}
+                  style={{
+                    padding: "10px 18px",
+                    borderRadius: "10px",
+                    background: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "#ffffff",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                  }}
+                >
+                  ปิดหน้าต่าง
+                </button>
+                {votingOpen && (
+                  <Link
+                    href="/trial-foty/vote"
+                    style={{
+                      padding: "10px 22px",
+                      borderRadius: "10px",
+                      background: "linear-gradient(90deg, #ffd700 0%, #ff8800 100%)",
+                      color: "#030812",
+                      fontSize: "13px",
+                      fontWeight: "900",
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
+                    }}
+                  >
+                    <span>🗳️ ไปที่หน้าลงคะแนนโหวต Trial</span>
+                    <span>→</span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

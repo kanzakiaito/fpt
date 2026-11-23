@@ -24,6 +24,35 @@ export function getYouTubeId(url) {
   return match && match[1] ? match[1] : null;
 }
 
+export function getEmbedVideoUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== "string") return null;
+  const url = rawUrl.trim();
+  if (!url) return null;
+
+  // Google Drive
+  const driveFileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://drive.google.com/file/d/${driveFileMatch[1]}/preview`;
+  }
+  const driveIdMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (url.includes("drive.google.com") && driveIdMatch && driveIdMatch[1]) {
+    return `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+  }
+
+  // YouTube
+  const ytId = getYouTubeId(url);
+  if (ytId) {
+    return `https://www.youtube.com/embed/${ytId}`;
+  }
+
+  // Raw 11-char ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
+    return `https://www.youtube.com/embed/${url}`;
+  }
+
+  return url;
+}
+
 export default function TournamentLandingClient({ initialTournamentData }) {
   const [tournamentWeeklyMatches, setTournamentWeeklyMatches] = useState([]);
   const [showFotyInNav, setShowFotyInNav] = useState(true);
@@ -744,9 +773,9 @@ export default function TournamentLandingClient({ initialTournamentData }) {
                         type="button"
                         onClick={() => {
                           const url = m.replayUrl || m.youtubeUrl;
-                          const vid = getYouTubeId(url);
-                          if (vid) {
-                            setActiveVideoModal(vid);
+                          const embedUrl = getEmbedVideoUrl(url);
+                          if (embedUrl) {
+                            setActiveVideoModal(embedUrl);
                           } else {
                             window.open(url, "_blank");
                           }
@@ -917,9 +946,9 @@ export default function TournamentLandingClient({ initialTournamentData }) {
               ✕
             </button>
             <iframe
-              src={`https://www.youtube.com/embed/${activeVideoModal}?autoplay=1`}
-              title="YouTube video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              src={activeVideoModal.includes("?") ? `${activeVideoModal}&autoplay=1` : `${activeVideoModal}?autoplay=1`}
+              title="Match video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               allowFullScreen
               style={{ width: "100%", height: "100%", border: "none" }}
             />
