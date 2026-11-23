@@ -1970,9 +1970,6 @@ export default function MainPage() {
                       คลิกที่การ์ดผู้เข้าแข่งขันแต่ละท่านเพื่อดูข้อมูลประวัติ หัวข้อ คะแนนรอบเก็บ และรับชมคลิปวิดีโอแนะนำตัว
                     </div>
                   </div>
-                  <div style={{ padding: "6px 14px", borderRadius: "20px", background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#00e5ff", fontSize: "12px", fontWeight: "800" }}>
-                    🎬 มีคลิปแนะนำตัว & ประวัติ
-                  </div>
                 </div>
               )}
 
