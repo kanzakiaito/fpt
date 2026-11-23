@@ -75,22 +75,37 @@ export async function getKVData(key, fallbackReadFn) {
  */
 export async function saveKVData(key, data, fallbackWriteFn) {
   const client = getRedisClient();
+  let redisSaved = false;
+  let redisErr = null;
+
   if (client) {
     try {
       await client.set(key, data);
+      redisSaved = true;
     } catch (err) {
-      console.error(`Error saving ${key} to KV:`, err);
+      redisErr = err;
+      console.error(`Error saving ${key} to KV:`, err.message || err);
     }
   }
 
+  let localSaved = false;
   // Attempt local write (works in localhost/VPS, gracefully skips read-only errors on Vercel)
   if (typeof fallbackWriteFn === "function") {
     try {
       fallbackWriteFn(data);
+      localSaved = true;
     } catch (err) {
       if (err.code !== "EROFS") {
         console.error(`Local write error for ${key}:`, err);
       }
     }
   }
+
+  // If neither Redis nor local storage could save, alert the API caller
+  if (!redisSaved && !localSaved) {
+    const errorMsg = redisErr ? (redisErr.message || String(redisErr)) : "No writable storage available";
+    throw new Error(`ไม่สามารถบันทึกข้อมูลลงฐานข้อมูลได้ (${errorMsg})`);
+  }
+
+  return { success: true, redisSaved, localSaved };
 }
