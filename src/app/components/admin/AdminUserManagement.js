@@ -40,7 +40,7 @@ export default function AdminUserManagement({
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/admin-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -81,7 +81,7 @@ export default function AdminUserManagement({
     setCheckingUser(true);
     setModalError("");
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/admin-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -122,7 +122,7 @@ export default function AdminUserManagement({
 
     setSavingUser(true);
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/admin-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -161,7 +161,7 @@ export default function AdminUserManagement({
   // Quick grant access
   const handleQuickGrant = async (targetUsername, grantRole = "admin") => {
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/admin-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -189,7 +189,7 @@ export default function AdminUserManagement({
   const handleToggleMainAdmin = async (targetUser) => {
     const newStatus = !targetUser.isMainAdmin;
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/admin-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -215,7 +215,7 @@ export default function AdminUserManagement({
   // Update user role
   const handleUpdateRole = async (targetUser, newRole) => {
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/admin-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -242,7 +242,7 @@ export default function AdminUserManagement({
   const handleRevoke = async () => {
     if (!revokeTarget) return;
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/admin-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

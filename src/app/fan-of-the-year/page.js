@@ -616,9 +616,23 @@ export default function MainPage() {
     } catch (e) {}
 
     fetchData();
-    // Poll every 3 seconds for real-time live scoring sync with admin
-    const timer = setInterval(fetchData, 3000);
-    return () => clearInterval(timer);
+    // Poll every 10 seconds (pauses when tab is hidden to save Vercel CPU)
+    const timer = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      fetchData();
+    }, 10000);
+
+    const handleVisibility = () => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchData();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   const handleFotyLogin = async (e) => {

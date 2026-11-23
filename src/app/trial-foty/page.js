@@ -475,8 +475,23 @@ export default function TrialFOTYPage() {
     } catch (e) {}
 
     fetchData();
-    const interval = setInterval(() => fetchData(false), 8000);
-    return () => clearInterval(interval);
+    // Poll every 12 seconds (pauses when tab is hidden to save Vercel CPU)
+    const interval = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      fetchData(false);
+    }, 12000);
+
+    const handleVisibility = () => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchData(false);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   // Compute 6 Floating Hero Columns (using real contestants data, avoiding stale build-time fallbacks)
