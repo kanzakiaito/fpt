@@ -30,6 +30,30 @@ export function getYouTubeId(url) {
   return match && match[1] ? match[1] : null;
 }
 
+export function getEmbedVideoUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== "string") return null;
+  const url = rawUrl.trim();
+  if (!url) return null;
+
+  // Google Drive
+  const driveFileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://drive.google.com/file/d/${driveFileMatch[1]}/preview`;
+  }
+  const driveIdMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (url.includes("drive.google.com") && driveIdMatch && driveIdMatch[1]) {
+    return `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+  }
+
+  // YouTube
+  const ytId = getYouTubeId(url);
+  if (ytId) {
+    return `https://www.youtube-nocookie.com/embed/${ytId}`;
+  }
+
+  return url;
+}
+
 export default function MainPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
@@ -60,6 +84,9 @@ export default function MainPage() {
   const [fotyRevealCategory, setFotyRevealCategory] = useState("attribute");
   const [fotyReveal3SecPartial, setFotyReveal3SecPartial] = useState(0);
   const [pollList, setPollList] = useState([]);
+  const [pollVotingOpen, setPollVotingOpen] = useState(false);
+  const [pollViewMode, setPollViewMode] = useState("cards"); // 'cards' | 'table'
+  const [selectedCandidateModal, setSelectedCandidateModal] = useState(null);
   const [activeFotyHomeTab, setActiveFotyHomeTab] = useState("standings");
   const [fotySearchQuery, setFotySearchQuery] = useState("");
 
@@ -91,7 +118,13 @@ export default function MainPage() {
       if (pollData.success && Array.isArray(pollData.data)) {
         setPollList(pollData.data);
       }
+      if (pollData.votingOpen !== undefined) {
+        setPollVotingOpen(Boolean(pollData.votingOpen));
+      }
       if (settingsData.success) {
+        if (settingsData.pollVotingOpen !== undefined) {
+          setPollVotingOpen(Boolean(settingsData.pollVotingOpen));
+        }
         setShowFotyInNav(settingsData.showFotyInNav !== false);
         setShowCurrentInNav(settingsData.showCurrentInNav !== false);
         setShowChampionsOnHome(settingsData.showChampionsOnHome !== false);
@@ -1791,142 +1824,671 @@ export default function MainPage() {
             </div>
           )}
 
-          {/* VIEW 2: POLL TABLE */}
+          {/* VIEW 2: POLL SECTION (CARDS & TABLE) */}
           {(activeFotyHomeTab === "poll" || !showFotyQualifyingOnHome) && showPollTable && (
-            <div
-              style={{
-                background: "linear-gradient(180deg, rgba(16, 24, 40, 0.95) 0%, rgba(8, 14, 24, 0.98) 100%)",
-                border: "1.5px solid rgba(255, 215, 0, 0.35)",
-                borderRadius: "20px",
-                padding: "20px",
-                boxShadow: "0 10px 40px rgba(0, 0, 0, 0.6)",
-                overflowX: "auto",
-              }}
-            >
-              <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 8px", minWidth: "650px" }}>
-                <thead>
-                  <tr style={{ color: "rgba(255,255,255,0.7)", fontSize: "12px", textTransform: "uppercase" }}>
-                    <th style={{ padding: "10px", textAlign: "center", width: "65px" }}>อันดับโพล</th>
-                    <th style={{ padding: "10px", textAlign: "left" }}>ผู้เข้าแข่งขัน & หัวข้อ</th>
-                    <th style={{ padding: "10px", textAlign: "right", width: "120px", color: "#ffd700" }}>สัดส่วนคะแนน</th>
-                    <th style={{ padding: "10px", textAlign: "left", width: "160px" }}>แผนภูมิ</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div>
+              {/* Poll Voting Banner (Shows prominently when poll voting is open) */}
+              {pollVotingOpen && (
+                <div
+                  style={{
+                    background: "linear-gradient(90deg, rgba(255, 215, 0, 0.16) 0%, rgba(0, 229, 255, 0.16) 100%)",
+                    border: "1.5px solid rgba(255, 215, 0, 0.45)",
+                    borderRadius: "16px",
+                    padding: "16px 22px",
+                    marginBottom: "20px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "14px",
+                    boxShadow: "0 0 24px rgba(255, 215, 0, 0.15)",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span>🗳️</span> เปิดรับคะแนนโหวตโพลล์มหาชนแห่งปีแล้ว!
+                    </div>
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)", marginTop: "4px" }}>
+                      คลิกที่การ์ดผู้เข้าแข่งขันเพื่อดูประวัติ ข้อมูลคะแนนรอบเก็บโพลล์ และรับชมคลิปแนะนำตัว
+                    </div>
+                  </div>
+                  <Link
+                    href="/poll"
+                    style={{
+                      padding: "10px 22px",
+                      borderRadius: "10px",
+                      background: "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
+                      color: "#030812",
+                      fontWeight: "900",
+                      fontSize: "14px",
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
+                    }}
+                  >
+                    <span>🗳️ ไปที่หน้าลงคะแนนโหวต</span>
+                    <span>→</span>
+                  </Link>
+                </div>
+              )}
+
+              {/* View Switcher: Cards vs Table */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                  พบผู้เข้าแข่งขัน <strong style={{ color: "#00e5ff" }}>{filteredPollList.length}</strong> คน
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setPollViewMode("cards")}
+                    style={{
+                      padding: "7px 15px",
+                      borderRadius: "8px",
+                      background: pollViewMode === "cards" ? "rgba(255, 215, 0, 0.22)" : "rgba(255, 255, 255, 0.05)",
+                      border: pollViewMode === "cards" ? "1.5px solid #ffd700" : "1px solid rgba(255, 255, 255, 0.15)",
+                      color: pollViewMode === "cards" ? "#ffd700" : "rgba(255,255,255,0.6)",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <span>🎴</span> รูปแบบการ์ด (Cards)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPollViewMode("table")}
+                    style={{
+                      padding: "7px 15px",
+                      borderRadius: "8px",
+                      background: pollViewMode === "table" ? "rgba(255, 215, 0, 0.22)" : "rgba(255, 255, 255, 0.05)",
+                      border: pollViewMode === "table" ? "1.5px solid #ffd700" : "1px solid rgba(255, 255, 255, 0.15)",
+                      color: pollViewMode === "table" ? "#ffd700" : "rgba(255,255,255,0.6)",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <span>📊</span> รูปแบบตาราง (Table)
+                  </button>
+                </div>
+              </div>
+
+              {/* 1. CARDS VIEW */}
+              {pollViewMode === "cards" ? (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                    gap: "18px",
+                  }}
+                >
                   {filteredPollList.map((p, idx) => {
-                    const avatar = avatarMap.get(p.name) || avatarMap.get(p.nickname) || "";
+                    const avatar = avatarMap.get(p.name) || avatarMap.get(p.nickname) || p.image || "";
                     const rank = Number(p.pollRank || idx + 1);
-                    const isTop3 = rank <= 3;
-                    const percentNum = parseFloat(p.percent) || 0;
+                    const isTop5 = rank <= 5;
+                    const hasVideo = Boolean(p.videoUrl);
 
                     return (
-                      <tr
-                        key={idx}
+                      <div
+                        key={p.id || idx}
+                        onClick={() => setSelectedCandidateModal(p)}
                         style={{
-                          background: isTop3
-                            ? "linear-gradient(90deg, rgba(255, 215, 0, 0.12) 0%, rgba(15, 23, 42, 0.75) 100%)"
-                            : "rgba(255, 255, 255, 0.03)",
-                          borderRadius: "10px",
-                          border: isTop3 ? "1px solid rgba(255, 215, 0, 0.35)" : "1px solid rgba(255, 255, 255, 0.06)",
+                          background: "linear-gradient(150deg, rgba(16, 28, 52, 0.85) 0%, rgba(8, 14, 28, 0.95) 100%)",
+                          border: isTop5 ? "1.5px solid rgba(255, 215, 0, 0.5)" : "1px solid rgba(0, 229, 255, 0.25)",
+                          borderRadius: "16px",
+                          padding: "18px",
+                          display: "flex",
+                          flexDirection: "column",
+                          cursor: "pointer",
+                          position: "relative",
+                          transition: "all 0.2s ease",
+                          boxShadow: isTop5 ? "0 8px 24px rgba(255, 215, 0, 0.12)" : "0 4px 16px rgba(0, 0, 0, 0.4)",
                         }}
                       >
-                        {/* Poll Rank */}
-                        <td style={{ padding: "12px 10px", textAlign: "center" }}>
+                        {/* Top Badges */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                           <span
                             style={{
-                              display: "inline-block",
-                              width: "32px",
-                              height: "32px",
-                              lineHeight: "32px",
-                              borderRadius: "50%",
-                              background:
-                                rank === 1
-                                  ? "linear-gradient(135deg, #ffd700 0%, #b8860b 100%)"
-                                  : rank === 2
-                                  ? "linear-gradient(135deg, #e0e0e0 0%, #9e9e9e 100%)"
-                                  : rank === 3
-                                  ? "linear-gradient(135deg, #cd7f32 0%, #8c4a16 100%)"
-                                  : "rgba(255,255,255,0.08)",
-                              color: isTop3 ? "#030812" : "#fff",
+                              padding: "3px 10px",
+                              borderRadius: "20px",
+                              fontSize: "12px",
                               fontWeight: "900",
-                              fontSize: "13px",
+                              background: isTop5 ? "linear-gradient(90deg, #ffd700, #ff9900)" : "rgba(0, 229, 255, 0.15)",
+                              color: isTop5 ? "#030812" : "#67e8f9",
+                              border: isTop5 ? "none" : "1px solid rgba(0, 229, 255, 0.4)",
                             }}
                           >
-                            #{rank}
+                            #{rank} {isTop5 ? "⭐ Top 5" : ""}
                           </span>
-                        </td>
-
-                        {/* Contestant */}
-                        <td style={{ padding: "12px 10px" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                            <div
+                          {hasVideo && (
+                            <span
                               style={{
-                                width: "40px",
-                                height: "40px",
-                                borderRadius: "50%",
-                                overflow: "hidden",
-                                border: isTop3 ? "1.5px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.5)",
-                                background: "#081020",
-                                flexShrink: 0,
+                                padding: "3px 8px",
+                                borderRadius: "6px",
+                                fontSize: "11px",
+                                fontWeight: "700",
+                                background: "rgba(239, 68, 68, 0.2)",
+                                color: "#fca5a5",
+                                border: "1px solid rgba(239, 68, 68, 0.4)",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
                               }}
                             >
-                              {avatar ? (
-                                <img
-                                  src={getOptimizedImageUrl(avatar, 100)}
-                                  alt={p.name}
-                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                />
-                              ) : (
-                                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                  👤
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <div style={{ fontSize: "14px", fontWeight: "800", color: "#fff" }}>
-                                {p.nickname && <span style={{ color: "#ffd700" }}>({p.nickname})</span>}{" "}
-                                {p.name}
-                              </div>
-                              <div style={{ fontSize: "12px", color: "#94a3b8" }}>
-                                {p.topic}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
+                              <span>🎬</span> มีคลิป
+                            </span>
+                          )}
+                        </div>
 
-                        {/* Percentage */}
-                        <td style={{ padding: "12px 10px", textAlign: "right", fontWeight: "900", color: "#ffd700", fontSize: "15px" }}>
-                          {p.percent}
-                        </td>
-
-                        {/* Progress Bar */}
-                        <td style={{ padding: "12px 10px" }}>
-                          <div
-                            style={{
-                              width: "100%",
-                              height: "10px",
-                              borderRadius: "10px",
-                              background: "rgba(255,255,255,0.08)",
-                              overflow: "hidden",
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: `${Math.min(percentNum * 8, 100)}%`,
-                                height: "100%",
-                                borderRadius: "10px",
-                                background: isTop3
-                                  ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)"
-                                  : "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                              }}
+                        {/* Contestant Photo */}
+                        <div
+                          style={{
+                            width: "92px",
+                            height: "92px",
+                            borderRadius: "50%",
+                            margin: "0 auto 12px auto",
+                            overflow: "hidden",
+                            border: isTop5 ? "2.5px solid #ffd700" : "2px solid #00e5ff",
+                            boxShadow: isTop5 ? "0 0 16px rgba(255, 215, 0, 0.3)" : "0 0 12px rgba(0, 229, 255, 0.25)",
+                            background: "#081020",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {avatar ? (
+                            <img
+                              src={getOptimizedImageUrl(avatar, 180)}
+                              alt={p.name}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
                             />
+                          ) : (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "36px" }}>
+                              👤
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Name & Nickname */}
+                        <div style={{ textAlign: "center", marginBottom: "8px" }}>
+                          <div style={{ fontSize: "15px", fontWeight: "900", color: "#ffffff", lineHeight: "1.3" }}>
+                            {p.name}
                           </div>
-                        </td>
-                      </tr>
+                          {p.nickname && (
+                            <div style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700", marginTop: "2px" }}>
+                              ({p.nickname})
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Topic */}
+                        <div
+                          style={{
+                            background: "rgba(0, 0, 0, 0.35)",
+                            border: "1px solid rgba(0, 229, 255, 0.15)",
+                            borderRadius: "8px",
+                            padding: "8px 10px",
+                            textAlign: "center",
+                            fontSize: "12px",
+                            color: "rgba(255, 255, 255, 0.85)",
+                            marginBottom: "12px",
+                            minHeight: "46px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <span>{p.topic || "-"}</span>
+                        </div>
+
+                        {/* Scores / Percent summary */}
+                        <div style={{ marginTop: "auto", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.55)" }}>
+                            {p.totalScore !== undefined && p.totalScore !== null && p.totalScore > 0
+                              ? `คะแนนเก็บ: ${p.totalScore}`
+                              : "สัดส่วนโหวต"}
+                          </span>
+                          <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700" }}>
+                            {p.percent}
+                          </span>
+                        </div>
+
+                        {/* Click Hint */}
+                        <div style={{ marginTop: "10px", textAlign: "center" }}>
+                          <span style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>
+                            🔍 แตะเพื่อดูคลิป & คะแนนรอบเก็บโพลล์
+                          </span>
+                        </div>
+                      </div>
                     );
                   })}
-                </tbody>
-              </table>
+                </div>
+              ) : (
+                /* 2. TABLE VIEW */
+                <div
+                  style={{
+                    background: "linear-gradient(180deg, rgba(16, 24, 40, 0.95) 0%, rgba(8, 14, 24, 0.98) 100%)",
+                    border: "1.5px solid rgba(255, 215, 0, 0.35)",
+                    borderRadius: "20px",
+                    padding: "20px",
+                    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.6)",
+                    overflowX: "auto",
+                  }}
+                >
+                  <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 8px", minWidth: "650px" }}>
+                    <thead>
+                      <tr style={{ color: "rgba(255,255,255,0.7)", fontSize: "12px", textTransform: "uppercase" }}>
+                        <th style={{ padding: "10px", textAlign: "center", width: "65px" }}>อันดับโพล</th>
+                        <th style={{ padding: "10px", textAlign: "left" }}>ผู้เข้าแข่งขัน & หัวข้อ</th>
+                        <th style={{ padding: "10px", textAlign: "right", width: "120px", color: "#ffd700" }}>สัดส่วนคะแนน</th>
+                        <th style={{ padding: "10px", textAlign: "left", width: "160px" }}>แผนภูมิ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredPollList.map((p, idx) => {
+                        const avatar = avatarMap.get(p.name) || avatarMap.get(p.nickname) || p.image || "";
+                        const rank = Number(p.pollRank || idx + 1);
+                        const isTop3 = rank <= 3;
+                        const percentNum = parseFloat(p.percent) || 0;
+
+                        return (
+                          <tr
+                            key={idx}
+                            onClick={() => setSelectedCandidateModal(p)}
+                            style={{
+                              background: isTop3
+                                ? "linear-gradient(90deg, rgba(255, 215, 0, 0.12) 0%, rgba(15, 23, 42, 0.75) 100%)"
+                                : "rgba(255, 255, 255, 0.03)",
+                              borderRadius: "10px",
+                              border: isTop3 ? "1px solid rgba(255, 215, 0, 0.35)" : "1px solid rgba(255, 255, 255, 0.06)",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {/* Poll Rank */}
+                            <td style={{ padding: "12px 10px", textAlign: "center" }}>
+                              <span
+                                style={{
+                                  display: "inline-block",
+                                  width: "32px",
+                                  height: "32px",
+                                  lineHeight: "32px",
+                                  borderRadius: "50%",
+                                  background:
+                                    rank === 1
+                                      ? "linear-gradient(135deg, #ffd700 0%, #b8860b 100%)"
+                                      : rank === 2
+                                      ? "linear-gradient(135deg, #e0e0e0 0%, #9e9e9e 100%)"
+                                      : rank === 3
+                                      ? "linear-gradient(135deg, #cd7f32 0%, #8c4a16 100%)"
+                                      : "rgba(255,255,255,0.08)",
+                                  color: isTop3 ? "#030812" : "#fff",
+                                  fontWeight: "900",
+                                  fontSize: "13px",
+                                }}
+                              >
+                                #{rank}
+                              </span>
+                            </td>
+
+                            {/* Contestant */}
+                            <td style={{ padding: "12px 10px" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div
+                                  style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    borderRadius: "50%",
+                                    overflow: "hidden",
+                                    border: isTop3 ? "1.5px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.5)",
+                                    background: "#081020",
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {avatar ? (
+                                    <img
+                                      src={getOptimizedImageUrl(avatar, 100)}
+                                      alt={p.name}
+                                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                    />
+                                  ) : (
+                                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                      👤
+                                    </div>
+                                  )}
+                                </div>
+                                <div>
+                                  <div style={{ fontSize: "14px", fontWeight: "800", color: "#fff", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <span>
+                                      {p.name} {p.nickname && <span style={{ color: "#ffd700" }}>({p.nickname})</span>}
+                                    </span>
+                                    {p.videoUrl && (
+                                      <span style={{ fontSize: "11px", background: "rgba(239, 68, 68, 0.2)", color: "#fca5a5", padding: "1px 6px", borderRadius: "4px" }}>
+                                        🎬
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                                    {p.topic}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Percentage */}
+                            <td style={{ padding: "12px 10px", textAlign: "right", fontWeight: "900", color: "#ffd700", fontSize: "15px" }}>
+                              {p.percent}
+                            </td>
+
+                            {/* Progress Bar */}
+                            <td style={{ padding: "12px 10px" }}>
+                              <div
+                                style={{
+                                  width: "100%",
+                                  height: "10px",
+                                  borderRadius: "10px",
+                                  background: "rgba(255,255,255,0.08)",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: `${Math.min(percentNum * 8, 100)}%`,
+                                    height: "100%",
+                                    borderRadius: "10px",
+                                    background: isTop3
+                                      ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)"
+                                      : "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                                  }}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* CANDIDATE DETAIL MODAL */}
+              {selectedCandidateModal && (
+                <div
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: "rgba(0, 0, 0, 0.85)",
+                    backdropFilter: "blur(8px)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 10000,
+                    padding: "20px",
+                  }}
+                  onClick={() => setSelectedCandidateModal(null)}
+                >
+                  <div
+                    style={{
+                      background: "linear-gradient(160deg, #0d192e 0%, #060b14 100%)",
+                      border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                      borderRadius: "20px",
+                      maxWidth: "680px",
+                      width: "100%",
+                      maxHeight: "90vh",
+                      overflowY: "auto",
+                      padding: "24px",
+                      boxShadow: "0 25px 60px rgba(0, 0, 0, 0.9)",
+                      position: "relative",
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Close button */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCandidateModal(null)}
+                      style={{
+                        position: "absolute",
+                        top: "16px",
+                        right: "16px",
+                        background: "rgba(255, 255, 255, 0.1)",
+                        border: "none",
+                        color: "#fff",
+                        width: "34px",
+                        height: "34px",
+                        borderRadius: "50%",
+                        cursor: "pointer",
+                        fontSize: "18px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 1,
+                      }}
+                    >
+                      ✕
+                    </button>
+
+                    {/* Header with Photo, Name, Nickname, Topic */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "18px", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(0, 229, 255, 0.2)" }}>
+                      <div
+                        style={{
+                          width: "80px",
+                          height: "80px",
+                          borderRadius: "50%",
+                          overflow: "hidden",
+                          border: "2.5px solid #ffd700",
+                          boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
+                          flexShrink: 0,
+                          background: "#081020",
+                        }}
+                      >
+                        {(() => {
+                          const avatar = avatarMap.get(selectedCandidateModal.name) || avatarMap.get(selectedCandidateModal.nickname) || selectedCandidateModal.image || "";
+                          return avatar ? (
+                            <img
+                              src={getOptimizedImageUrl(avatar, 160)}
+                              alt={selectedCandidateModal.name}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
+                          ) : (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>
+                              👤
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <div style={{ paddingRight: "40px" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "900", color: "#ffffff", lineHeight: "1.3" }}>
+                          {selectedCandidateModal.name}{" "}
+                          {selectedCandidateModal.nickname && (
+                            <span style={{ color: "#ffd700" }}>({selectedCandidateModal.nickname})</span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: "14px", color: "#00e5ff", fontWeight: "700", marginTop: "3px" }}>
+                          ⭐ แฟนพันธุ์แท้: {selectedCandidateModal.topic || "-"}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)", marginTop: "4px" }}>
+                          อันดับโพลล์ปัจจุบัน: <strong style={{ color: "#ffd700" }}>#{selectedCandidateModal.pollRank || "-"}</strong> ({selectedCandidateModal.percent || "-"})
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Embedded Video (Google Drive / YouTube) */}
+                    {selectedCandidateModal.videoUrl ? (
+                      <div style={{ marginBottom: "22px" }}>
+                        <div style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span>🎬</span> คลิปแนะนำตัว / ผลงาน (Google Drive Video)
+                        </div>
+                        <div
+                          style={{
+                            position: "relative",
+                            width: "100%",
+                            paddingTop: "56.25%",
+                            borderRadius: "14px",
+                            overflow: "hidden",
+                            background: "#000",
+                            border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7)",
+                          }}
+                        >
+                          <iframe
+                            src={getEmbedVideoUrl(selectedCandidateModal.videoUrl)}
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              border: "none",
+                            }}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                            allowFullScreen
+                            title={selectedCandidateModal.name}
+                          />
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {/* Description (Admin ใส่เอง) */}
+                    {selectedCandidateModal.description ? (
+                      <div
+                        style={{
+                          background: "rgba(0, 229, 255, 0.05)",
+                          border: "1px solid rgba(0, 229, 255, 0.2)",
+                          borderRadius: "12px",
+                          padding: "14px 18px",
+                          marginBottom: "20px",
+                        }}
+                      >
+                        <div style={{ fontSize: "13px", fontWeight: "800", color: "#00e5ff", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span>📝</span> ข้อมูลผู้เข้าแข่งขัน
+                        </div>
+                        <p style={{ margin: 0, fontSize: "14px", color: "rgba(255, 255, 255, 0.9)", lineHeight: "1.6", whiteSpace: "pre-line" }}>
+                          {selectedCandidateModal.description}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {/* Scores in Preliminary Round (3 วินาที / คำถาม-คำตอบ / จิ๊กซอว์ / คุณสมบัติ / คะแนนรวม) */}
+                    <div
+                      style={{
+                        background: "linear-gradient(145deg, rgba(16, 32, 60, 0.6) 0%, rgba(8, 16, 32, 0.8) 100%)",
+                        border: "1.5px solid rgba(255, 215, 0, 0.3)",
+                        borderRadius: "14px",
+                        padding: "16px",
+                        marginBottom: "22px",
+                      }}
+                    >
+                      <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffd700", marginBottom: "12px", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span>🏆</span> คะแนนรอบเก็บโพลล์
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", textAlign: "center" }}>
+                        {/* 3 วินาที */}
+                        <div style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(0, 229, 255, 0.2)", borderRadius: "10px", padding: "10px 6px" }}>
+                          <div style={{ fontSize: "11px", color: "#80d0ff", marginBottom: "4px" }}>⚡ 3 วินาที</div>
+                          <div style={{ fontSize: "18px", fontWeight: "900", color: "#ffffff" }}>
+                            {selectedCandidateModal.scores?.["3sec"] !== null && selectedCandidateModal.scores?.["3sec"] !== undefined
+                              ? selectedCandidateModal.scores["3sec"]
+                              : "-"}
+                          </div>
+                        </div>
+
+                        {/* คำถาม-คำตอบ */}
+                        <div style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(0, 229, 255, 0.2)", borderRadius: "10px", padding: "10px 6px" }}>
+                          <div style={{ fontSize: "11px", color: "#80d0ff", marginBottom: "4px" }}>❓ ถาม-ตอบ</div>
+                          <div style={{ fontSize: "18px", fontWeight: "900", color: "#ffffff" }}>
+                            {selectedCandidateModal.scores?.qa !== null && selectedCandidateModal.scores?.qa !== undefined
+                              ? selectedCandidateModal.scores.qa
+                              : "-"}
+                          </div>
+                        </div>
+
+                        {/* จิ๊กซอว์ */}
+                        <div style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(0, 229, 255, 0.2)", borderRadius: "10px", padding: "10px 6px" }}>
+                          <div style={{ fontSize: "11px", color: "#80d0ff", marginBottom: "4px" }}>🧩 จิ๊กซอว์</div>
+                          <div style={{ fontSize: "18px", fontWeight: "900", color: "#ffffff" }}>
+                            {selectedCandidateModal.scores?.jigsaw !== null && selectedCandidateModal.scores?.jigsaw !== undefined
+                              ? selectedCandidateModal.scores.jigsaw
+                              : "-"}
+                          </div>
+                        </div>
+
+                        {/* คุณสมบัติ */}
+                        <div style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(0, 229, 255, 0.2)", borderRadius: "10px", padding: "10px 6px" }}>
+                          <div style={{ fontSize: "11px", color: "#80d0ff", marginBottom: "4px" }}>🔍 คุณสมบัติ</div>
+                          <div style={{ fontSize: "18px", fontWeight: "900", color: "#ffffff" }}>
+                            {selectedCandidateModal.scores?.attribute !== null && selectedCandidateModal.scores?.attribute !== undefined
+                              ? selectedCandidateModal.scores.attribute
+                              : "-"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Total Score */}
+                      <div style={{ marginTop: "14px", paddingTop: "12px", borderTop: "1px solid rgba(255, 215, 0, 0.2)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: "14px", fontWeight: "900", color: "#ffd700" }}>คะแนนรวมรอบเก็บโพลล์:</span>
+                        <span style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700" }}>
+                          {selectedCandidateModal.totalScore !== undefined && selectedCandidateModal.totalScore !== null
+                            ? selectedCandidateModal.totalScore
+                            : (Number(selectedCandidateModal.scores?.["3sec"]) || 0) +
+                              (Number(selectedCandidateModal.scores?.qa) || 0) +
+                              (Number(selectedCandidateModal.scores?.jigsaw) || 0) +
+                              (Number(selectedCandidateModal.scores?.attribute) || 0)}{" "}
+                          <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>คะแนน</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action / Vote CTA button */}
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCandidateModal(null)}
+                        style={{
+                          padding: "10px 20px",
+                          borderRadius: "10px",
+                          background: "rgba(255, 255, 255, 0.08)",
+                          border: "1px solid rgba(255, 255, 255, 0.2)",
+                          color: "#ffffff",
+                          fontSize: "14px",
+                          fontWeight: "700",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ปิดหน้าต่าง
+                      </button>
+                      {pollVotingOpen && (
+                        <Link
+                          href="/poll"
+                          style={{
+                            padding: "10px 24px",
+                            borderRadius: "10px",
+                            background: "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
+                            color: "#030812",
+                            fontSize: "14px",
+                            fontWeight: "900",
+                            textDecoration: "none",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
+                          }}
+                        >
+                          <span>🗳️ ไปโหวตให้ผู้เข้าแข่งขันท่านนี้</span>
+                          <span>→</span>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </section>

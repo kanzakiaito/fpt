@@ -10,221 +10,221 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-        "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-        "นี่คือคุณสมบัติของตัวละครในจักรวาล Magica ที่มีชื่อว่าอะไร?"
+        "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
+        "นี่คือคุณสมบัติของตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
+        "ประโยคต่อไปนี้เป็นของตัวละคร Harry Potter ที่มีชื่อว่าอะไร?"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "Tomoe Mami"
+            "answer": "Hermione Granger"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "Miki Sayaka"
+            "answer": "Luna Lovegood"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "Akemi Homura"
+            "answer": "Cho Chang"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "Momoe Nagisa"
+            "answer": "Nearly Headless Nick (นิกหัวเกือบขาด)"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "Tamaki Iroha"
+            "answer": "Newt Scamander"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "Zi Ding Xiang"
+            "answer": "Vernon Dursley"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "Alina Gray"
+            "answer": "Kingsley Shacklebolt"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "Higure Fuka"
+            "answer": "Antonin Dolohov"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "Nagiboshi Sorana"
+            "answer": "Nymphadora Tonks"
         },
         {
-            "question": "นี่คือภาพสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละคร Harry Potter ที่มีชื่อว่าอะไร?",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "Kaname Madoka"
+            "answer": "Draco Malfoy"
         },
         {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/11.png",
-            "audio": null,
-            "video": null,
-            "answer": "Gertrud"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/12.png",
-            "audio": null,
-            "video": null,
-            "answer": "Gisela"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/13.png",
-            "audio": null,
-            "video": null,
-            "answer": "Walpurgisnacht"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/14.png",
-            "audio": null,
-            "video": null,
-            "answer": "Roberta"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/15.png",
-            "audio": null,
-            "video": null,
-            "answer": "Candy"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/16.png",
-            "audio": null,
-            "video": null,
-            "answer": "Zenobia"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/17.png",
-            "audio": null,
-            "video": null,
-            "answer": "Albertine"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/18.png",
-            "audio": null,
-            "video": null,
-            "answer": "Oktavia von Seckendorff"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/19.png",
-            "audio": null,
-            "video": null,
-            "answer": "Neo Dorothy Motherfucker"
-        },
-        {
-            "question": "นี่คือภาพแม่มดในจักรวาล Magica ที่มีชื่อว่าอะไร?",
-            "image": "public/img/20.png",
-            "audio": null,
-            "video": null,
-            "answer": "Charlotte"
-        },
-        {
-            "question": "สาวน้อยเวทมนตร์ในกลุ่ม Holy Quintet เพียงคนเดียวที่ใช้กระบองเป็นอาวุธ",
+            "question": "อาจารย์สอนวิชาป้องกันตัวจากศาสตร์มืดในภาคนักโทษแห่งอัซคาบัน",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Sakura Kyoko"
+            "answer": "Remus Lupin"
         },
         {
-            "question": "สาวน้อยเวทมนตร์ที่ใช้ \"ฟิล์มภาพยนตร์\" เป็นเอกลักษณ์ของตน",
+            "question": "ผู้สอนการเล่นควิดดิชให้แก่ Harry Potter",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Aki Mabayu"
+            "answer": "Oliver Wood"
         },
         {
-            "question": "แม่มดที่สังหาร Mami ให้หัวขาดและตัวห้อยลอยเหนือพื้น",
+            "question": "แชมป์ร่วมกับ Harry Potter ในการแข่งขันไตรเวทประจำโรงเรียนฮอกวอร์ต",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Charlotte"
+            "answer": "Cedric Diggory"
         },
         {
-            "question": "แมวสุดรักสุดหวงเพียงหนึ่งเดียวของ Madoka",
+            "question": "ผีประจำโรงเรียนฮอกวอร์ต",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Amy"
+            "answer": "Bloody Baron (บารอนเลือด)"
         },
         {
-            "question": "สิ่งมีชีวิตตัวเล็กปริศนา ที่เชิญชวนสร้างพันธะสัญญาในการเป็นสาวน้อยเวทมนตร์",
+            "question": "พ่อเขยของ Ginny Weasley",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Kyubey"
+            "answer": "James Potter"
+        },
+        {
+            "question": "แมงมุมยักษ์พูดได้ของ Rubeus Hagrid",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Aragog"
+        },
+        {
+            "question": "ครูใหญ่ประจำโรงเรียนเวทมนตร์โบซ์บาตง",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Olympe Maxime"
+        },
+        {
+            "question": "อดีตมือปราบมารผู้มีศักดิ์เป็นพี่ชายของ Newt Scamander",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Theseus Scamander"
+        },
+        {
+            "question": "ลูกชายอันเป็นญาติห่างของ Aberforth Dumbledore",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Credence Barebone / Aurelius Dumbledore"
+        },
+        {
+            "question": "นักเรียนแห่งบ้านกริฟฟินดอร์ผู้มีสายฟ้าบนหน้าผาก",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Harry Potter"
+        },
+        {
+            "question": "\"แฮร์รี่ พ่อของเจ้าเป็นคนยโส\"",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Severus Snape"
+        },
+        {
+            "question": "\"ร้ายกาจ!\"",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Ron Weasley"
+        },
+        {
+            "question": "\"ไม่มีใครขอความเห็นเธอ คนเลือดสีโคลนโสโครก\"",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Draco Malfoy"
+        },
+        {
+            "question": "\"ทำไมเวลาเกิดอะไรขึ้น ต้องเป็นพวกเธอสามคนทุกที\"",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Minerva McGonagall"
+        },
+        {
+            "question": "\"10 คะแนนให้บ้านกริฟฟินดอร์\"",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "Albus Dumbledore"
         }
     ],
     "qa": {
-        "question": "จากทุกจักรวาลแห่ง Magica ตั้งแต่ภาคหลัก, ภาคเสริมในภาพยนตร์, Magia Record และ Magia Exedra สาวน้อยเวทมนตร์ที่คำอธิษฐานมีใจความสั้นที่สุดคือใคร / กล่าวไว้ว่าอย่างไร?",
-        "answer": "Tomoe Mami / \"ฉันอยากมีชีวิต\"",
+        "question": "นับตั้งแต่ Harry Potter ภาคศิลาอาถรรพ์ ถึงภาคเครื่องรางยมทูต แฮรรี่ พอตเตอร์ทำแต้มให้บ้านกริฟฟินดอร์ได้ทั้งหมดกี่แต้ม เป็นแต้มบวกกี่แต้ม และถูกหักกี่แต้ม",
+        "answer": "58 แต้ม / 350 แต้ม / 292 แต้ม",
         "audio": null,
         "choices": [
-            "Momoe Nagisa / \"ฉันอยากกินชีสเค้ก\"",
-            "Akemi Homura / \"ฉันอยากพบมาโดกะ\"",
-            "Nanami Yachiyo / \"ฉันอยากเป็นผู้นำ\"",
-            "Lilly Candy / \"ฉันอยากเป็นสุดยอด VTuber\"",
-            "Tomoe Mami / \"ฉันอยากมีชีวิต\""
+            "58 แต้ม / 208 แต้ม / 150 แต้ม",
+            "58 แต้ม / 350 แต้ม / 292 แต้ม",
+            "58 แต้ม / 420 แต้ม / 362 แต้ม",
+            "96 แต้ม / 350 แต้ม / 294 แต้ม",
+            "96 แต้ม / 500 แต้ม / 404 แต้ม"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
+            3,
             4,
-            1,
-            2
+            5
         ]
     },
     "jigsaw": {
-        "mode": "landscape",
+        "mode": "portrait",
         "image": "public/img/jigsaw.png",
-        "answer": "Momoe Nagisa",
-        "question": "หลังจิ๊กซอว์นี้คือตัวละครในจักรวาล Magica ที่มีชื่อว่าอะไร?"
+        "answer": "Albus Dumbledore",
+        "question": "หลังจิ๊กซอว์นี้คือตัวละคร Harry Potter ที่มีชื่อว่าอะไร?"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของสาวน้อยเวทมนตร์ในจักรวาล Magica ที่มีชื่อว่าอะไร?",
+        "question": "นี่คือคุณสมบัติของตัวละครใน Harry Potter ที่มีชื่อว่าอะไร",
         "clues": [
-            "เป็นสาวน้อยเวทมนตร์ที่ปรากฏใน Magia Record",
-            "ใช้ธนูเป็นอาวุธ",
-            "Soul Gem ประจำตัวมีสีชมพู",
-            "เป็นสาวน้อยเวทมนตร์ที่ปรากฏในภาพยนตร์ภาค Walpurgisnacht Rising",
-            "เป็นสาวน้อยเวทมนตร์ในกลุ่ม Holy Quintet"
+            "ปรากฏตัวครั้งแรกใน \"แฮร์รี่ พอตเตอร์กับศิลาอาถรรพ์\"",
+            "1 ในผู้ถูกร่ายคำสาปโทษผิดสถานเดียวใส่",
+            "หมวกคัดสรรคัดให้คน ๆ นี้อยู่บ้านกริฟฟินดอร์",
+            "เป็นคนในตระกูลพอตเตอร์",
+            "ปัจจุบันยังมีชีวิตอยู่"
         ],
-        "answer": "Kaname Madoka"
+        "answer": "Harry Potter (แฮรี่ พอตเตอร์)"
     },
     "battle": {
         "player1": {

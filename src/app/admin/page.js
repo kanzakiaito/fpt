@@ -237,6 +237,18 @@ export default function AdminPage() {
   const [loadingPoll, setLoadingPoll] = useState(false);
   const [savingPoll, setSavingPoll] = useState(false);
   const [pollNotice, setPollNotice] = useState("");
+  const [editingPollCandidate, setEditingPollCandidate] = useState(null);
+  const [pollCandidateForm, setPollCandidateForm] = useState({
+    id: "",
+    name: "",
+    nickname: "",
+    topic: "",
+    description: "",
+    videoUrl: "",
+    scores: { "3sec": "", qa: "", jigsaw: "", attribute: "" },
+    totalScore: "",
+  });
+  const [savingCandidateDetails, setSavingCandidateDetails] = useState(false);
 
   // History & Hall of Fame Admin States
   const [adminHistoryData, setAdminHistoryData] = useState(null);
@@ -687,7 +699,7 @@ export default function AdminPage() {
   const loadPoll = async () => {
     setLoadingPoll(true);
     try {
-      const res = await fetch(`/api/poll?t=${Date.now()}`, { cache: "no-store" });
+      const res = await fetch(`/api/poll?admin=1&t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setPollItems(data.data);
@@ -973,6 +985,98 @@ export default function AdminPage() {
       alert("เกิดข้อผิดพลาดในการรีเซ็ตผลโพลล์");
     } finally {
       setSavingPoll(false);
+    }
+  };
+
+  const handleOpenEditCandidate = (item) => {
+    setEditingPollCandidate(item);
+    setPollCandidateForm({
+      id: item.id || "",
+      name: item.name || "",
+      nickname: item.nickname || "",
+      topic: item.topic || "",
+      description: item.description || "",
+      videoUrl: item.videoUrl || "",
+      scores: {
+        "3sec": item.scores?.["3sec"] !== null && item.scores?.["3sec"] !== undefined ? item.scores["3sec"] : "",
+        qa: item.scores?.qa !== null && item.scores?.qa !== undefined ? item.scores.qa : "",
+        jigsaw: item.scores?.jigsaw !== null && item.scores?.jigsaw !== undefined ? item.scores.jigsaw : "",
+        attribute: item.scores?.attribute !== null && item.scores?.attribute !== undefined ? item.scores.attribute : "",
+      },
+      totalScore: item.totalScore !== null && item.totalScore !== undefined ? item.totalScore : "",
+    });
+  };
+
+  const handleScoreChange = (category, value) => {
+    setPollCandidateForm((prev) => {
+      const newScores = { ...prev.scores, [category]: value };
+      const s3 = Number(newScores["3sec"]) || 0;
+      const sq = Number(newScores.qa) || 0;
+      const sj = Number(newScores.jigsaw) || 0;
+      const sa = Number(newScores.attribute) || 0;
+      const calcTotal = s3 + sq + sj + sa;
+      return {
+        ...prev,
+        scores: newScores,
+        totalScore: calcTotal,
+      };
+    });
+  };
+
+  const handleSaveCandidateDetails = async () => {
+    if (!editingPollCandidate) return;
+    setSavingCandidateDetails(true);
+    try {
+      const payload = {
+        action: "save_candidate_details",
+        id: pollCandidateForm.id,
+        name: pollCandidateForm.name,
+        nickname: pollCandidateForm.nickname,
+        topic: pollCandidateForm.topic,
+        description: pollCandidateForm.description,
+        videoUrl: pollCandidateForm.videoUrl,
+        scores: {
+          "3sec": pollCandidateForm.scores["3sec"] !== "" ? Number(pollCandidateForm.scores["3sec"]) : null,
+          qa: pollCandidateForm.scores.qa !== "" ? Number(pollCandidateForm.scores.qa) : null,
+          jigsaw: pollCandidateForm.scores.jigsaw !== "" ? Number(pollCandidateForm.scores.jigsaw) : null,
+          attribute: pollCandidateForm.scores.attribute !== "" ? Number(pollCandidateForm.scores.attribute) : null,
+        },
+        totalScore: Number(pollCandidateForm.totalScore) || 0,
+      };
+      const res = await fetch("/api/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("บันทึกข้อมูลและคลิปเรียบร้อยแล้ว");
+        setPollItems((prev) =>
+          prev.map((item) => {
+            if (
+              (payload.id && String(item.id) === String(payload.id)) ||
+              (payload.name && item.name === payload.name)
+            ) {
+              return {
+                ...item,
+                description: payload.description,
+                videoUrl: payload.videoUrl,
+                scores: payload.scores,
+                totalScore: payload.totalScore,
+              };
+            }
+            return item;
+          })
+        );
+        setEditingPollCandidate(null);
+      } else {
+        alert("เกิดข้อผิดพลาด: " + (data.error || "ไม่สามารถบันทึกได้"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    } finally {
+      setSavingCandidateDetails(false);
     }
   };
 
@@ -5061,6 +5165,7 @@ export default function AdminPage() {
                     <th style={{ padding: "12px 14px", textAlign: "left", width: "130px", color: "#80d0ff" }}>ชื่อเล่น</th>
                     <th style={{ padding: "12px 14px", textAlign: "left", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
                     <th style={{ padding: "12px 14px", textAlign: "center", width: "130px", color: "#80d0ff" }}>คิดเป็น %</th>
+                    <th style={{ padding: "12px 14px", textAlign: "center", width: "140px", color: "#ffd700" }}>โปรไฟล์ & คลิป</th>
                     <th style={{ padding: "12px 14px", textAlign: "center", width: "110px", color: "#80d0ff" }}>เลื่อนลำดับ</th>
                     <th style={{ padding: "12px 14px", textAlign: "center", width: "80px", color: "#80d0ff" }}>ลบ</th>
                   </tr>
@@ -5173,6 +5278,32 @@ export default function AdminPage() {
                           />
                         </td>
 
+                        {/* Profile & Video Button */}
+                        <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditCandidate(item)}
+                            title="แก้ไขคำอธิบาย, ลิงก์คลิป Google Drive, และคะแนนรอบเก็บโพลล์"
+                            style={{
+                              padding: "6px 10px",
+                              borderRadius: "6px",
+                              background: item.videoUrl || item.description ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 255, 255, 0.08)",
+                              border: item.videoUrl || item.description ? "1px solid #00e5ff" : "1px solid rgba(255, 255, 255, 0.2)",
+                              color: item.videoUrl || item.description ? "#00e5ff" : "rgba(255,255,255,0.7)",
+                              fontSize: "12px",
+                              fontWeight: "700",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              whiteSpace: "nowrap"
+                            }}
+                          >
+                            <span>🎬</span>
+                            <span>{item.videoUrl ? "มีคลิปแล้ว" : "ข้อมูล/คลิป"}</span>
+                          </button>
+                        </td>
+
                         {/* Reorder Buttons */}
                         <td style={{ padding: "8px 10px", textAlign: "center" }}>
                           <div style={{ display: "inline-flex", gap: "4px" }}>
@@ -5250,7 +5381,7 @@ export default function AdminPage() {
 
                   {pollItems.length === 0 && (
                     <tr>
-                      <td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.4)" }}>
+                      <td colSpan={8} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.4)" }}>
                         ยังไม่มีข้อมูลในตารางอันดับโพลล์ กดปุ่ม "➕ เพิ่มคนในโพลล์" หรือ "🔄 รีเซ็ตค่าเริ่มต้น" เพื่อเริ่มต้น
                       </td>
                     </tr>
@@ -5283,6 +5414,250 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
+
+            {/* Candidate Profile & Video Edit Modal */}
+            {editingPollCandidate && (
+              <div style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                backdropFilter: "blur(6px)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 9999,
+                padding: "20px"
+              }}>
+                <div style={{
+                  background: "linear-gradient(145deg, #0d192e 0%, #060b14 100%)",
+                  border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                  borderRadius: "16px",
+                  maxWidth: "600px",
+                  width: "100%",
+                  maxHeight: "90vh",
+                  overflowY: "auto",
+                  padding: "24px",
+                  boxShadow: "0 20px 50px rgba(0, 0, 0, 0.8)"
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", borderBottom: "1px solid rgba(0,229,255,0.2)", paddingBottom: "12px" }}>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "800", color: "#ffd700", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span>🎬</span> แก้ไขข้อมูลและคลิปผู้เข้าแข่งขัน
+                      </h3>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#80d0ff" }}>
+                        {pollCandidateForm.name} ({pollCandidateForm.nickname}) - {pollCandidateForm.topic}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingPollCandidate(null)}
+                      style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: "22px", cursor: "pointer", lineHeight: "1" }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {/* Description */}
+                    <div>
+                      <label style={{ display: "block", fontSize: "13px", fontWeight: "700", color: "#ffd700", marginBottom: "6px" }}>
+                        📝 คำอธิบาย (Admin ใส่เอง แสดงในการ์ดผู้เข้าแข่งขัน):
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={pollCandidateForm.description}
+                        onChange={(e) => setPollCandidateForm({ ...pollCandidateForm, description: e.target.value })}
+                        placeholder="พิมพ์ประวัติ ผลงาน หรือคำอธิบายเกี่ยวกับผู้เข้าแข่งขันท่านนี้..."
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1px solid rgba(0,229,255,0.3)",
+                          color: "#fff",
+                          fontSize: "13px",
+                          lineHeight: "1.5"
+                        }}
+                      />
+                    </div>
+
+                    {/* Google Drive Video URL */}
+                    <div>
+                      <label style={{ display: "block", fontSize: "13px", fontWeight: "700", color: "#00e5ff", marginBottom: "6px" }}>
+                        🎬 ลิงก์คลิปจาก Google Drive (หรือ YouTube):
+                      </label>
+                      <input
+                        type="text"
+                        value={pollCandidateForm.videoUrl}
+                        onChange={(e) => setPollCandidateForm({ ...pollCandidateForm, videoUrl: e.target.value })}
+                        placeholder="https://drive.google.com/file/d/.../view?usp=sharing"
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1px solid rgba(0,229,255,0.3)",
+                          color: "#fff",
+                          fontSize: "13px"
+                        }}
+                      />
+                      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "4px", display: "block" }}>
+                        💡 วางลิงก์แชร์ของ Google Drive (ตั้งค่า Anyone with link can view) หรือ YouTube ระบบจะแปลงเป็น Embed ให้อัตโนมัติ
+                      </span>
+                    </div>
+
+                    {/* Scores Section */}
+                    <div style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,215,0,0.25)", borderRadius: "10px", padding: "14px" }}>
+                      <div style={{ fontSize: "13px", fontWeight: "700", color: "#ffd700", marginBottom: "10px" }}>
+                        🏆 คะแนนรอบเก็บโพลล์ (4 หมวดการแข่งขัน):
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.8)", marginBottom: "4px" }}>
+                            ⚡ 3 วินาที (คะแนน):
+                          </label>
+                          <input
+                            type="number"
+                            value={pollCandidateForm.scores["3sec"]}
+                            onChange={(e) => handleScoreChange("3sec", e.target.value)}
+                            placeholder="0"
+                            style={{
+                              width: "100%",
+                              padding: "8px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(0,229,255,0.3)",
+                              color: "#fff",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.8)", marginBottom: "4px" }}>
+                            ❓ คำถาม-คำตอบ (คะแนน):
+                          </label>
+                          <input
+                            type="number"
+                            value={pollCandidateForm.scores.qa}
+                            onChange={(e) => handleScoreChange("qa", e.target.value)}
+                            placeholder="0"
+                            style={{
+                              width: "100%",
+                              padding: "8px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(0,229,255,0.3)",
+                              color: "#fff",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.8)", marginBottom: "4px" }}>
+                            🧩 จิ๊กซอว์ (คะแนน):
+                          </label>
+                          <input
+                            type="number"
+                            value={pollCandidateForm.scores.jigsaw}
+                            onChange={(e) => handleScoreChange("jigsaw", e.target.value)}
+                            placeholder="0"
+                            style={{
+                              width: "100%",
+                              padding: "8px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(0,229,255,0.3)",
+                              color: "#fff",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.8)", marginBottom: "4px" }}>
+                            🔍 คุณสมบัติ (คะแนน):
+                          </label>
+                          <input
+                            type="number"
+                            value={pollCandidateForm.scores.attribute}
+                            onChange={(e) => handleScoreChange("attribute", e.target.value)}
+                            placeholder="0"
+                            style={{
+                              width: "100%",
+                              padding: "8px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(0,229,255,0.3)",
+                              color: "#fff",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700" }}>คะแนนรวม:</span>
+                        <input
+                          type="number"
+                          value={pollCandidateForm.totalScore}
+                          onChange={(e) => setPollCandidateForm({ ...pollCandidateForm, totalScore: e.target.value })}
+                          style={{
+                            width: "110px",
+                            padding: "8px",
+                            borderRadius: "6px",
+                            background: "#050b14",
+                            border: "1px solid #ffd700",
+                            color: "#ffd700",
+                            fontSize: "15px",
+                            fontWeight: "800",
+                            textAlign: "right"
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Modal Actions */}
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
+                      <button
+                        type="button"
+                        onClick={() => setEditingPollCandidate(null)}
+                        style={{
+                          padding: "10px 18px",
+                          borderRadius: "8px",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          color: "#fff",
+                          fontSize: "13px",
+                          fontWeight: "700",
+                          cursor: "pointer"
+                        }}
+                      >
+                        ยกเลิก
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveCandidateDetails}
+                        disabled={savingCandidateDetails}
+                        style={{
+                          padding: "10px 22px",
+                          borderRadius: "8px",
+                          background: "linear-gradient(90deg, #00e5ff 0%, #00a8ff 100%)",
+                          border: "none",
+                          color: "#030812",
+                          fontSize: "13px",
+                          fontWeight: "800",
+                          cursor: savingCandidateDetails ? "not-allowed" : "pointer",
+                          boxShadow: "0 0 14px rgba(0,229,255,0.4)"
+                        }}
+                      >
+                        {savingCandidateDetails ? "⏳ กำลังบันทึก..." : "💾 บันทึกข้อมูลและคลิป"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

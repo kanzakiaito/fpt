@@ -9,6 +9,26 @@ export const revalidate = 0;
 
 const POLL_FILE = path.join(process.cwd(), "src/app/data/poll.json");
 const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
+const LEADERBOARD_FILE = path.join(process.cwd(), "src/app/data/leaderboard.json");
+const GAME_LEADERBOARD_FILE = path.join(process.cwd(), "src/app/data/game_leaderboard.json");
+
+function readLocalGameLeaderboard() {
+  try {
+    if (fs.existsSync(GAME_LEADERBOARD_FILE)) {
+      return JSON.parse(fs.readFileSync(GAME_LEADERBOARD_FILE, "utf-8"));
+    }
+  } catch (e) {}
+  return [];
+}
+
+function readLocalMainLeaderboard() {
+  try {
+    if (fs.existsSync(LEADERBOARD_FILE)) {
+      return JSON.parse(fs.readFileSync(LEADERBOARD_FILE, "utf-8"));
+    }
+  } catch (e) {}
+  return [];
+}
 
 function getAudition2026() {
   return historyData?.seasons?.["2026"]?.audition || [];
@@ -129,6 +149,8 @@ export async function GET(req) {
 
     let items = Array.isArray(pollData) && pollData.length > 0 ? pollData : [...DEFAULT_POLL];
     const auditions = getAudition2026();
+    const gameLeaderboard = readLocalGameLeaderboard();
+    const mainLeaderboard = readLocalMainLeaderboard();
 
     // Ensure all 28 contestants of 2026 exist in items
     auditions.forEach((c) => {
@@ -147,37 +169,75 @@ export async function GET(req) {
           votes: 10,
           image: c.image || "",
           id: String(c.order || items.length + 1),
+          description: "",
+          videoUrl: "",
+          scores: { "3sec": null, qa: null, jigsaw: null, attribute: null },
+          totalScore: 0,
         });
       }
     });
 
-    // Merge latest photos and IDs from audition
+    // Merge latest photos, IDs, description, videoUrl, and scores
     const enriched = items.map((item, idx) => {
       const matchedAud = auditions.find(
         (c) =>
           (c.name && item.name && c.name.trim() === item.name.trim()) ||
           (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
       );
+      const matchedGame = gameLeaderboard.find(
+        (g) =>
+          (g.name && item.name && g.name.trim() === item.name.trim()) ||
+          (g.nickname && item.nickname && g.nickname.trim() === item.nickname.trim())
+      );
+      const matchedMain = mainLeaderboard.find(
+        (l) =>
+          (l.name && item.name && l.name.trim() === item.name.trim()) ||
+          (l.nickname && item.nickname && l.nickname.trim() === item.nickname.trim())
+      );
+
+      const fallbackScores = matchedGame?.scores || matchedMain?.scores || {
+        "3sec": null,
+        qa: null,
+        jigsaw: null,
+        attribute: null,
+      };
+      const fallbackTotal = matchedGame?.totalScore ?? matchedMain?.totalScore ?? 0;
+
       return {
         ...item,
         id: item.id || (matchedAud?.order ? String(matchedAud.order) : String(idx + 1)),
-        image: (matchedAud && matchedAud.image) ? matchedAud.image : (item.image || ""),
+        image: (matchedAud && matchedAud.image) ? matchedAud.image : (item.image || matchedGame?.image || matchedMain?.image || ""),
         nickname: item.nickname || matchedAud?.nickname || "",
         name: item.name || matchedAud?.name || "",
         topic: item.topic || matchedAud?.topic || "-",
         votes: Number(item.votes) || 0,
+        description: item.description || "",
+        videoUrl: item.videoUrl || "",
+        scores: item.scores || fallbackScores,
+        totalScore: item.totalScore !== undefined && item.totalScore !== null ? Number(item.totalScore) : fallbackTotal,
       };
     });
 
     // Contestants list formatted for ballot picker
-    const candidates = auditions.map((c, idx) => ({
-      id: String(c.order || idx + 1),
-      order: c.order || idx + 1,
-      name: c.name,
-      nickname: c.nickname,
-      topic: c.topic,
-      image: c.image || "",
-    }));
+    const candidates = auditions.map((c, idx) => {
+      const matchedEnriched = enriched.find(
+        (e) =>
+          (e.name && c.name && e.name.trim() === c.name.trim()) ||
+          (e.nickname && c.nickname && e.nickname.trim() === c.nickname.trim())
+      );
+      return {
+        id: String(c.order || idx + 1),
+        order: c.order || idx + 1,
+        name: c.name,
+        nickname: c.nickname,
+        topic: c.topic,
+        image: c.image || (matchedEnriched && matchedEnriched.image) || "",
+        description: matchedEnriched?.description || "",
+        videoUrl: matchedEnriched?.videoUrl || "",
+        scores: matchedEnriched?.scores || { "3sec": null, qa: null, jigsaw: null, attribute: null },
+        totalScore: matchedEnriched?.totalScore || 0,
+      };
+    });
 
     let outputData = enriched;
     if (isScoreHidden) {
@@ -402,13 +462,65 @@ export async function POST(request) {
         percent: String(item.percent || "").trim() || "0.00%",
         votes: Number(item.votes) || 0,
         image: item.image || "",
+        description: item.description !== undefined ? String(item.description) : "",
+        videoUrl: item.videoUrl !== undefined ? String(item.videoUrl) : "",
+        scores: item.scores || null,
+        totalScore: item.totalScore !== undefined && item.totalScore !== null ? Number(item.totalScore) : 0,
       }));
       sanitized.sort((a, b) => a.pollRank - b.pollRank);
       await saveKVData("fpt_poll", sanitized, writeLocalPoll);
       return NextResponse.json({ success: true, data: sanitized, message: "บันทึกผลโพลล์ทั้งหมดเรียบร้อยแล้ว" });
     }
 
-    // 5. Delete Item
+    // 5. Update Candidate Details (Admin: description, videoUrl, scores, totalScore)
+    if (action === "save_candidate_details" || action === "update_candidate_details") {
+      let current = (await getKVData("fpt_poll", readLocalPoll)) || [...DEFAULT_POLL];
+      const { id, name, nickname, description, videoUrl, scores, totalScore } = body;
+
+      let found = false;
+      current = current.map((item) => {
+        const matchesId = id && String(item.id) === String(id);
+        const matchesName = name && item.name && item.name.trim() === String(name).trim();
+        const matchesNick = nickname && item.nickname && item.nickname.trim() === String(nickname).trim();
+        if (matchesId || matchesName || matchesNick) {
+          found = true;
+          return {
+            ...item,
+            description: description !== undefined ? String(description) : (item.description || ""),
+            videoUrl: videoUrl !== undefined ? String(videoUrl) : (item.videoUrl || ""),
+            scores: scores !== undefined ? scores : (item.scores || null),
+            totalScore: totalScore !== undefined ? Number(totalScore) : (item.totalScore || 0),
+          };
+        }
+        return item;
+      });
+
+      if (!found && (id || name)) {
+        current.push({
+          id: String(id || current.length + 1),
+          pollRank: current.length + 1,
+          name: String(name || ""),
+          nickname: String(nickname || ""),
+          topic: body.topic || "",
+          percent: "0.00%",
+          votes: 0,
+          image: body.image || "",
+          description: description || "",
+          videoUrl: videoUrl || "",
+          scores: scores || null,
+          totalScore: totalScore || 0,
+        });
+      }
+
+      await saveKVData("fpt_poll", current, writeLocalPoll);
+      return NextResponse.json({
+        success: true,
+        data: current,
+        message: "บันทึกข้อมูลและคลิปของผู้เข้าแข่งขันเรียบร้อยแล้ว",
+      });
+    }
+
+    // 6. Delete Item
     if (action === "delete" && body.pollRank) {
       let current = (await getKVData("fpt_poll", readLocalPoll)) || [...DEFAULT_POLL];
       current = current.filter((item) => Number(item.pollRank) !== Number(body.pollRank));

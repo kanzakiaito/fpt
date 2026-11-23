@@ -590,5 +590,37 @@
     "image": "",
     "createdAt": "2026-11-16T16:59:55.454Z",
     "updatedAt": "2026-11-16T17:30:38.339Z"
+  },
+  {
+    "id": "1795187394910",
+    "name": "ปรมัย สมเภาว์มาลย์",
+    "nickname": "ทาโร่",
+    "topic": "Metal Heroes",
+    "scores": {
+      "3sec": 8,
+      "qa": 20,
+      "jigsaw": 20,
+      "attribute": 0
+    },
+    "totalScore": 48,
+    "image": "",
+    "createdAt": "2026-11-20T15:09:54.965Z",
+    "updatedAt": "2026-11-20T16:34:56.635Z"
+  },
+  {
+    "id": "1795192920082",
+    "name": "พัทธ์ศีล ปุญศิริ",
+    "nickname": "ศีล",
+    "topic": "Puella Magi Madoka Magica",
+    "scores": {
+      "3sec": 15,
+      "qa": 20,
+      "jigsaw": 20,
+      "attribute": 20
+    },
+    "totalScore": 75,
+    "image": "",
+    "createdAt": "2026-11-20T16:42:00.131Z",
+    "updatedAt": "2026-11-20T18:04:06.823Z"
   }
 ]
