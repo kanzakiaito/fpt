@@ -3645,12 +3645,12 @@ export default function TrialAdminPage() {
                   <span style={{ fontSize: "24px" }}>🛡️</span>
                   <div>
                     <div style={{ fontSize: "14px", fontWeight: "900", color: "#fca5a5" }}>
-                      โหมดกันสปอยล์ฝั่งแอดมินกำลังทำงาน (Admin Spoiler Shield Active)
+                      โหมดกันสปอยล์กำลังทำงาน (Admin Spoiler Shield Active)
                     </div>
                     <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.75)" }}>
                       {adminRevealPollScores
-                        ? "👁️ กำลังเปิดเผยตัวเลขคะแนนจริงชั่วคราวเพื่อการตรวจสอบ/แก้ไข"
-                        : "ตัวเลขคะแนนโหวตและอันดับทั้งหมดถูกซ่อนไว้ เพื่อไม่ให้ทีมงาน/แอดมินเห็นผลสปอยล์"}
+                        ? "👁️ กำลังเปิดเผยตัวเลขคะแนนโหวตมหาชนชั่วคราวเพื่อการตรวจสอบ/แก้ไข"
+                        : "ซ่อนคะแนนโหวตมหาชนและอันดับ (อนุญาตให้เปิดและแสดงเฉพาะคะแนนเก็บโพลล์ What If 30%)"}
                     </div>
                   </div>
                 </div>
@@ -3672,7 +3672,7 @@ export default function TrialAdminPage() {
                     gap: "6px",
                   }}
                 >
-                  {adminRevealPollScores ? "🙈 ซ่อนคะแนนจริง (เปิดม่านกันสปอยล์)" : "👁️ เผยคะแนนชั่วคราว (Peek Real Scores)"}
+                  {adminRevealPollScores ? "🙈 ซ่อนคะแนนโหวตมหาชน (เปิดม่านกันสปอยล์)" : "👁️ เผยคะแนนโหวตมหาชนชั่วคราว (Peek Votes)"}
                 </button>
               </div>
             )}
@@ -3875,45 +3875,41 @@ export default function TrialAdminPage() {
                           />
                         </td>
 
-                        {/* What If Score Input (เต็ม 100, คิดเป็น 30%) */}
+                        {/* What If Score Input (เต็ม 100, คิดเป็น 30%) - อนุญาตให้เปิดแสดงเสมอ */}
                         <td style={{ padding: "6px 4px", textAlign: "center", background: "rgba(255, 136, 0, 0.05)", borderLeft: "1px solid rgba(255, 136, 0, 0.3)" }}>
-                          {isPollScoreMasked ? (
-                            <span style={{ fontSize: "12px", color: "#ffa940", fontWeight: "800" }}>🔒 ซ่อน</span>
-                          ) : (
-                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-                              <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={item.whatIfScore ?? 0}
-                                onChange={(e) => {
-                                  const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                  handlePollFieldChange(index, "whatIfScore", val);
-                                }}
-                                title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100 คะแนน คิดเป็น 30% ของคะแนนรวม)"
-                                style={{
-                                  width: "56px",
-                                  padding: "6px 2px",
-                                  borderRadius: "6px",
-                                  background: "#050b14",
-                                  border: "1px solid rgba(255, 136, 0, 0.7)",
-                                  color: "#ff8800",
-                                  fontSize: "13px",
-                                  fontWeight: "900",
-                                  textAlign: "center",
-                                }}
-                              />
-                              {(() => {
-                                const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
-                                const whatIfPct30 = totalWhatIf > 0 ? ((Number(item.whatIfScore) || 0) / totalWhatIf) * 30 : 0;
-                                return (
-                                  <span style={{ fontSize: "10px", color: "#fb923c", fontWeight: "700" }} title="สัดส่วนในโควต้า 30% ของโพลล์ (คะแนนคนนี้ ÷ คะแนนรวมทุกคน x 30%)">
-                                    = {whatIfPct30.toFixed(2)}%
-                                  </span>
-                                );
-                              })()}
-                            </div>
-                          )}
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={item.whatIfScore ?? 0}
+                              onChange={(e) => {
+                                const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                handlePollFieldChange(index, "whatIfScore", val);
+                              }}
+                              title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100 คะแนน คิดเป็น 30% ของคะแนนรวม)"
+                              style={{
+                                width: "56px",
+                                padding: "6px 2px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(255, 136, 0, 0.7)",
+                                color: "#ff8800",
+                                fontSize: "13px",
+                                fontWeight: "900",
+                                textAlign: "center",
+                              }}
+                            />
+                            {(() => {
+                              const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
+                              const whatIfPct30 = totalWhatIf > 0 ? ((Number(item.whatIfScore) || 0) / totalWhatIf) * 30 : 0;
+                              return (
+                                <span style={{ fontSize: "10px", color: "#fb923c", fontWeight: "700" }} title="สัดส่วนในโควต้า 30% ของโพลล์ (คะแนนคนนี้ ÷ คะแนนรวมทุกคน x 30%)">
+                                  = {whatIfPct30.toFixed(2)}%
+                                </span>
+                              );
+                            })()}
+                          </div>
                         </td>
 
                         {/* Rank 1 votes */}

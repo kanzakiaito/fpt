@@ -3113,7 +3113,7 @@ export default function TrialFOTYPage() {
                                         }}
                                       >
                                         <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                          {(isScoreHidden && !isAdmin) ? "🔒" : (sc !== null && sc !== undefined && sc !== "" ? sc : "–")}
+                                          {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
                                         </span>
                                       </div>
                                     );
@@ -3138,7 +3138,7 @@ export default function TrialFOTYPage() {
                                         }}
                                       >
                                         <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                          {(isScoreHidden && !isAdmin) ? "🔒" : (sc !== null && sc !== undefined && sc !== "" ? sc : "–")}
+                                          {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
                                         </span>
                                       </div>
                                     );
@@ -3163,7 +3163,7 @@ export default function TrialFOTYPage() {
                                         }}
                                       >
                                         <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                          {(isScoreHidden && !isAdmin) ? "🔒" : (sc !== null && sc !== undefined && sc !== "" ? sc : "–")}
+                                          {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
                                         </span>
                                       </div>
                                     );
@@ -3188,7 +3188,7 @@ export default function TrialFOTYPage() {
                                         }}
                                       >
                                         <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                          {(isScoreHidden && !isAdmin) ? "🔒" : (sc !== null && sc !== undefined && sc !== "" ? sc : "–")}
+                                          {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
                                         </span>
                                       </div>
                                     );
@@ -3224,7 +3224,7 @@ export default function TrialFOTYPage() {
                                     textShadow: isScheduled ? "none" : "0 2px 6px rgba(0, 0, 0, 0.9)",
                                   }}
                                 >
-                                  {(isScheduled) ? "–" : ((isScoreHidden && !isAdmin) ? "🔒" : (item.finalWarmupScore ?? 0))}
+                                  {isScheduled ? "–" : (item.finalWarmupScore ?? 0)}
                                 </span>
                               </div>
                             </div>
@@ -4408,7 +4408,7 @@ export default function TrialFOTYPage() {
                       {cat.label}
                     </div>
                     <div style={{ fontSize: "24px", fontWeight: "900", color: cat.color }}>
-                      {(isScoreHidden && !isAdmin) ? "🔒" : (selectedSpotlight.scores?.[cat.key] ?? "–")}
+                      {selectedSpotlight.scores?.[cat.key] ?? "–"}
                     </div>
                   </div>
                 ))}
@@ -4430,11 +4430,11 @@ export default function TrialFOTYPage() {
                 <div>
                   <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.65)" }}>คะแนนเก็บโพลล์รวม:</div>
                   <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff" }}>
-                    {(isScoreHidden && !isAdmin) ? "🛡️ ซ่อนอันดับ (โหมดกันสปอยล์)" : (selectedSpotlight.rank ? `อันดับที่ #${selectedSpotlight.rank}` : selectedSpotlight.pollRank ? `อันดับโพลล์ #${selectedSpotlight.pollRank}` : "ยังไม่มีอันดับทางการ")}
+                    {isScoreHidden ? "🛡️ ซ่อนอันดับ (โหมดกันสปอยล์)" : (selectedSpotlight.rank ? `อันดับที่ #${selectedSpotlight.rank}` : selectedSpotlight.pollRank ? `อันดับโพลล์ #${selectedSpotlight.pollRank}` : "ยังไม่มีอันดับทางการ")}
                   </div>
                 </div>
                 <div style={{ fontSize: "30px", fontWeight: "900", color: "#ffd700" }}>
-                  {(isScoreHidden && !isAdmin) ? "🔒 ซ่อนคะแนน" : <>{selectedSpotlight.totalScore ?? 0} <span style={{ fontSize: "16px", color: "rgba(255,255,255,0.5)" }}>/ 100</span></>}
+                  {selectedSpotlight.totalScore ?? 0} <span style={{ fontSize: "16px", color: "rgba(255,255,255,0.5)" }}>/ 100</span>
                 </div>
               </div>
 
