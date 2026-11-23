@@ -177,6 +177,27 @@ export async function GET(req) {
       }
     });
 
+    // Calculate official contestant audition sequence order (1..22)
+    const sortedByAudition = [...items].sort((a, b) => {
+      const idxA = auditions.findIndex(
+        (c) =>
+          (c.name && a.name && c.name.trim() === a.name.trim()) ||
+          (c.nickname && a.nickname && c.nickname.trim() === a.nickname.trim())
+      );
+      const idxB = auditions.findIndex(
+        (c) =>
+          (c.name && b.name && c.name.trim() === b.name.trim()) ||
+          (c.nickname && b.nickname && c.nickname.trim() === b.nickname.trim())
+      );
+      return (idxA >= 0 ? idxA : 999) - (idxB >= 0 ? idxB : 999);
+    });
+
+    const auditionOrderMap = new Map();
+    sortedByAudition.forEach((it, i) => {
+      if (it.name) auditionOrderMap.set(it.name.trim(), i + 1);
+      if (it.nickname) auditionOrderMap.set(it.nickname.trim(), i + 1);
+    });
+
     // Merge latest photos, IDs, description, videoUrl, and scores
     const enriched = items.map((item, idx) => {
       const matchedAud = auditions.find(
@@ -203,9 +224,15 @@ export async function GET(req) {
       };
       const fallbackTotal = matchedGame?.totalScore ?? matchedMain?.totalScore ?? 0;
 
+      const officialOrder =
+        (item.name && auditionOrderMap.get(item.name.trim())) ||
+        (item.nickname && auditionOrderMap.get(item.nickname.trim())) ||
+        (matchedAud?.order ? Number(matchedAud.order) : idx + 1);
+
       return {
         ...item,
-        id: item.id || (matchedAud?.order ? String(matchedAud.order) : String(idx + 1)),
+        order: item.order || officialOrder,
+        id: item.id || String(officialOrder),
         image: (matchedAud && matchedAud.image) ? matchedAud.image : (item.image || matchedGame?.image || matchedMain?.image || ""),
         nickname: item.nickname || matchedAud?.nickname || "",
         name: item.name || matchedAud?.name || "",

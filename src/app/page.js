@@ -87,6 +87,7 @@ export default function MainPage() {
   const [pollList, setPollList] = useState([]);
   const [pollVotingOpen, setPollVotingOpen] = useState(false);
   const [pollViewMode, setPollViewMode] = useState("cards"); // 'cards' | 'table'
+  const [fotySortBy, setFotySortBy] = useState("order"); // 'order' | 'rank'
   const [selectedCandidateModal, setSelectedCandidateModal] = useState(null);
   const [activeFotyHomeTab, setActiveFotyHomeTab] = useState("standings");
   const [fotySearchQuery, setFotySearchQuery] = useState("");
@@ -454,16 +455,22 @@ export default function MainPage() {
     );
   }, [revealedQualifyingList, fotySearchQuery]);
 
-  // Filtered Poll List for search
+  // Filtered Poll List for search & sorting
   const filteredPollList = useMemo(() => {
-    if (!fotySearchQuery.trim()) return pollList;
+    let list = [...(pollList || [])];
+    if (fotySortBy === "order") {
+      list.sort((a, b) => (Number(a.order ?? a.id) || 999) - (Number(b.order ?? b.id) || 999));
+    } else {
+      list.sort((a, b) => (Number(a.pollRank) || 999) - (Number(b.pollRank) || 999));
+    }
+    if (!fotySearchQuery.trim()) return list;
     const q = fotySearchQuery.toLowerCase().trim();
-    return (pollList || []).filter((p) =>
+    return list.filter((p) =>
       (p.name && p.name.toLowerCase().includes(q)) ||
       (p.nickname && p.nickname.toLowerCase().includes(q)) ||
       (p.topic && p.topic.toLowerCase().includes(q))
     );
-  }, [pollList, fotySearchQuery]);
+  }, [pollList, fotySearchQuery, fotySortBy]);
 
   // Warmup contestants: contestants that have warmupSchedule
   const warmupContestants = useMemo(() => {
@@ -1943,10 +1950,48 @@ export default function MainPage() {
                 </div>
               )}
 
-              {/* View Switcher: Cards vs Table */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
-                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
-                  พบผู้เข้าแข่งขัน <strong style={{ color: "#00e5ff" }}>{filteredPollList.length}</strong> คน
+              {/* View & Sort Switcher */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                    พบผู้เข้าแข่งขัน <strong style={{ color: "#00e5ff" }}>{filteredPollList.length}</strong> คน
+                  </div>
+                  {/* Sort Switcher */}
+                  <div style={{ display: "inline-flex", gap: "6px", alignItems: "center", background: "rgba(0,0,0,0.3)", padding: "3px 6px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginLeft: "4px" }}>เรียงตาม:</span>
+                    <button
+                      type="button"
+                      onClick={() => setFotySortBy("order")}
+                      style={{
+                        padding: "4px 10px",
+                        borderRadius: "7px",
+                        background: fotySortBy === "order" ? "rgba(0, 229, 255, 0.25)" : "transparent",
+                        border: fotySortBy === "order" ? "1px solid #00e5ff" : "1px solid transparent",
+                        color: fotySortBy === "order" ? "#00e5ff" : "rgba(255,255,255,0.6)",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        cursor: "pointer",
+                      }}
+                    >
+                      🔢 ลำดับที่ (1-22)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFotySortBy("rank")}
+                      style={{
+                        padding: "4px 10px",
+                        borderRadius: "7px",
+                        background: fotySortBy === "rank" ? "rgba(255, 215, 0, 0.25)" : "transparent",
+                        border: fotySortBy === "rank" ? "1px solid #ffd700" : "1px solid transparent",
+                        color: fotySortBy === "rank" ? "#ffd700" : "rgba(255,255,255,0.6)",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        cursor: "pointer",
+                      }}
+                    >
+                      🏆 อันดับคะแนน
+                    </button>
+                  </div>
                 </div>
                 <div style={{ display: "flex", gap: "8px" }}>
                   <button
@@ -2002,7 +2047,7 @@ export default function MainPage() {
                   {filteredPollList.map((p, idx) => {
                     const avatar = avatarMap.get(p.name) || avatarMap.get(p.nickname) || p.image || "";
                     const rank = Number(p.pollRank || idx + 1);
-                    const isTop5 = rank <= 5;
+                    const isTop5 = fotySortBy === "rank" && rank <= 5;
                     const hasVideo = Boolean(p.videoUrl);
 
                     return (
@@ -2030,12 +2075,14 @@ export default function MainPage() {
                               borderRadius: "20px",
                               fontSize: "12px",
                               fontWeight: "900",
-                              background: pollVotingOpen && isTop5 ? "linear-gradient(90deg, #ffd700, #ff9900)" : "rgba(0, 229, 255, 0.15)",
-                              color: pollVotingOpen && isTop5 ? "#030812" : "#67e8f9",
-                              border: pollVotingOpen && isTop5 ? "none" : "1px solid rgba(0, 229, 255, 0.4)",
+                              background: (fotySortBy === "rank" && pollVotingOpen && isTop5) ? "linear-gradient(90deg, #ffd700, #ff9900)" : "rgba(0, 229, 255, 0.15)",
+                              color: (fotySortBy === "rank" && pollVotingOpen && isTop5) ? "#030812" : "#67e8f9",
+                              border: (fotySortBy === "rank" && pollVotingOpen && isTop5) ? "none" : "1px solid rgba(0, 229, 255, 0.4)",
                             }}
                           >
-                            {pollVotingOpen ? `#${rank} ${isTop5 ? "⭐ Top 5" : ""}` : `ลำดับที่ #${p.id || idx + 1}`}
+                            {fotySortBy === "order"
+                              ? `ลำดับที่ #${p.order || p.id || idx + 1}`
+                              : (pollVotingOpen ? `#${rank} ${isTop5 ? "⭐ Top 5" : ""}` : `อันดับโพลล์ #${rank}`)}
                           </span>
                           {hasVideo && (
                             <span
@@ -2153,7 +2200,7 @@ export default function MainPage() {
                   <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 8px", minWidth: "650px" }}>
                     <thead>
                       <tr style={{ color: "rgba(255,255,255,0.7)", fontSize: "12px", textTransform: "uppercase" }}>
-                        <th style={{ padding: "10px", textAlign: "center", width: "65px" }}>อันดับโพล</th>
+                        <th style={{ padding: "10px", textAlign: "center", width: "75px" }}>{fotySortBy === "order" ? "ลำดับที่" : "อันดับโพล"}</th>
                         <th style={{ padding: "10px", textAlign: "left" }}>ผู้เข้าแข่งขัน & หัวข้อ</th>
                         <th style={{ padding: "10px", textAlign: "right", width: "120px", color: "#ffd700" }}>สัดส่วนคะแนน</th>
                         <th style={{ padding: "10px", textAlign: "left", width: "160px" }}>แผนภูมิ</th>
@@ -2163,7 +2210,7 @@ export default function MainPage() {
                       {filteredPollList.map((p, idx) => {
                         const avatar = avatarMap.get(p.name) || avatarMap.get(p.nickname) || p.image || "";
                         const rank = Number(p.pollRank || idx + 1);
-                        const isTop3 = rank <= 3;
+                        const isTop3 = fotySortBy === "rank" && rank <= 3;
                         const percentNum = parseFloat(p.percent) || 0;
 
                         return (
@@ -2179,29 +2226,33 @@ export default function MainPage() {
                               cursor: "pointer",
                             }}
                           >
-                            {/* Poll Rank */}
+                            {/* Poll Rank or Sequence Number */}
                             <td style={{ padding: "12px 10px", textAlign: "center" }}>
                               <span
                                 style={{
                                   display: "inline-block",
-                                  width: "32px",
+                                  minWidth: "32px",
                                   height: "32px",
+                                  padding: "0 6px",
                                   lineHeight: "32px",
-                                  borderRadius: "50%",
+                                  borderRadius: "16px",
                                   background:
-                                    rank === 1
+                                    fotySortBy === "order"
+                                      ? "rgba(0, 229, 255, 0.15)"
+                                      : rank === 1
                                       ? "linear-gradient(135deg, #ffd700 0%, #b8860b 100%)"
                                       : rank === 2
                                       ? "linear-gradient(135deg, #e0e0e0 0%, #9e9e9e 100%)"
                                       : rank === 3
                                       ? "linear-gradient(135deg, #cd7f32 0%, #8c4a16 100%)"
                                       : "rgba(255,255,255,0.08)",
-                                  color: isTop3 ? "#030812" : "#fff",
+                                  color: fotySortBy === "order" ? "#67e8f9" : isTop3 ? "#030812" : "#fff",
+                                  border: fotySortBy === "order" ? "1px solid rgba(0, 229, 255, 0.3)" : "none",
                                   fontWeight: "900",
                                   fontSize: "13px",
                                 }}
                               >
-                                #{rank}
+                                #{fotySortBy === "order" ? (p.order || p.id || idx + 1) : rank}
                               </span>
                             </td>
 

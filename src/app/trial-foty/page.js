@@ -349,6 +349,7 @@ export default function TrialFOTYPage() {
     "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก"
   );
   const [sortBy, setSortBy] = useState("rank"); // 'rank' | 'order'
+  const [pollSortBy, setPollSortBy] = useState("order"); // 'order' | 'rank'
   const [searchQuery, setSearchQuery] = useState("");
   const [pollSearchQuery, setPollSearchQuery] = useState("");
   const [warmupSearchQuery, setWarmupSearchQuery] = useState("");
@@ -550,7 +551,12 @@ export default function TrialFOTYPage() {
 
   // Filtered Poll
   const filteredPoll = useMemo(() => {
-    const list = [...pollList].sort((a, b) => (Number(a.pollRank) || 999) - (Number(b.pollRank) || 999));
+    let list = [...pollList];
+    if (pollSortBy === "order") {
+      list.sort((a, b) => (Number(a.id ?? a.playOrder) || 999) - (Number(b.id ?? b.playOrder) || 999));
+    } else {
+      list.sort((a, b) => (Number(a.pollRank) || 999) - (Number(b.pollRank) || 999));
+    }
     const q = pollSearchQuery.trim().toLowerCase();
     if (!q) return list;
     return list.filter(
@@ -559,7 +565,7 @@ export default function TrialFOTYPage() {
         p.nickname?.toLowerCase().includes(q) ||
         p.topic?.toLowerCase().includes(q)
     );
-  }, [pollList, pollSearchQuery]);
+  }, [pollList, pollSearchQuery, pollSortBy]);
 
   // Helper: Check if a contestant has warm-up score recorded
   const hasWarmupScoreRecorded = (item) => {
@@ -3555,10 +3561,48 @@ export default function TrialFOTYPage() {
               )}
             </div>
 
-            {/* View Switcher: Cards vs Table */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
-              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
-                พบผู้เข้าแข่งขัน <strong style={{ color: "#ffd700" }}>{filteredPoll.length}</strong> คน
+            {/* View & Sort Switchers */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                  พบผู้เข้าแข่งขัน <strong style={{ color: "#00e5ff" }}>{filteredPoll.length}</strong> คน
+                </div>
+                {/* Sort Toggle */}
+                <div style={{ display: "inline-flex", gap: "6px", alignItems: "center", background: "rgba(0,0,0,0.3)", padding: "3px 6px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginLeft: "4px" }}>เรียงตาม:</span>
+                  <button
+                    type="button"
+                    onClick={() => setPollSortBy("order")}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: "7px",
+                      background: pollSortBy === "order" ? "rgba(0, 229, 255, 0.25)" : "transparent",
+                      border: pollSortBy === "order" ? "1px solid #00e5ff" : "1px solid transparent",
+                      color: pollSortBy === "order" ? "#00e5ff" : "rgba(255,255,255,0.6)",
+                      fontSize: "12px",
+                      fontWeight: "800",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🔢 ลำดับที่ (1-40)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPollSortBy("rank")}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: "7px",
+                      background: pollSortBy === "rank" ? "rgba(255, 215, 0, 0.25)" : "transparent",
+                      border: pollSortBy === "rank" ? "1px solid #ffd700" : "1px solid transparent",
+                      color: pollSortBy === "rank" ? "#ffd700" : "rgba(255,255,255,0.6)",
+                      fontSize: "12px",
+                      fontWeight: "800",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🏆 อันดับคะแนน
+                  </button>
+                </div>
               </div>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button
@@ -3620,7 +3664,7 @@ export default function TrialFOTYPage() {
                       (c.topic && item.topic && (c.topic.trim() === item.topic.trim() || item.topic.includes(c.topic) || c.topic.includes(item.topic)))
                   );
                   const photo = item.image || matchedContestant?.image || null;
-                  const isTop5 = !isScoreHidden && Number(item.pollRank) <= 5;
+                  const isTop5 = pollSortBy === "rank" && !isScoreHidden && Number(item.pollRank) <= 5;
                   const hasVideo = Boolean(item.videoUrl || matchedContestant?.videoUrl);
                   const itemDescription = item.description || matchedContestant?.description || "";
                   const itemVideo = item.videoUrl || matchedContestant?.videoUrl || "";
@@ -3853,7 +3897,7 @@ export default function TrialFOTYPage() {
                     }}
                   >
                     <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-                      อันดับโพลล์
+                      {pollSortBy === "order" ? "ลำดับที่" : "อันดับโพลล์"}
                     </span>
                   </div>
 
@@ -3932,8 +3976,8 @@ export default function TrialFOTYPage() {
                         (c.topic && item.topic && (c.topic.trim() === item.topic.trim() || item.topic.includes(c.topic) || c.topic.includes(item.topic)))
                     );
                     const photo = matchedContestant?.image || null;
-                    const isTop5 = !isScoreHidden && Number(item.pollRank) <= 5;
-                    const isRank1 = !isScoreHidden && Number(item.pollRank) === 1;
+                    const isTop5 = pollSortBy === "rank" && !isScoreHidden && Number(item.pollRank) <= 5;
+                    const isRank1 = pollSortBy === "rank" && !isScoreHidden && Number(item.pollRank) === 1;
 
                     const borderColor = isTop5 ? "#ffd700" : "rgba(255, 255, 255, 0.3)";
                     const glowShadow = isRank1
@@ -3994,7 +4038,7 @@ export default function TrialFOTYPage() {
                               textShadow: isTop5 ? "none" : "0 2px 6px rgba(0,0,0,0.8)",
                             }}
                           >
-                            {isScoreHidden ? "🛡️" : item.pollRank}
+                            {pollSortBy === "order" ? `#${item.id || index + 1}` : (isScoreHidden ? "🛡️" : item.pollRank)}
                           </span>
                         </div>
 
