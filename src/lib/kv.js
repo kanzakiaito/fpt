@@ -1,23 +1,46 @@
 import { Redis } from "@upstash/redis";
 
-const redisUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const redisToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+function cleanEnvVal(val) {
+  if (!val || typeof val !== "string") return "";
+  return val.trim().replace(/^["']|["']$/g, "").trim();
+}
 
 let redisClient = null;
 
-if (redisUrl && redisToken) {
-  try {
-    redisClient = new Redis({
-      url: redisUrl,
-      token: redisToken,
-    });
-  } catch (err) {
-    console.warn("Failed to initialize Upstash Redis client:", err);
+export function getRedisClient() {
+  if (redisClient) return redisClient;
+
+  const rawUrl =
+    process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.KV_URL ||
+    process.env.REDIS_URL;
+
+  const rawToken =
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.KV_REST_API_READ_ONLY_TOKEN;
+
+  const url = cleanEnvVal(rawUrl);
+  const token = cleanEnvVal(rawToken);
+
+  if (url && token && (url.startsWith("https://") || url.startsWith("http://"))) {
+    try {
+      redisClient = new Redis({
+        url,
+        token,
+      });
+      return redisClient;
+    } catch (err) {
+      console.warn("Failed to initialize Upstash Redis client:", err);
+      return null;
+    }
   }
+  return null;
 }
 
 export function isKVConfigured() {
-  return Boolean(redisClient);
+  return Boolean(getRedisClient());
 }
 
 /**
@@ -25,9 +48,10 @@ export function isKVConfigured() {
  * If data is not yet in KV but found in fallback, seed KV automatically.
  */
 export async function getKVData(key, fallbackReadFn) {
-  if (redisClient) {
+  const client = getRedisClient();
+  if (client) {
     try {
-      const data = await redisClient.get(key);
+      const data = await client.get(key);
       if (data !== null && data !== undefined) {
         return data;
       }
@@ -35,7 +59,7 @@ export async function getKVData(key, fallbackReadFn) {
       if (typeof fallbackReadFn === "function") {
         const localData = fallbackReadFn();
         if (localData !== null && localData !== undefined) {
-          await redisClient.set(key, localData);
+          await client.set(key, localData);
           return localData;
         }
       }
@@ -50,9 +74,10 @@ export async function getKVData(key, fallbackReadFn) {
  * Save data to Upstash KV and also attempt local write (if filesystem is writable).
  */
 export async function saveKVData(key, data, fallbackWriteFn) {
-  if (redisClient) {
+  const client = getRedisClient();
+  if (client) {
     try {
-      await redisClient.set(key, data);
+      await client.set(key, data);
     } catch (err) {
       console.error(`Error saving ${key} to KV:`, err);
     }
