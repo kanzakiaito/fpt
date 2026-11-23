@@ -1,10 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const UNIFIED_STORAGE_KEY = "fpt_admin_session";
 const SECTION_STORAGE_PREFIX = "fpt_admin_session_";
 const ALL_ADMIN_SECTIONS = ["main", "tournament", "trial_foty"];
+
+// Module-level cache & lock to prevent cross-component / cross-tab request storms
+let inFlightVerifyPromise = null;
+let lastVerifyAttemptTime = 0;
+const SESSION_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache before re-validating with server
+const MIN_REQUEST_COOLDOWN_MS = 15 * 1000; // Minimum 15 seconds between server network requests
 
 export function useAdminSession(section = "main") {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,8 +18,6 @@ export function useAdminSession(section = "main") {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [noAccessInfo, setNoAccessInfo] = useState(null);
-
-  const storageKey = `${SECTION_STORAGE_PREFIX}${section}`;
 
   // Helper to retrieve unexpired session from unified storage or fallback section keys
   const getLocalSession = useCallback(() => {
@@ -58,7 +62,7 @@ export function useAdminSession(section = "main") {
     return null;
   }, [section]);
 
-  const verifySession = useCallback(async () => {
+  const verifySession = useCallback(async (force = false) => {
     if (typeof window === "undefined") return;
 
     try {
@@ -79,25 +83,66 @@ export function useAdminSession(section = "main") {
         return;
       }
 
-      // 2. Verify server-side token validity and permissions for this specific section
-      const res = await fetch("/api/admin-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "verify",
-          token: session.token,
-          section,
-        }),
-      });
+      const now = Date.now();
 
-      const data = await res.json();
-      if (data.success && data.valid && data.user) {
+      // 2. If recently verified within cache TTL and not forced, trust local session without hitting server
+      if (!force && session.lastVerified && (now - session.lastVerified < SESSION_CACHE_TTL_MS)) {
+        setIsAuthenticated(true);
+        setUser(session.user);
+        setToken(session.token);
+        setNoAccessInfo(null);
+        setAuthChecking(false);
+        return;
+      }
+
+      // 3. Throttle network requests: avoid hammering server within cooldown window
+      if (!force && (now - lastVerifyAttemptTime < MIN_REQUEST_COOLDOWN_MS)) {
+        // Use cached state during cooldown
+        if (session.user) {
+          setIsAuthenticated(true);
+          setUser(session.user);
+          setToken(session.token);
+        }
+        setAuthChecking(false);
+        return;
+      }
+
+      lastVerifyAttemptTime = now;
+
+      // 4. Reuse in-flight request if one is already running
+      if (!inFlightVerifyPromise) {
+        inFlightVerifyPromise = (async () => {
+          try {
+            const res = await fetch("/api/admin-session", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                action: "verify",
+                token: session.token,
+                section,
+              }),
+            });
+
+            if (!res.ok) {
+              throw new Error(`HTTP error ${res.status}`);
+            }
+
+            return await res.json();
+          } finally {
+            inFlightVerifyPromise = null;
+          }
+        })();
+      }
+
+      const data = await inFlightVerifyPromise;
+
+      if (data && data.success && data.valid && data.user) {
         setIsAuthenticated(true);
         setUser(data.user);
         setToken(session.token);
         setNoAccessInfo(null);
 
-        // Synchronize unified session and current section session
+        // Synchronize unified session and current section session with new lastVerified timestamp
         const syncedSession = {
           ...session,
           user: data.user,
@@ -107,7 +152,7 @@ export function useAdminSession(section = "main") {
           localStorage.setItem(UNIFIED_STORAGE_KEY, JSON.stringify(syncedSession));
           localStorage.setItem(`${SECTION_STORAGE_PREFIX}${section}`, JSON.stringify(syncedSession));
         } catch (e) {}
-      } else if (data.noAccess) {
+      } else if (data && data.noAccess) {
         // Valid login, but user doesn't have permission for this section
         setIsAuthenticated(false);
         setUser(null);
@@ -117,13 +162,13 @@ export function useAdminSession(section = "main") {
           name: data.name,
           error: data.error,
         });
-      } else {
-        // Expired or invalid token on server
+      } else if (data && data.valid === false) {
+        // Expired or explicitly invalid token on server
         handleLogout();
       }
     } catch (err) {
-      console.warn("Session check error, preserving local session if unexpired:", err);
-      // In case of network glitch but valid unexpired local session
+      console.warn("Session check server notice, preserving local session:", err.message || err);
+      // In case of network glitch or challenge, preserve local unexpired session
       try {
         const session = getLocalSession();
         if (session && session.expiresAt && Date.now() < session.expiresAt) {
@@ -138,31 +183,48 @@ export function useAdminSession(section = "main") {
   }, [section, getLocalSession]);
 
   useEffect(() => {
+    // Initial verification on mount
     verifySession();
 
-    // Listen to storage events so multi-tab or cross-page auth updates in real-time
+    // Listen to storage events: ONLY update in-memory state without re-fetching from server!
+    // This strictly prevents the ping-pong multi-tab infinite loop.
     const handleStorageEvent = (e) => {
       if (e.key === UNIFIED_STORAGE_KEY || (e.key && e.key.startsWith(SECTION_STORAGE_PREFIX))) {
-        verifySession();
+        const session = getLocalSession();
+        if (session && session.expiresAt && Date.now() < session.expiresAt) {
+          setIsAuthenticated(true);
+          setUser(session.user);
+          setToken(session.token);
+          setNoAccessInfo(null);
+        } else {
+          setIsAuthenticated(false);
+          setUser(null);
+          setToken(null);
+        }
+        setAuthChecking(false);
       }
     };
 
     window.addEventListener("storage", handleStorageEvent);
     return () => window.removeEventListener("storage", handleStorageEvent);
-  }, [verifySession]);
+  }, [verifySession, getLocalSession]);
 
   const handleLoginSuccess = (sessionData) => {
+    const enriched = {
+      ...sessionData,
+      lastVerified: Date.now(),
+    };
     setIsAuthenticated(true);
-    setUser(sessionData.user);
-    setToken(sessionData.token);
+    setUser(enriched.user);
+    setToken(enriched.token);
     setNoAccessInfo(null);
 
     // Save to unified key and all admin section keys
     try {
-      localStorage.setItem(UNIFIED_STORAGE_KEY, JSON.stringify(sessionData));
-      localStorage.setItem(`${SECTION_STORAGE_PREFIX}${section}`, JSON.stringify(sessionData));
+      localStorage.setItem(UNIFIED_STORAGE_KEY, JSON.stringify(enriched));
+      localStorage.setItem(`${SECTION_STORAGE_PREFIX}${section}`, JSON.stringify(enriched));
       ALL_ADMIN_SECTIONS.forEach((s) => {
-        localStorage.setItem(`${SECTION_STORAGE_PREFIX}${s}`, JSON.stringify(sessionData));
+        localStorage.setItem(`${SECTION_STORAGE_PREFIX}${s}`, JSON.stringify(enriched));
       });
     } catch (e) {}
   };
@@ -192,6 +254,6 @@ export function useAdminSession(section = "main") {
     noAccessInfo,
     handleLoginSuccess,
     handleLogout,
-    refreshSession: verifySession,
+    refreshSession: (force = true) => verifySession(force),
   };
 }
