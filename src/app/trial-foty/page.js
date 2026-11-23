@@ -4223,7 +4223,7 @@ export default function TrialFOTYPage() {
                 background: "linear-gradient(150deg, #0a1b33 0%, #030814 100%)",
                 border: "2px solid #00e5ff",
                 borderRadius: "24px",
-                maxWidth: "680px",
+                maxWidth: "760px",
                 width: "100%",
                 maxHeight: "90vh",
                 overflowY: "auto",
@@ -4236,51 +4236,94 @@ export default function TrialFOTYPage() {
                 willChange: "transform, opacity",
               }}
             >
-              {/* Modal Header */}
-              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px", borderBottom: "1px solid rgba(0,229,255,0.2)", paddingBottom: "16px" }}>
-                <div
-                  style={{
-                    width: "76px",
-                    height: "76px",
-                    borderRadius: "50%",
-                    overflow: "hidden",
-                    border: "2.5px solid #00e5ff",
-                    boxShadow: "0 0 18px rgba(0, 229, 255, 0.5)",
-                    background: "#030814",
-                    flexShrink: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {selectedSpotlight.image ? (
-                    <img
-                      src={getOptimizedImageUrl(selectedSpotlight.image, 160)}
-                      alt={selectedSpotlight.name}
-                      referrerPolicy="no-referrer"
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  ) : (
-                    <span style={{ fontSize: "32px" }}>👤</span>
-                  )}
+              {/* Modal Header: Avatar & Name on the left, Description on the right */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  justifyContent: "space-between",
+                  gap: "18px",
+                  marginBottom: "20px",
+                  borderBottom: "1px solid rgba(0, 229, 255, 0.2)",
+                  paddingBottom: "16px",
+                  paddingRight: "44px",
+                  flexWrap: "wrap",
+                }}
+              >
+                {/* Left: Avatar + Name / Topic */}
+                <div style={{ display: "flex", alignItems: "center", gap: "14px", flexShrink: 0, minWidth: "200px" }}>
+                  <div
+                    style={{
+                      width: "74px",
+                      height: "74px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      border: "2.5px solid #00e5ff",
+                      boxShadow: "0 0 18px rgba(0, 229, 255, 0.5)",
+                      background: "#030814",
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {selectedSpotlight.image ? (
+                      <img
+                        src={getOptimizedImageUrl(selectedSpotlight.image, 160)}
+                        alt={selectedSpotlight.name}
+                        referrerPolicy="no-referrer"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: "32px" }}>👤</span>
+                    )}
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", lineHeight: "1.2" }}>
+                      {selectedSpotlight.nickname || selectedSpotlight.name}
+                    </div>
+                    <div style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.8)", marginTop: "3px" }}>
+                      {selectedSpotlight.name}
+                    </div>
+                    <div style={{ fontSize: "13px", color: "#00e5ff", marginTop: "3px", fontWeight: "600" }}>
+                      {selectedSpotlight.topic}
+                    </div>
+                  </div>
                 </div>
 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700" }}>
-                    {selectedSpotlight.nickname || selectedSpotlight.name}
+                {/* Right: ข้อมูลผู้เข้าแข่งขัน (Description) */}
+                {selectedSpotlight.description ? (
+                  <div
+                    style={{
+                      flex: "1 1 240px",
+                      minWidth: "220px",
+                      background: "rgba(0, 229, 255, 0.06)",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      borderRadius: "12px",
+                      padding: "10px 14px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: "12px", fontWeight: "800", color: "#00e5ff", marginBottom: "4px", display: "flex", alignItems: "center", gap: "5px" }}>
+                      <span>📝</span> ข้อมูลผู้เข้าแข่งขัน
+                    </div>
+                    <p style={{ margin: 0, fontSize: "13px", color: "rgba(255, 255, 255, 0.9)", lineHeight: "1.5", whiteSpace: "pre-line" }}>
+                      {selectedSpotlight.description}
+                    </p>
                   </div>
-                  <div style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.75)" }}>
-                    {selectedSpotlight.name}
-                  </div>
-                  <div style={{ fontSize: "13px", color: "#00e5ff", marginTop: "2px" }}>
-                    {selectedSpotlight.topic}
-                  </div>
-                </div>
+                ) : null}
 
+                {/* Close Button */}
                 <button
                   type="button"
                   onClick={() => setSelectedSpotlight(null)}
                   style={{
+                    position: "absolute",
+                    top: "20px",
+                    right: "20px",
                     background: "rgba(255, 255, 255, 0.1)",
                     border: "none",
                     borderRadius: "50%",
@@ -4292,7 +4335,10 @@ export default function TrialFOTYPage() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    transition: "background 0.15s ease",
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.25)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)")}
                 >
                   ✕
                 </button>
@@ -4331,26 +4377,6 @@ export default function TrialFOTYPage() {
                       title={selectedSpotlight.name}
                     />
                   </div>
-                </div>
-              ) : null}
-
-              {/* Description (Admin ใส่เอง) */}
-              {selectedSpotlight.description ? (
-                <div
-                  style={{
-                    background: "rgba(0, 229, 255, 0.05)",
-                    border: "1px solid rgba(0, 229, 255, 0.2)",
-                    borderRadius: "12px",
-                    padding: "14px 18px",
-                    marginBottom: "18px",
-                  }}
-                >
-                  <div style={{ fontSize: "13px", fontWeight: "800", color: "#00e5ff", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span>📝</span> ข้อมูลผู้เข้าแข่งขัน
-                  </div>
-                  <p style={{ margin: 0, fontSize: "14px", color: "rgba(255, 255, 255, 0.9)", lineHeight: "1.6", whiteSpace: "pre-line" }}>
-                    {selectedSpotlight.description}
-                  </p>
                 </div>
               ) : null}
 
