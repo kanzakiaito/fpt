@@ -3480,9 +3480,6 @@ export default function TrialFOTYPage() {
                     <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)" }}>
                       คลิกที่การ์ดผู้เข้าแข่งขันเพื่อดูประวัติ ข้อมูลคะแนนรอบเก็บโพลล์ และรับชมคลิปวิดีโอแนะนำตัว
                     </div>
-                    <div style={{ fontSize: "12px", color: "#67e8f9", marginTop: "4px", fontWeight: "700" }}>
-                      🎬 มีคลิปแนะนำตัว & ข้อมูลครบถ้วน
-                    </div>
                   </div>
                 </div>
 
@@ -3740,24 +3737,6 @@ export default function TrialFOTYPage() {
                             ? (isScoreHidden ? "🛡️ ซ่อนอันดับ" : `#${item.pollRank} ${isTop5 ? "⭐ Top 5" : ""}`)
                             : `ลำดับที่ #${item.id || index + 1}`}
                         </span>
-                        {hasVideo && (
-                          <span
-                            style={{
-                              padding: "3px 8px",
-                              borderRadius: "6px",
-                              fontSize: "11px",
-                              fontWeight: "700",
-                              background: "rgba(239, 68, 68, 0.2)",
-                              color: "#fca5a5",
-                              border: "1px solid rgba(239, 68, 68, 0.4)",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "4px",
-                            }}
-                          >
-                            <span>🎬</span> มีคลิป
-                          </span>
-                        )}
                       </div>
 
                       {/* Contestant Photo */}

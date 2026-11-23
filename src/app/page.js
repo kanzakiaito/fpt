@@ -2110,24 +2110,6 @@ export default function MainPage() {
                               ? `ลำดับที่ #${p.order || p.id || idx + 1}`
                               : (pollVotingOpen ? `#${rank} ${isTop5 ? "⭐ Top 5" : ""}` : `อันดับโพลล์ #${rank}`)}
                           </span>
-                          {hasVideo && (
-                            <span
-                              style={{
-                                padding: "3px 8px",
-                                borderRadius: "6px",
-                                fontSize: "11px",
-                                fontWeight: "700",
-                                background: "rgba(239, 68, 68, 0.2)",
-                                color: "#fca5a5",
-                                border: "1px solid rgba(239, 68, 68, 0.4)",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "4px",
-                              }}
-                            >
-                              <span>🎬</span> มีคลิป
-                            </span>
-                          )}
                         </div>
 
                         {/* Contestant Photo */}
