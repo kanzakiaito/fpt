@@ -80,6 +80,7 @@ export default function AdminPage() {
   const [restrictPassword, setRestrictPassword] = useState("");
   const [showPollTable, setShowPollTable] = useState(true);
   const [showTrialPollTable, setShowTrialPollTable] = useState(true);
+  const [showContestantsOnHome, setShowContestantsOnHome] = useState(false);
   const [hidePollScoresDuringVote, setHidePollScoresDuringVote] = useState(true);
   const [togglingHidePollScores, setTogglingHidePollScores] = useState(false);
   const [settingsNotice, setSettingsNotice] = useState("");
@@ -577,6 +578,9 @@ export default function AdminPage() {
         }
         if (data.showTrialPollTable !== undefined) {
           setShowTrialPollTable(Boolean(data.showTrialPollTable));
+        }
+        if (data.showContestantsOnHome !== undefined) {
+          setShowContestantsOnHome(Boolean(data.showContestantsOnHome));
         }
         setProtectFoty(Boolean(data.protectFoty));
         setFotyPassword(data.fotyPassword || "");
@@ -1274,12 +1278,38 @@ export default function AdminPage() {
     }
   };
 
+  // Toggle Contestants Profile Mode on Homepage (/)
+  const handleToggleContestantsOnHome = async (newVal) => {
+    setShowContestantsOnHome(newVal);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_contestants_on_home", showContestantsOnHome: newVal }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const msg = newVal ? "🟢 เปลี่ยนหน้าแรกเป็นหน้าข้อมูลผู้เข้าแข่งขันแล้ว" : "🔴 ปิดโหมดหน้าข้อมูลผู้เข้าแข่งขันแล้ว";
+        setPollNotice(msg);
+        setSettingsNotice(msg);
+        setTimeout(() => {
+          setPollNotice("");
+          setSettingsNotice("");
+        }, 3500);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("เกิดข้อผิดพลาดในการบันทึก");
+    }
+  };
+
   // Save FOTY Qualifying & Poll on Home Reveal Settings
   const handleSaveFotyRevealSettings = async (overrides = {}) => {
     const payload = {
       action: "save_foty_qualifying_reveal",
       showFotyQualifyingOnHome: overrides.showFotyQualifyingOnHome !== undefined ? overrides.showFotyQualifyingOnHome : showFotyQualifyingOnHome,
       showPollTable: overrides.showPollTable !== undefined ? overrides.showPollTable : showPollTable,
+      showContestantsOnHome: overrides.showContestantsOnHome !== undefined ? overrides.showContestantsOnHome : showContestantsOnHome,
       fotyRevealUpToOrder: overrides.fotyRevealUpToOrder !== undefined ? overrides.fotyRevealUpToOrder : fotyRevealUpToOrder,
       fotyRevealCategory: overrides.fotyRevealCategory !== undefined ? overrides.fotyRevealCategory : fotyRevealCategory,
       fotyReveal3SecPartial: overrides.fotyReveal3SecPartial !== undefined ? overrides.fotyReveal3SecPartial : fotyReveal3SecPartial,
@@ -5057,6 +5087,32 @@ export default function AdminPage() {
                       gap: "8px",
                       padding: "9px 14px",
                       borderRadius: "8px",
+                      background: showContestantsOnHome ? "rgba(0, 229, 255, 0.18)" : "rgba(255, 255, 255, 0.05)",
+                      color: showContestantsOnHome ? "#00e5ff" : "rgba(255,255,255,0.6)",
+                      fontSize: "13px",
+                      border: showContestantsOnHome ? "1.5px solid rgba(0, 229, 255, 0.5)" : "1px solid rgba(255, 255, 255, 0.2)",
+                      fontWeight: "800",
+                      cursor: "pointer",
+                      userSelect: "none",
+                    }}
+                    title="สลับหน้าแรกให้เปลี่ยนเป็นหน้าข้อมูลผู้เข้าแข่งขันทันที โดยไม่ต้องรอให้เปิดรับโหวตโพลล์"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={showContestantsOnHome}
+                      onChange={(e) => handleToggleContestantsOnHome(e.target.checked)}
+                      style={{ accentColor: "#00e5ff", width: "16px", height: "16px", cursor: "pointer" }}
+                    />
+                    <span>🎴 หน้าแรกเป็นข้อมูลผู้เข้าแข่งขัน: {showContestantsOnHome ? "เปิด (ON)" : "ปิด (OFF)"}</span>
+                  </label>
+
+                  <label
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "9px 14px",
+                      borderRadius: "8px",
                       background: showPollTable ? "rgba(255, 215, 0, 0.18)" : "rgba(255, 255, 255, 0.05)",
                       color: showPollTable ? "#ffd700" : "rgba(255,255,255,0.6)",
                       fontSize: "13px",
@@ -6085,6 +6141,23 @@ export default function AdminPage() {
                       </div>
                     </label>
 
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: "rgba(0,0,0,0.3)", padding: "12px 14px", borderRadius: "10px", border: showContestantsOnHome ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.1)" }}>
+                      <input
+                        type="checkbox"
+                        checked={showContestantsOnHome}
+                        onChange={(e) => handleToggleContestantsOnHome(e.target.checked)}
+                        style={{ width: "18px", height: "18px", accentColor: "#00e5ff", cursor: "pointer" }}
+                      />
+                      <div>
+                        <div style={{ fontSize: "14px", fontWeight: "800", color: showContestantsOnHome ? "#00e5ff" : "#fff" }}>
+                          🎴 เปลี่ยนหน้าแรกเป็นหน้าข้อมูลผู้เข้าแข่งขัน (Contestant Profiles Mode)
+                        </div>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
+                          สลับหน้าแรกให้แสดงการ์ดประวัติ, ข้อมูล, คะแนนรอบเก็บ และคลิปแนะนำตัวทันที โดยไม่ต้องรอให้เปิดรับโหวตโพลล์
+                        </div>
+                      </div>
+                    </label>
+
                     <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: "rgba(0,0,0,0.3)", padding: "12px 14px", borderRadius: "10px", border: showPollTable ? "1px solid #ffd700" : "1px solid rgba(255,255,255,0.1)" }}>
                       <input
                         type="checkbox"
@@ -6742,6 +6815,28 @@ export default function AdminPage() {
                 </label>
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
                   เมื่อเปิดใช้งาน หน้าแรกจะแสดงตารางคะแนนรอบคัดเลือก 22 คน เพื่อชิง 5 อันดับแรกสู่รอบชิงชนะเลิศ
+                </p>
+              </div>
+
+              {/* Main Homepage Contestant Profiles Mode */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: showContestantsOnHome ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "16px"
+              }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: showContestantsOnHome ? "#00e5ff" : "rgba(255,255,255,0.7)" }}>
+                  <input
+                    type="checkbox"
+                    checked={showContestantsOnHome}
+                    onChange={(e) => handleToggleContestantsOnHome(e.target.checked)}
+                    style={{ width: "18px", height: "18px", accentColor: "#00e5ff", cursor: "pointer" }}
+                  />
+                  <span>🎴 เปลี่ยนหน้าแรกเป็นหน้าข้อมูลผู้เข้าแข่งขัน (ไม่ต้องรอเปิดโหวตโพลล์)</span>
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
+                  เมื่อเปิดใช้งาน ผู้ชมเข้าหน้าแรก (/) จะเห็นการ์ดข้อมูลและประวัติผู้เข้าแข่งขันทั้งหมด พร้อมคลิปและคะแนนรอบเก็บทันที
                 </p>
               </div>
 

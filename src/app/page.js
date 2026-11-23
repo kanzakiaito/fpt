@@ -80,6 +80,7 @@ export default function MainPage() {
   // FOTY Qualifying & Poll on Home States
   const [showFotyQualifyingOnHome, setShowFotyQualifyingOnHome] = useState(false);
   const [showPollTable, setShowPollTable] = useState(true);
+  const [showContestantsOnHome, setShowContestantsOnHome] = useState(false);
   const [fotyRevealUpToOrder, setFotyRevealUpToOrder] = useState("all");
   const [fotyRevealCategory, setFotyRevealCategory] = useState("attribute");
   const [fotyReveal3SecPartial, setFotyReveal3SecPartial] = useState(0);
@@ -133,6 +134,11 @@ export default function MainPage() {
         setShowPollInNav(Boolean(settingsData.showPollInNav));
         setShowFotyQualifyingOnHome(Boolean(settingsData.showFotyQualifyingOnHome));
         setShowPollTable(settingsData.showPollTable !== false);
+        const contestantsMode = Boolean(settingsData.showContestantsOnHome);
+        setShowContestantsOnHome(contestantsMode);
+        if (contestantsMode) {
+          setActiveFotyHomeTab("contestants");
+        }
         if (settingsData.fotyRevealUpToOrder !== undefined) {
           setFotyRevealUpToOrder(settingsData.fotyRevealUpToOrder);
         }
@@ -1449,9 +1455,9 @@ export default function MainPage() {
 
       {/* ========================================================
           3.5 SECTION: แฟนพันธุ์แท้แห่งปี 2026 (FAN OF THE YEAR 2026)
-              - ตารางคะแนนรอบคัดเลือก & อันดับผลโพลล์
+              - ตารางคะแนนรอบคัดเลือก & ข้อมูลผู้เข้าแข่งขัน & อันดับผลโพลล์
          ======================================================== */}
-      {dataLoaded && (showFotyQualifyingOnHome || showPollTable) && (
+      {dataLoaded && (showFotyQualifyingOnHome || showPollTable || showContestantsOnHome) && (
         <section
           id="foty-qualifying"
           style={{
@@ -1490,17 +1496,21 @@ export default function MainPage() {
             >
               {activeFotyHomeTab === "standings" && showFotyQualifyingOnHome
                 ? "ตารางคะแนนการแข่งขัน แฟนพันธุ์แท้แห่งปี 2026"
+                : activeFotyHomeTab === "contestants"
+                ? "ข้อมูลและประวัติผู้เข้าแข่งขัน แฟนพันธุ์แท้แห่งปี 2026"
                 : "ตารางอันดับโพลล์ความนิยม (Fan Poll Ranking)"}
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "650px", margin: "0 auto" }}>
               {activeFotyHomeTab === "standings" && showFotyQualifyingOnHome
                 ? fotySubtitle || "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)"
+                : activeFotyHomeTab === "contestants"
+                ? "ทำความรู้จัก 22 ผู้เข้าแข่งขัน พร้อมข้อมูลหัวข้อ คะแนนรอบเก็บโพลล์ และคลิปวิดีโอแนะนำตัว"
                 : "อันดับผลสำรวจความนิยมและความคาดหวังของผู้เข้าแข่งขัน แฟนพันธุ์แท้แห่งปี 2026 จากแฟนรายการ"}
             </p>
           </div>
 
-          {/* Tab Switcher (if both are enabled) */}
-          {showFotyQualifyingOnHome && showPollTable && (
+          {/* Tab Switcher */}
+          {(showFotyQualifyingOnHome || showPollTable || showContestantsOnHome) && (
             <div
               style={{
                 display: "flex",
@@ -1512,59 +1522,91 @@ export default function MainPage() {
             >
               <button
                 type="button"
-                onClick={() => setActiveFotyHomeTab("standings")}
+                onClick={() => setActiveFotyHomeTab("contestants")}
                 style={{
                   padding: "10px 24px",
                   borderRadius: "12px",
                   background:
-                    activeFotyHomeTab === "standings"
+                    activeFotyHomeTab === "contestants"
                       ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)"
                       : "rgba(16, 32, 60, 0.65)",
-                  color: activeFotyHomeTab === "standings" ? "#030812" : "#80d0ff",
+                  color: activeFotyHomeTab === "contestants" ? "#030812" : "#80d0ff",
                   border:
-                    activeFotyHomeTab === "standings"
+                    activeFotyHomeTab === "contestants"
                       ? "1.5px solid #00e5ff"
                       : "1px solid rgba(0, 229, 255, 0.25)",
                   fontSize: "15px",
                   fontWeight: "800",
                   cursor: "pointer",
                   boxShadow:
-                    activeFotyHomeTab === "standings"
+                    activeFotyHomeTab === "contestants"
                       ? "0 0 20px rgba(0, 229, 255, 0.45)"
                       : "none",
                   transition: "all 0.2s ease",
                 }}
               >
-                📊 ตารางคะแนนรอบคัดเลือก (Qualifying)
+                🎴 ข้อมูลผู้เข้าแข่งขัน (Contestants)
               </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveFotyHomeTab("poll")}
-                style={{
-                  padding: "10px 24px",
-                  borderRadius: "12px",
-                  background:
-                    activeFotyHomeTab === "poll"
-                      ? "linear-gradient(90deg, #ffd700 0%, #d48806 100%)"
-                      : "rgba(30, 24, 10, 0.65)",
-                  color: activeFotyHomeTab === "poll" ? "#030812" : "#ffd700",
-                  border:
-                    activeFotyHomeTab === "poll"
-                      ? "1.5px solid #ffd700"
-                      : "1px solid rgba(255, 215, 0, 0.25)",
-                  fontSize: "15px",
-                  fontWeight: "800",
-                  cursor: "pointer",
-                  boxShadow:
-                    activeFotyHomeTab === "poll"
-                      ? "0 0 20px rgba(255, 215, 0, 0.45)"
-                      : "none",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                🗳️ ตารางอันดับโพลล์ (Fan Poll)
-              </button>
+              {showFotyQualifyingOnHome && (
+                <button
+                  type="button"
+                  onClick={() => setActiveFotyHomeTab("standings")}
+                  style={{
+                    padding: "10px 24px",
+                    borderRadius: "12px",
+                    background:
+                      activeFotyHomeTab === "standings"
+                        ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)"
+                        : "rgba(16, 32, 60, 0.65)",
+                    color: activeFotyHomeTab === "standings" ? "#030812" : "#80d0ff",
+                    border:
+                      activeFotyHomeTab === "standings"
+                        ? "1.5px solid #00e5ff"
+                        : "1px solid rgba(0, 229, 255, 0.25)",
+                    fontSize: "15px",
+                    fontWeight: "800",
+                    cursor: "pointer",
+                    boxShadow:
+                      activeFotyHomeTab === "standings"
+                        ? "0 0 20px rgba(0, 229, 255, 0.45)"
+                        : "none",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  📊 ตารางคะแนนรอบคัดเลือก (Qualifying)
+                </button>
+              )}
+
+              {showPollTable && (
+                <button
+                  type="button"
+                  onClick={() => setActiveFotyHomeTab("poll")}
+                  style={{
+                    padding: "10px 24px",
+                    borderRadius: "12px",
+                    background:
+                      activeFotyHomeTab === "poll"
+                        ? "linear-gradient(90deg, #ffd700 0%, #d48806 100%)"
+                        : "rgba(30, 24, 10, 0.65)",
+                    color: activeFotyHomeTab === "poll" ? "#030812" : "#ffd700",
+                    border:
+                      activeFotyHomeTab === "poll"
+                        ? "1.5px solid #ffd700"
+                        : "1px solid rgba(255, 215, 0, 0.25)",
+                    fontSize: "15px",
+                    fontWeight: "800",
+                    cursor: "pointer",
+                    boxShadow:
+                      activeFotyHomeTab === "poll"
+                        ? "0 0 20px rgba(255, 215, 0, 0.45)"
+                        : "none",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  🗳️ ตารางอันดับโพลล์ (Fan Poll)
+                </button>
+              )}
             </div>
           )}
 
@@ -1824,11 +1866,11 @@ export default function MainPage() {
             </div>
           )}
 
-          {/* VIEW 2: POLL SECTION (CARDS & TABLE) */}
-          {(activeFotyHomeTab === "poll" || !showFotyQualifyingOnHome) && showPollTable && (
+          {/* VIEW 2: CONTESTANT PROFILES & POLL (CARDS & TABLE) */}
+          {(activeFotyHomeTab === "contestants" || activeFotyHomeTab === "poll" || !showFotyQualifyingOnHome) && (showContestantsOnHome || showPollTable) && (
             <div>
-              {/* Poll Voting Banner (Shows prominently when poll voting is open) */}
-              {pollVotingOpen && (
+              {/* Poll Voting or Contestant Profiles Banner */}
+              {pollVotingOpen ? (
                 <div
                   style={{
                     background: "linear-gradient(90deg, rgba(255, 215, 0, 0.16) 0%, rgba(0, 229, 255, 0.16) 100%)",
@@ -1871,6 +1913,33 @@ export default function MainPage() {
                     <span>🗳️ ไปที่หน้าลงคะแนนโหวต</span>
                     <span>→</span>
                   </Link>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    background: "linear-gradient(90deg, rgba(0, 229, 255, 0.12) 0%, rgba(14, 165, 233, 0.12) 100%)",
+                    border: "1.5px solid rgba(0, 229, 255, 0.35)",
+                    borderRadius: "16px",
+                    padding: "14px 20px",
+                    marginBottom: "20px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "12px",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: "15px", fontWeight: "900", color: "#00e5ff", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span>🎴</span> ข้อมูลและทำความรู้จัก 22 ผู้เข้าแข่งขันแฟนพันธุ์แท้แห่งปี 2026
+                    </div>
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)", marginTop: "3px" }}>
+                      คลิกที่การ์ดผู้เข้าแข่งขันแต่ละท่านเพื่อดูข้อมูลประวัติ หัวข้อ คะแนนรอบเก็บ และรับชมคลิปวิดีโอแนะนำตัว
+                    </div>
+                  </div>
+                  <div style={{ padding: "6px 14px", borderRadius: "20px", background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#00e5ff", fontSize: "12px", fontWeight: "800" }}>
+                    🎬 มีคลิปแนะนำตัว & ประวัติ
+                  </div>
                 </div>
               )}
 
@@ -1961,12 +2030,12 @@ export default function MainPage() {
                               borderRadius: "20px",
                               fontSize: "12px",
                               fontWeight: "900",
-                              background: isTop5 ? "linear-gradient(90deg, #ffd700, #ff9900)" : "rgba(0, 229, 255, 0.15)",
-                              color: isTop5 ? "#030812" : "#67e8f9",
-                              border: isTop5 ? "none" : "1px solid rgba(0, 229, 255, 0.4)",
+                              background: pollVotingOpen && isTop5 ? "linear-gradient(90deg, #ffd700, #ff9900)" : "rgba(0, 229, 255, 0.15)",
+                              color: pollVotingOpen && isTop5 ? "#030812" : "#67e8f9",
+                              border: pollVotingOpen && isTop5 ? "none" : "1px solid rgba(0, 229, 255, 0.4)",
                             }}
                           >
-                            #{rank} {isTop5 ? "⭐ Top 5" : ""}
+                            {pollVotingOpen ? `#${rank} ${isTop5 ? "⭐ Top 5" : ""}` : `ลำดับที่ #${p.id || idx + 1}`}
                           </span>
                           {hasVideo && (
                             <span
@@ -2052,10 +2121,10 @@ export default function MainPage() {
                           <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.55)" }}>
                             {p.totalScore !== undefined && p.totalScore !== null && p.totalScore > 0
                               ? `คะแนนเก็บ: ${p.totalScore}`
-                              : "สัดส่วนโหวต"}
+                              : pollVotingOpen ? "สัดส่วนโหวต" : "สถานะ"}
                           </span>
                           <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700" }}>
-                            {p.percent}
+                            {pollVotingOpen ? p.percent : (p.totalScore > 0 ? `${p.totalScore} คะแนน` : "พร้อมแข่งขัน")}
                           </span>
                         </div>
 

@@ -342,8 +342,9 @@ export default function TrialFOTYPage() {
   const [activeTableTab, setActiveTableTab] = useState("standings"); // 'standings' | 'warmup' | 'poll'
   const [showWarmupTable, setShowWarmupTable] = useState(true);
   const [showPollTable, setShowPollTable] = useState(true);
+  const [showTrialContestantsOnHome, setShowTrialContestantsOnHome] = useState(false);
   const [isScoreHidden, setIsScoreHidden] = useState(false);
-  const canViewPoll = showPollTable;
+  const canViewPoll = showPollTable || showTrialContestantsOnHome;
   const [trialSubtitle, setTrialSubtitle] = useState(
     "ศึกประลองความรู้แฟนพันธุ์แท้ฉบับทดสอบ (Trial Edition) คำนวณแบบ Dense Ranking พร้อมระบบโควตาตัดตัว 5 อันดับแรก"
   );
@@ -404,8 +405,16 @@ export default function TrialFOTYPage() {
           try {
             localStorage.setItem("fpt_trial_show_poll_table", String(isPollVis));
           } catch (e) {}
-          if (!isPollVis) {
+          if (!isPollVis && !jsonPoll.showTrialContestantsOnHome) {
             setActiveTableTab((prev) => (prev === "poll" ? "standings" : prev));
+          }
+        }
+        if (jsonPoll.showTrialContestantsOnHome !== undefined) {
+          const isTrialContestantsMode = Boolean(jsonPoll.showTrialContestantsOnHome);
+          setShowTrialContestantsOnHome(isTrialContestantsMode);
+          if (isTrialContestantsMode) {
+            setActiveTableTab("poll");
+            setPollViewMode("cards");
           }
         }
         if (jsonPoll.trialSubtitle) {
@@ -1084,7 +1093,7 @@ export default function TrialFOTYPage() {
                 transition: "all 0.2s ease",
               }}
             >
-              📊 ตารางอันดับโพลล์ (Poll)
+              {showTrialContestantsOnHome ? "🎴 ข้อมูลผู้เข้าแข่งขัน & โพลล์" : "📊 ตารางอันดับโพลล์ (Poll)"}
             </button>
           )}
         </div>

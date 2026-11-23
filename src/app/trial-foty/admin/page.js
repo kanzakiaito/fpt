@@ -125,6 +125,8 @@ export default function TrialAdminPage() {
   const [togglingWarmupTable, setTogglingWarmupTable] = useState(false);
   const [showPollTable, setShowPollTable] = useState(true);
   const [togglingPollTable, setTogglingPollTable] = useState(false);
+  const [showTrialContestantsOnHome, setShowTrialContestantsOnHome] = useState(false);
+  const [togglingTrialContestants, setTogglingTrialContestants] = useState(false);
   const [showMainPollTable, setShowMainPollTable] = useState(true);
   const [togglingMainPollTable, setTogglingMainPollTable] = useState(false);
   const [hideTrialPollScores, setHideTrialPollScores] = useState(true);
@@ -839,6 +841,9 @@ export default function TrialAdminPage() {
         if (data.showPollTable !== undefined) {
           setShowMainPollTable(Boolean(data.showPollTable));
         }
+        if (data.showTrialContestantsOnHome !== undefined) {
+          setShowTrialContestantsOnHome(Boolean(data.showTrialContestantsOnHome));
+        }
         if (data.hideTrialPollScoresDuringVote !== undefined) {
           setHideTrialPollScores(Boolean(data.hideTrialPollScoresDuringVote));
         }
@@ -954,6 +959,30 @@ export default function TrialAdminPage() {
       showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
     } finally {
       setTogglingPollTable(false);
+    }
+  };
+
+  const handleToggleTrialContestants = async (newStatus) => {
+    const targetStatus = typeof newStatus === "boolean" ? newStatus : !showTrialContestantsOnHome;
+    setTogglingTrialContestants(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_trial_contestants_on_home", showTrialContestantsOnHome: targetStatus }),
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        setShowTrialContestantsOnHome(data.showTrialContestantsOnHome);
+        showToast(data.showTrialContestantsOnHome ? "🟢 เปลี่ยนหน้าแรก Trial เป็นหน้าข้อมูลผู้เข้าแข่งขันแล้ว" : "🔴 ปิดโหมดหน้าข้อมูลผู้เข้าแข่งขัน Trial แล้ว", "success");
+      } else {
+        showToast("เกิดข้อผิดพลาดในการบันทึก", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setTogglingTrialContestants(false);
     }
   };
 
@@ -5027,6 +5056,104 @@ export default function TrialAdminPage() {
                       : showWarmupTable
                       ? "🔒 คลิกเพื่อปิดซ่อน"
                       : "🔓 คลิกเพื่อเปิดแสดง"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Trial Contestants On Home Box */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: showTrialContestantsOnHome ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1.5px solid rgba(239, 68, 68, 0.4)",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "20px",
+                boxShadow: showTrialContestantsOnHome ? "0 0 20px rgba(0, 229, 255, 0.12)" : "0 0 20px rgba(239, 68, 68, 0.12)",
+              }}
+            >
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#00e5ff", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>🎴</span> เปลี่ยนหน้าแรก Trial เป็นหน้าข้อมูลผู้เข้าแข่งขัน (Contestant Profiles Mode)
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
+                เปิดแสดงการ์ดข้อมูลผู้เข้าแข่งขัน, ประวัติ, คะแนนรอบเก็บ และคลิปวิดีโอเป็นหน้าแรกของ <code>/trial-foty</code> ทันที โดยไม่ต้องรอให้เปิดรับโหวตโพลล์
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "14px 18px",
+                  borderRadius: "12px",
+                  background: showTrialContestantsOnHome ? "rgba(0, 229, 255, 0.12)" : "rgba(239, 68, 68, 0.12)",
+                  border: showTrialContestantsOnHome ? "1px solid rgba(0, 229, 255, 0.35)" : "1px solid rgba(239, 68, 68, 0.35)",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingTrialContestants ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showTrialContestantsOnHome}
+                    disabled={togglingTrialContestants}
+                    onChange={(e) => handleToggleTrialContestants(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingTrialContestants ? "not-allowed" : "pointer",
+                      accentColor: "#00e5ff",
+                    }}
+                  />
+                  <div>
+                    <span
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "900",
+                        color: showTrialContestantsOnHome ? "#00e5ff" : "#f87171",
+                      }}
+                    >
+                      {showTrialContestantsOnHome ? "🎴 เปิดโหมดหน้าข้อมูลผู้เข้าแข่งขัน (ON)" : "🔴 ปิดโหมดหน้าข้อมูลผู้เข้าแข่งขัน (OFF)"}
+                    </span>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", margin: "3px 0 0" }}>
+                      {showTrialContestantsOnHome
+                        ? "เมื่อผู้ชมเข้าสู่ /trial-foty จะเห็นการ์ดข้อมูลผู้เข้าแข่งขันและคลิปแนะนำตัวเป็นแท็บแรกทันที"
+                        : "แสดงผลตามปกติ (แท็บตารางคะแนนแข่งขัน)"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    type="button"
+                    disabled={togglingTrialContestants}
+                    onClick={() => handleToggleTrialContestants(!showTrialContestantsOnHome)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: showTrialContestantsOnHome ? "rgba(239, 68, 68, 0.2)" : "rgba(0, 229, 255, 0.2)",
+                      border: showTrialContestantsOnHome ? "1px solid rgba(239, 68, 68, 0.5)" : "1px solid rgba(0, 229, 255, 0.5)",
+                      color: showTrialContestantsOnHome ? "#fca5a5" : "#67e8f9",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingTrialContestants ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    {togglingTrialContestants
+                      ? "⏳ กำลังบันทึก..."
+                      : showTrialContestantsOnHome
+                      ? "🔒 คลิกเพื่อปิด"
+                      : "🔓 คลิกเพื่อเปิด"}
                   </button>
                 </div>
               </div>

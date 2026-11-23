@@ -142,6 +142,7 @@ export async function GET(req) {
     ? (rawSettings.showTrialPollTable !== undefined ? rawSettings.showTrialPollTable !== false : true)
     : true;
   const showPollTable = showTrialPollTable;
+  const showTrialContestantsOnHome = Boolean(rawSettings?.showTrialContestantsOnHome);
   const hideTrialPollScoresDuringVote = rawSettings ? rawSettings.hideTrialPollScoresDuringVote !== false : true;
 
   let isAdmin = false;
@@ -210,6 +211,7 @@ export async function GET(req) {
       showWarmupTable,
       showPollTable,
       showTrialPollTable,
+      showTrialContestantsOnHome,
       isScoreHidden,
       hideTrialPollScoresDuringVote,
       trialSubtitle:
@@ -307,6 +309,29 @@ export async function POST(request) {
         showPollTable: newStatus,
         showTrialPollTable: newStatus,
         message: newStatus ? "🟢 เปิดแสดงตารางโพลล์ในหน้าแรกแล้ว" : "🔴 ซ่อนตารางโพลล์ในหน้าแรกแล้ว",
+      });
+    }
+
+    // Toggle contestants view mode on trial front page
+    if (body.action === "toggle_trial_contestants_on_home") {
+      const rawSettings = await getKVData("fpt_settings", readSettings);
+      const currentVal = Boolean(rawSettings?.showTrialContestantsOnHome);
+      const newStatus =
+        body.showTrialContestantsOnHome !== undefined
+          ? Boolean(body.showTrialContestantsOnHome)
+          : !currentVal;
+      const updatedSettings = {
+        ...(rawSettings || {}),
+        showTrialContestantsOnHome: newStatus,
+      };
+
+      writeSettings(updatedSettings);
+      await saveKVData("fpt_settings", updatedSettings, writeSettings);
+
+      return NextResponse.json({
+        success: true,
+        showTrialContestantsOnHome: newStatus,
+        message: newStatus ? "🟢 เปลี่ยนหน้าแรก Trial เป็นหน้าข้อมูลผู้เข้าแข่งขันแล้ว" : "🔴 ปิดโหมดหน้าข้อมูลผู้เข้าแข่งขันแล้ว",
       });
     }
 

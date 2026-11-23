@@ -29,6 +29,8 @@ const DEFAULT_SETTINGS = {
   showWarmupTable: true,
   showPollTable: true,
   showTrialPollTable: true,
+  showContestantsOnHome: false,
+  showTrialContestantsOnHome: false,
   favFanVotingOpen: false,
   showFavFanInNav: false,
   pollVotingOpen: false,
@@ -117,6 +119,8 @@ export async function GET(request) {
       showWarmupTable: settings.showWarmupTable !== false,
       showPollTable: settings.showPollTable !== false,
       showTrialPollTable: settings.showTrialPollTable !== false,
+      showContestantsOnHome: Boolean(settings.showContestantsOnHome),
+      showTrialContestantsOnHome: Boolean(settings.showTrialContestantsOnHome),
       favFanVotingOpen: Boolean(settings.favFanVotingOpen),
       showFavFanInNav: Boolean(settings.showFavFanInNav),
       pollVotingOpen: Boolean(settings.pollVotingOpen),
@@ -166,6 +170,8 @@ export async function GET(request) {
     showWarmupTable: settings.showWarmupTable !== false,
     showPollTable: settings.showPollTable !== false,
     showTrialPollTable: settings.showTrialPollTable !== false,
+    showContestantsOnHome: Boolean(settings.showContestantsOnHome),
+    showTrialContestantsOnHome: Boolean(settings.showTrialContestantsOnHome),
     favFanVotingOpen: Boolean(settings.favFanVotingOpen),
     showFavFanInNav: Boolean(settings.showFavFanInNav),
     pollVotingOpen: Boolean(settings.pollVotingOpen),
@@ -346,6 +352,12 @@ export async function POST(request) {
       }
       if (body.showTrialPollTable !== undefined) {
         newSettings.showTrialPollTable = Boolean(body.showTrialPollTable);
+      }
+      if (body.showContestantsOnHome !== undefined) {
+        newSettings.showContestantsOnHome = Boolean(body.showContestantsOnHome);
+      }
+      if (body.showTrialContestantsOnHome !== undefined) {
+        newSettings.showTrialContestantsOnHome = Boolean(body.showTrialContestantsOnHome);
       }
       if (body.protectFoty !== undefined) {
         newSettings.protectFoty = Boolean(body.protectFoty);
@@ -563,6 +575,36 @@ export async function POST(request) {
         success: true,
         showPollTable: newStatus,
         message: newStatus ? "เปิดแสดงตารางโพลล์แล้ว" : "ปิดแสดงตารางโพลล์แล้ว",
+      });
+    }
+
+    // Toggle contestants view mode on home page (/)
+    if (body.action === "toggle_contestants_on_home") {
+      const newStatus =
+        body.showContestantsOnHome !== undefined
+          ? Boolean(body.showContestantsOnHome)
+          : !current.showContestantsOnHome;
+      const newSettings = { ...current, showContestantsOnHome: newStatus };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        showContestantsOnHome: newStatus,
+        message: newStatus ? "เปลี่ยนหน้าแรกเป็นหน้าข้อมูลผู้เข้าแข่งขันแล้ว" : "ปิดโหมดหน้าข้อมูลผู้เข้าแข่งขันแล้ว",
+      });
+    }
+
+    // Toggle contestants view mode on Trial FOTY (/trial-foty)
+    if (body.action === "toggle_trial_contestants_on_home") {
+      const newStatus =
+        body.showTrialContestantsOnHome !== undefined
+          ? Boolean(body.showTrialContestantsOnHome)
+          : !current.showTrialContestantsOnHome;
+      const newSettings = { ...current, showTrialContestantsOnHome: newStatus };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        showTrialContestantsOnHome: newStatus,
+        message: newStatus ? "เปลี่ยนหน้าแรก Trial เป็นหน้าข้อมูลผู้เข้าแข่งขันแล้ว" : "ปิดโหมดหน้าข้อมูลผู้เข้าแข่งขัน Trial แล้ว",
       });
     }
 
