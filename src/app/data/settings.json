@@ -1,20 +1,100 @@
 {
   "gamePassword": "fanpantae_2026",
   "adminPassword": "admin_fan_2026",
+  "trialAdminPassword": "trial_admin_2026",
   "totalContestants": 22,
   "protectHome": false,
   "homePassword": "fanoftheyear2026",
-  "protectDraw": false,
+  "protectDraw": true,
   "drawPassword": "fanoftheyear2026",
   "protectHistory": false,
-  "historyPassword": "fanoftheyear2026",
+  "historyPassword": "",
   "protectRestrict": false,
-  "restrictPassword": "fanoftheyear2026",
-  "trialAdminPassword": "trial_admin_2026",
+  "restrictPassword": "",
+  "isArchived": true,
+  "archivedAt": "2026-10-24T18:24:10.960Z",
+  "currentPhase": "qualifying",
+  "qualifyingLocked": false,
+  "trialVotingOpen": false,
+  "showWarmupTable": true,
+  "showPollTable": false,
+  "showTrialPollTable": false,
+  "showContestantsOnHome": false,
+  "showTrialContestantsOnHome": true,
   "favFanVotingOpen": false,
   "showFavFanInNav": false,
   "pollVotingOpen": false,
   "showPollInNav": false,
   "hidePollScoresDuringVote": true,
-  "hideTrialPollScoresDuringVote": true
+  "hideTrialPollScoresDuringVote": false,
+  "protectFoty": true,
+  "fotyPassword": "fanoftheyear2026",
+  "showFotyInNav": false,
+  "protectCurrent": true,
+  "currentPassword": "fan_tournament2026",
+  "showCurrentInNav": false,
+  "weeklyMatches": [],
+  "tournamentWeeklyMatches": [],
+  "showChampionsOnHome": true,
+  "tournamentUpdateUpToMatch": "24",
+  "tournamentAwardOverride": "auto",
+  "tournamentPenaltyOverride": "auto",
+  "fotyUpdateUpToMatch": "all",
+  "fotyAirUpToEpisode": "4",
+  "fotyUpcomingEpisode": "5",
+  "fotyBroadcastCustoms": {
+    "1": {
+      "airDate": "14 พฤศจิกายน พ.ศ. 2569",
+      "replayUrl": "https://www.youtube.com/watch?v=2pqAuSe3jaE"
+    },
+    "2": {
+      "replayUrl": "https://www.youtube.com/watch?v=UhaEyMysrYU",
+      "airDate": "16 พฤศจิกายน พ.ศ. 2569"
+    },
+    "3": {
+      "replayUrl": "https://www.youtube.com/watch?v=SUhFQ7QSIVQ",
+      "airDate": "17 พฤศจิกายน พ.ศ. 2569"
+    },
+    "4": {
+      "airDate": "18 พฤศจิกายน พ.ศ. 2569",
+      "replayUrl": "https://www.youtube.com/watch?v=dm3GqLHMXLE"
+    },
+    "5": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "6": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "7": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "8": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "9": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "10": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "11": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "12": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "13": {
+      "airDate": "เร็ว ๆ นี้"
+    },
+    "14": {
+      "airDate": "เร็ว ๆ นี้"
+    }
+  },
+  "showFotyQualifyingOnHome": false,
+  "fotyRevealUpToOrder": "all",
+  "fotyRevealCategory": "attribute",
+  "fotyReveal3SecPartial": 0,
+  "trialSubtitle": "The Biggest of The Genius War",
+  "fotySubtitle": "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)",
+  "tournamentSubtitle": "การแข่งขันลีกสุดดุเดือด แบ่งสาย Group A และ Group B ชิงชัยเพื่อครองบัลลังก์เจ้าแห่งทัวร์นาเมนต์"
 }

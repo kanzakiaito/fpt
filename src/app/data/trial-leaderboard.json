@@ -4,7 +4,7 @@
     "name": "นัทธสม บุญมา",
     "nickname": "ซ่า",
     "topic": "ประวัติศาสตร์ไทย",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMe1vJXocwupyOJrMtEfpFo5OPnMJlViccu4NZm9t-9TkKwUop80I1PDRqcT4jilED0k07WAwleA2sEHGQceHzzsxcBn1Y_cOHW7I4IkImzQK5dj3Tj3DQYxGGZgsjBtTyWHvYypYOibHN6VUIXMycf=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczO8Kc6srkOk0U5DT26SP74V1kbo377OBWSq0MXC6XlTXt0U4zVBQ7j6QVRPkHcTBQY51JFsNIsIlbxYxUlP4XWEI9aJyEG5hlDpIbrnaKFfULfrQnWTvnwHnkET017HDC2bMMgURJang2eOYODSStEb=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -16,14 +16,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.782Z",
-    "updatedAt": "2026-11-01T15:03:09.786Z"
+    "updatedAt": "2026-11-22T17:02:07.931Z",
+    "warmupSchedule": ""
   },
   {
     "id": "2",
     "name": "ณชนน ยุงคุณ",
     "nickname": "เจสัน",
     "topic": "ซีรีส์ F.R.I.E.N.D.S",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOSfRwKmGHwdQPemYmAyUztPOb_QZCsSc1rYwm9fWUESjcG42qQxj7cRgnPKMV_vZbmyPat7r_vGpKs0M9bgDXYyERBMJALw3cTMUNHRRJP-QF7hjCR_ZfgyFYWlTXEIq9nMBzf-Xxci2lMhlmH1DTq=w1110-h1113-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPmV5HtOTl-ntwrW6-cC557Qh1B2DYTp4BcM-BcdIhbvtCEPn0YkpFxg4rVy_pgjt8WlBDEcLFUBsdaEL1qiYP_ZqAoLaQj_Zx2aGhCmEGtdF0dCSjP9dbOoqc5ylSemJ4oMMzJKEzbYtFSIBVcymir=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -35,14 +36,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.786Z",
-    "updatedAt": "2026-11-01T15:03:09.786Z"
+    "updatedAt": "2026-11-18T07:32:37.092Z",
+    "warmupSchedule": ""
   },
   {
     "id": "3",
     "name": "สหัสวรรษ นิจพันธ์",
     "nickname": "พีท",
     "topic": "คอมพิวเตอร์",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczMLt_RCM7m3VPvssHx-q-XnCrN7ncVrTbWK-Wkmn5Z35pHQhrskPUJDqwVEiXwcOtxn9JHeJzqxKUH1dBm2edF69YtnGmC5xOt6oAFx4WTb3flBwogugJ_YMfW0ZU3UDfaXU4C8kL-SEUpte3mgCTBV=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -54,14 +56,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.786Z",
-    "updatedAt": "2026-11-01T15:03:09.786Z"
+    "updatedAt": "2026-11-18T07:31:27.019Z",
+    "warmupSchedule": ""
   },
   {
     "id": "4",
     "name": "ศุภกร นิลสุวรรณ",
     "nickname": "หมี",
     "topic": "บุคคลสำคัญของโลก",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczNZoycybKH_JLe3sadOjWqcKYB6T7gla157eLfhpdmiqjreEQXzlWy3N6MNXuZ3j5jwymUTuHtcmTWj4dwZFDRL476koalvo2o0X5Uefh2H-jeCkCkS6ktiFu-JJ3X_G_oWt2Aq5AHSQCXzNCxoOyn_=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOMEGP84V37WWoKaC5h9zbsT5VLZvMccARzQyfLK6TXAIxlRQbQcknhBamxvPa4kvKK7Z_qBZBdibrR_D-fAEZnz8Oi0edqFGUOtNR04PSMmLCIg6I4_nEglZ1DR0M80UB7f7avcuLPqaneUoE53VtW=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -73,14 +76,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.786Z",
-    "updatedAt": "2026-11-01T15:03:09.786Z"
+    "updatedAt": "2026-11-18T07:31:52.191Z",
+    "warmupSchedule": ""
   },
   {
     "id": "5",
     "name": "นิธิกร วิชัยวงศ์",
     "nickname": "ก๊อปปี้",
     "topic": "Disney",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczNGXiRybdHr50jnZ5cSGVWylSyacpr0_lKea-J997YP8DTnyd2LSErW43LVIV1jv05TzvFz9X3BwyMZ1NDAk0AFH9d5tlu-9ZBq54sW8LK3wfGKAH6cdN-Y2BS3jHh4jxLuJIsoSxuhPwbvBALA7kO_=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczN3asPYKRkAQCUnaqO7eMcL9xutacg-iDIRKHzMqq4rvZ2ytGb3RjHskEUu5l2H6-yq03KKao8uTLbhtdyWgGZ-0Gyvexg6Z1CexiUjTYV08ZT_kT4MSYftWDLRmkxDxKKPzGacgk04WQ58Ifos_0OU=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -92,14 +96,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.786Z",
-    "updatedAt": "2026-11-01T15:03:09.786Z"
+    "updatedAt": "2026-11-18T07:32:16.381Z",
+    "warmupSchedule": ""
   },
   {
     "id": "6",
     "name": "ฤทธิชัย ภูสิญามณี",
     "nickname": "ริท",
     "topic": "วงไอดอลหญิงไทย",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOqXTftL6JOypWC2yES-VRiTU1b7tpE3zr2r3RJiJYO4hyujMq9vKNr5qOYLW7ZZLdpg3fPP8JZVj-0JNjO0KdQF2yCtougj5qz8L__ZrJuD9DdYVK_sEi0nAHhqD1JFE9bu8g-gqKAGaUVJ9w4EHws=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -111,14 +116,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.786Z",
-    "updatedAt": "2026-11-01T15:03:09.786Z"
+    "updatedAt": "2026-11-18T07:30:41.226Z",
+    "warmupSchedule": ""
   },
   {
     "id": "7",
     "name": "ณัฐดนัย วงศ์ปัญญา",
     "nickname": "แฟรงค์",
     "topic": "จินตหรา พูนลาภ",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczM14X9Rd93Tc6EVRrvYI1ns_lXDKgxS-6t9B99n90V4g0hHGENS9c8IggI4eqnUUW5bCAGuG6PwKCyPWVWSqjwiZeoG8jOpVOHUE_OwjgHbZ6OQTnr8jU6brI33P6CMKE9749M8iMEoiviPjfCIudOQ=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -130,14 +136,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.786Z",
-    "updatedAt": "2026-11-01T15:03:09.786Z"
+    "updatedAt": "2026-11-18T07:30:08.328Z",
+    "warmupSchedule": ""
   },
   {
     "id": "8",
     "name": "ปกรณ์ สถิตอยู่คู่ไทย",
     "nickname": "แมน",
     "topic": "บะหมี่กึ่งสำเร็จรูปไทย",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPHCjubYTcWTLIJZNbW8YuPlIQxTI2xId16SOpQ6vkwvU77oLBHJMckZrJfQZh2tSxhLNkAXwpt_S-i5YMnpYUfmq5ho2g9VVV28IySO9f13efUnOdQQGo_AhkLOk9y3bAgryJg-lrNOMb68v9gUdDZ=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -149,14 +156,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.786Z",
-    "updatedAt": "2026-11-01T15:03:09.786Z"
+    "updatedAt": "2026-11-18T07:32:31.197Z",
+    "warmupSchedule": ""
   },
   {
     "id": "9",
     "name": "อดิเทพ พฤกธารา",
     "nickname": "โอเว่น",
     "topic": "Cookie Run Classic",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczP-Q4RRnAx8RJaodQVpQwc1upQFYHzqLKnRPu64myPQERgqzKsM6i4YOe-K9O5o84GHmQDME8zvW1hELLIHZQ95zwcsKaSH0jAqHvGw72EoxrcwvilAY8ap9-0QW6VmsFj0FpdHKgK9QjaowjPyfG3s=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -168,14 +176,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:33:14.710Z",
+    "warmupSchedule": ""
   },
   {
     "id": "10",
     "name": "เจษฎาพร ศรีมาตย์",
     "nickname": "ออมสิน",
     "topic": "Five Night At Freddy's",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPm7XK3GBPrPoj5mitFuPhsIM-Ro5DWjk2l4zC8YydVisJjER1unaYVitNce0BUZa18n7hmXdnWbwa0DO5CkrWEHvBKBctORALIzEnkkPkRjlQlWlT12sVUEv2s2MySTZFoabz9xfc8nj2U9e-vmHL6=w1101-h1099-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczNfwWVFemH8SoZhE-scHeAMGd-ax_5LKpjH61bB8FedIgsv_UyIBgAxktW1qsMpZccLLNQyYTJR7ujGtkgL_JecX4UUpW_MGAphieyZSK8TKHJ9Gu11leINO3czPn8TTmxg-wW5H-ll9UbS9ADDeNtL=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -187,14 +196,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:32:24.751Z",
+    "warmupSchedule": ""
   },
   {
     "id": "11",
     "name": "เชาว์วรรธน์ จันทร์สุข",
     "nickname": "ก๊อง",
     "topic": "Workpoint",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOoVNTKBCTKvOsaIH0OZZr1I2BmQEvovwxz1ADl4lHiBqIXSbKWoIhAjTC1kLf-9CUMSQgXE433kjXigSNIBcx2eEyXlQY67so9I6Qv3iDdJXxRBEVtyLVg2D_gDhVhMYu-swWvIUYOnX_4m96SJxs7=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -206,14 +216,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:30:00.582Z",
+    "warmupSchedule": ""
   },
   {
     "id": "12",
     "name": "ปรมัย สมเภาว์มาลย์",
     "nickname": "ทาโร่",
     "topic": "Metal Heroes",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPmNSXml4jKCrpze0s6i_FJS5-TqmiNu2FGfvznqSO2FlRs9PrWWHb13S45eUtOw7rui5-a9lKlr2Sjj3qIwR8VkUOEJcr_9dCGUEfgUORPU-OfLVZGEwMAgX9vddPbFbqukBdA5o_kyDVxYm7ugblk=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -225,14 +236,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:30:56.402Z",
+    "warmupSchedule": ""
   },
   {
     "id": "13",
     "name": "พีรภัทร หมื่นหาญ",
     "nickname": "พีม",
     "topic": "อัสนี วสันต์",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOAlEwQaLwL5Kzhzyphkyj14Icnr8wWbFszLrJLT89GKY50HNs9LiBqVML3uC7BSXiZdIWbtUMkyjhT5jcEyXSfkJgn2cbEdi1RqYK0EfEyQM91CpVCIOk1DdMiFdC1wNDIHWyWWbu2JclwOiUsKEWB=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -244,14 +256,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:33:47.826Z",
+    "warmupSchedule": ""
   },
   {
     "id": "14",
     "name": "ณัฐวุฒิ โนรี",
     "nickname": "แสตมป์",
     "topic": "รายการ The Cube UK",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPioiz5362-yx4IyFh5ujVIiP8u9T9HO9Szx73eo7RNgAv1vpU_NXF4AhPHts5qXPf0-Tc-FDkoC--krXYTr5CpHbd2alN0a3Mvv0qG_WLVqHKcs79yVOctUXLqdqw1J-1Yv1hIYaMBr61YOXK2oRaJ=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczNEYslcc1YGydNKJzbecp39VkOyGc5BhcPfRvgn8jXDgKPIUU8iWZk2o5CekjT5XPb-XqAs51CE25t6EvorW1JO_p-YyXXSHUxJwnLF4lWrkGrp5lwbRLAgBorT9WZuRrMwcVGaKdSuIeeDNQM0wwWj=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -263,14 +276,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:31:13.032Z",
+    "warmupSchedule": ""
   },
   {
     "id": "15",
     "name": "พศวัต พุ่มเงิน",
     "nickname": "ปาร์ค",
     "topic": "Uma Musume: Pretty Derby",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMwFPheesY-nKVcVpRYTHvCFm_Kvsf2djmqLhSfgE6btw62df02FN84YxvJnUHojPbRuOTYYcL-JEol0ZwrqvhwyENZWRk8KHGxLoZ4byFEbxKy7tYrZhY_9PSnMIxvau4O3_iyy_noIIO24OkcYhQJ=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczNJNvq1QicI6JctYiHEyCXC9W3XiAmBmda42CXlq4oSDJQmP6lfYPHX_4qgBkkkK427E9g-d9_RqYbMgBGyFUhKkulpN88PFdInvcJyDVRKIeEJV4zp7XMQy3dp_hJPq0_La0JyHRd8S3BDwk3Dp95c=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -282,14 +296,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:31:35.233Z",
+    "warmupSchedule": ""
   },
   {
     "id": "16",
     "name": "กันตชาติ ศรีเพ็ชร",
     "nickname": "กัปตัน",
     "topic": "Valorant Esport",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczN87yq_9fWf_gMlAfHPx8yOsf9f-mRbrZCwTaV4V7aq6SLANnCPC_cq9JJVbxc7S3AoEHO_BkvDvAUITPLwERz7ljkkRrvhvUST-t1T7gDTOdR5AmHLVS4keFuhyrb7ZXkd-RU5i3kj_vTs8ANcAIDy=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczNaSD4lEdfG4UoCEyxtgMPMgUm0jDOmKET3aIgg0xguowwTHucKtbKLpDySE_G8BGCUQ7DLxSoSB1yXmj36YKwHdLDeLIkzgGBNJqZhSHwVAv9fiueAxquytyYSgxwqbawtX5onHyC9IfepuhydDGLh=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -301,14 +316,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:33:05.905Z",
+    "warmupSchedule": ""
   },
   {
     "id": "17",
     "name": "ภควัต เลี้ยงอยู่",
     "nickname": "ไผ่",
     "topic": "Super Sentai",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOehDRQ0ar4hz5VZ7CK_GTYbl2e2YdFymb_KW6S4Ljfc2vWc5w-doWt_uFuF4fPXQWdc1lr_-b9QN9heV2_F4CSj_9e16wW6mrvDOQQyeu7S0Ol0ualvyJWActhjMRYMTbqOlXuEeCrvnuEwMrPSo6a=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczNp8EhCE_1uvwarJdsRA0DMsAP8DaoP6daBri0q14fg8XS5NxX5vUZWO-IkSo9DcWjsMpg4Sn4LtTRKk6QIUeSg3jy90bawXi2wfZRXhu606y04snPgRetbq7Xkh_N89i7dqpnC_wVl--nQfVKjbIBL=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -320,14 +336,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:30:31.957Z",
+    "warmupSchedule": ""
   },
   {
     "id": "18",
     "name": "ณฤกร วงศ์บูรณะ",
     "nickname": "ตฤณ",
     "topic": "Marvel Cinematic Universe",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczMEGP77n0nYKJsMP7_eaVx2hitNJHzuCAdtbJfbpXIx2BR_JL3oAF7aO_LHfsl-A4SqgjP0xAhIxj09SIlcmufkg-HneaAfnVEXB-lZUQeK9M2YUdtw1Hluy6y7Od2MFzlTEfUiPxLFbbuZDmASumGj=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -339,14 +356,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:30:50.030Z",
+    "warmupSchedule": ""
   },
   {
     "id": "19",
     "name": "วรพัชร์ พงษ์ประเสริฐ",
     "nickname": "ไอซ์วอ",
     "topic": "โฆษณาโทรทัศน์ไทย",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOnpgZZivcY5DrsQQg33JjFdQlsuSgkAq4Yp0GgtbHTgBhe19Cvdn2c1Pbv0vAWziWIPPaq83X-Gjs_NhxdBJtatvk05vhwRL9G4U2VbNBEYdyAeTloivnp7zsRKPp9VFxNCH9RvVcN-IgmANtPZb4v=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczM9CzyfKVuKIzdSy0aMnVVeMgaICA5MaeNpQhmL50dwI01BVuHoyZUcGarfi0cpvRMJamy5OQ4KBAiS3j4UZZLKtyrDt3znlc38o1GsLf5Uq-HbkaBQPA_5csggDx0S60W2BCEkesQAou25m5RDgBpi=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -358,14 +376,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:29:06.973Z",
+    "warmupSchedule": ""
   },
   {
     "id": "20",
     "name": "ปฏิปัน อัศวภูไชย",
     "nickname": "ปัน",
     "topic": "48Group Thailand",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMYJs2gfkpivIlfFh_ogguJ850aCteu5kKVtkB2sKh-XFht5S6AzcTd42JOYXTFCi_-mpl16FpUV2fHvuZlY5J9ENOize1yH06NsdYgjLekboQ--KeSMVnuviGwjLkB5anel5ToX5KKP5d_g6NtvB9I=w1092-h1092-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczN_VNnPKvxcaYQUoZvlPrP9feB3-Vw32KAUeTCy3ItwmlEL9usyM3bdPx3kOx_nGbUZ-59H4pWcry21W5ykpqTPfRBqqDpdY8GOB6R1WPBBOIVMzyn9gHPVst06yq-zCFBOCwQv5qXHoo-kUcy_Jipu=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -377,14 +396,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:30:23.948Z",
+    "warmupSchedule": ""
   },
   {
     "id": "21",
     "name": "ธนกร สุขปาน",
     "nickname": "ออม",
     "topic": "แกรมมี่โกลด์",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPP8nZ07EZHdzSIrVCyY_JJVLoAVFwc5nWH4E4FzJRHd5UckRRz9r4TGQSJQTK4G0Rff5XYSUMNfr4hsnds_foBX_6RMxRhCfoHUKdVPhK7MqOh9VpytXXVd-pLYaFTHr9xw0QM5q7T2VZahmTWhEtl=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOATe9a60IA6frJ_Qbp66Bhv-EbB8PejqVMT0uvv-afLq1_KSq_OhcYA9GAYFvonZNSr1hk-W7JeMNL1_Rcp5ZcucS-qcvddpmjf3a3uNlm2gS0k4lMBlolHcpTe5nm1mhUD5yYk2CjJ6XHL3lj8N_I=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -396,14 +416,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:29:45.384Z",
+    "warmupSchedule": ""
   },
   {
     "id": "22",
     "name": "ภควัต ศรศุกลรัตน์",
     "nickname": "อาร์ม",
     "topic": "รายการโทรทัศน์ไทย 90's-2010's",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOXZ7x2lelKztH88AKbMMCOY3kEca65A0ke-9gVHZ3bjA-US37R2F-PQKOztqpRzHcmQaRfen2rY6jE26F4GPby3gG8o1ZdVfsxbzB6g0N6Cz6epHSO57s17ofVHCodPHJfdyQdTt-mjTc_M9i6bKKq=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPraYrTBPzq6OGXOvtybbMQFuyakMBLwfEAJCGbeTCYr2Sip-_PecLz9lmWOIDfA14pneHt7OXGUNJCg2DkUKW3819Y84syMTNo8WAQej-tKR0ermPLbo2LV3YHYyNme0y0Mq6W5jNN0t2hiXv0phPA=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -415,14 +436,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:31:19.935Z",
+    "warmupSchedule": ""
   },
   {
     "id": "23",
     "name": "นันทวัฒน์ สาริกา",
     "nickname": "นัท",
     "topic": "ยอดนักสืบจิ๋วโคนัน",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOQ701srfaEGkuK1N2KBJTwKg0qv5RntEOorfHm6x63d6zQ0AgzJ3Sv3ugg1R3Q3dy4i0dg_D6oCVfEcQ3R2dPpnp4CfmiVZX6mYGvSy0EJK8vDAZUeLYLo1Bk_0Xy9E8EyRv3O6JVxjFS-mxQZo3f1=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -434,14 +456,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:33:37.982Z",
+    "warmupSchedule": ""
   },
   {
     "id": "24",
     "name": "วินทกร คำภีระ",
     "nickname": "อุลตร้า",
     "topic": "ดูนกไทย",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPq9XSlfTSu6mYQfYcizPlpoRX-U1FWtsCIro9l10CjTHzq79kjjB2sgb6DvdUHshgyY750-i0DGgNwYeTd7xnWvpzpAxUvdEwy6nI5UJY-a7X3O74FJQqePYA3BI3iIFFWcxJB7CxfVdxj2yJD4ITT=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -453,14 +476,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:32:00.155Z",
+    "warmupSchedule": ""
   },
   {
     "id": "25",
     "name": "ณัฐภัทร แก้วสินธุ์",
     "nickname": "นที",
     "topic": "Cookie Run Classic",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczN8o5FXqfPvxqOJs1do7f6f9mxT29Uah3nW-H2erXV1B5DsWhlnT2Acsq2rLJsMW-7g61ODyOzeSNohiJcv7AcIr-bM0JJPltRCNxrKU_qX_fqhdFIvEGOb-jJfe3CUI_FByhfFMQ9Dr7cPChdMDL4-=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczMXCwuYEvL8zhPGHdsji8HIwQZ-db1u_Vj3Pa9gVh9TIFXngGhv3SihGLXSiOmMEBMBZqT0gMUGAwyVrw4a4IW-9bu0QPB8gS-QKzz2n5GtLIYVlr4CgI4so-ZF4phf8YM_4LQrixXP7MlEjPXdKTad=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -472,14 +496,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:29:51.460Z",
+    "warmupSchedule": ""
   },
   {
     "id": "26",
     "name": "ณัฐพงษ์ อ่ำกลาง",
     "nickname": "อั้ม",
     "topic": "Tilly Birds",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczMJNr8wJWNZQqojGeGPffIvjVszdbf-3U3gi0RgqzTj1tYYXhlqpyE1TFanmFSXNsNnHjsh7yTXRctbDGrDxdWZelqhttLw0t9poB4XruaI1TDRCLiUNjzlla4DYl-cBPuBDaXaeDNr1CF1HYMVOJQ6=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -491,14 +516,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:33:25.216Z",
+    "warmupSchedule": ""
   },
   {
     "id": "27",
     "name": "นัทธภพ ธนวัฒนาเจริญ",
     "nickname": "นนท์",
     "topic": "Cardfight Vanguard",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczNhXutHbE11LOiqMlcSZF-VfZC_CDeZFvyQ8p6J3OhZ5xFmb52Lu5iebeYOFEFyhi_5NvUOko1ijczYnQqFecJ05ES221a6eiKkupeX4jQGSDfTRmP9pmyc0g-Kyq5IEjxEKIuZdVbH05buSv7UXrjy=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -510,14 +536,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:32:46.936Z",
+    "warmupSchedule": ""
   },
   {
     "id": "28",
     "name": "รติพงษ์ กมลเกียรติพัฒน์",
     "nickname": "นิว",
     "topic": "My Hero Academia",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPalqWB79ObwsPqJVjlBoLGr-31QtzntceySm9B0TC7LItpwpfkpXmrZNUof2TKuOv2dBhk1KbQAGS_TBEt-AwfqtpiPmaoN_DURhOEGoA3R4T7NHbgYP_4-B69D2xS01de-BWLa3YFQo5QtBiLpQgC=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczMwuoU0h1xKMnYf9aBGY5M8ddpCkrNfxfZMjhaD8PUpqqW2Ww3hvrfL2_SRmyeY4fcJAIEkWgnxMyofxwbK8r8J9EmKh4Q-4KEdP3pcI9flvxnNVuOsqwpw9Js-L6qpVyuL1cUAHeHSX0uBjNkimcsy=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -529,14 +556,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:32:53.757Z",
+    "warmupSchedule": ""
   },
   {
     "id": "29",
     "name": "พัชราภรณ์ ขวัญพรมสี",
     "nickname": "เอิร์น",
     "topic": "Disney Twisted-Wonderland",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOkN98O0LDhBcQhE4X4iE67B322lQ1L3iZKvqZyP5LXaH37LibFcH26AbonLsUzAkxKXARjmy2s0hT7n83PQ0_hiVbM8TUigd-_RRr_9wH5bI8GUXg93DH5tmYRC7yNHrzFxoPMhtp7n7WE7JzTSgk9=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPgbLhhGhid3wVOHYmv3D1qwI1bPyDI8pYNO-914ifFG15yYDL3iHkeisplrhRLKwo2HJ3lr5a0lmNK9q_MVQ0puS9mXSDT9gHEmDUJpyCIEizoO4nGhzL1JROzBQpDCU7TjCvucLc2qrmkQ5O1MOla=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -548,14 +576,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:29:29.074Z",
+    "warmupSchedule": ""
   },
   {
     "id": "30",
     "name": "คุณอินทร์ บุญสิน",
     "nickname": "อินทร์",
     "topic": "รายการแฟนพันธุ์แท้",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPWAuR_xFInBJ-degK9dYzw7iRgJtbvOZTy6Aw7m3PPnCTs5GCrdQ_lyPOuaVcrnjAkzArwDjQStQXHI35qdAP2DylBjZhSwarynr8qQRmnAVmHPNZdWn-pnevM2UECOuRCtLkJJTRfD8_XGtkYB5EQ=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -567,14 +596,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:32:07.478Z",
+    "warmupSchedule": ""
   },
   {
     "id": "31",
     "name": "สิปโปทัย ศรีบุญเรือง",
     "nickname": "กัส",
     "topic": "คาราบาว",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMpg3NPj_C_0lXZ55wQnYy3uBdKxWYsCYSfNyh4TC5T802iCIilGvzTZVtTYlKpVFkdWWLlSt8RBq0gHtckzQclQUElkO3nXjkdK5DiMl1uuIvbX6cmoWVgZwoCDs0MhqBpyEULkO1DERQqMl5I6lxJ=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczMjaUuXce4j6qurxt_1bkJFG4JVWjC2Tqi2TMgDZvdTxdtX-YZFuhnBFk7vFmMjbu_SIIKSXa278Vwh2d2jc3dyVOW_ztkXnNEbaa09coyD5Z3KqLcn-im4ZlDjFOaiJVhWl5JVz91WmxaICIZiv2N2=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -586,14 +616,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:29:36.463Z",
+    "warmupSchedule": ""
   },
   {
     "id": "32",
     "name": "ชนกมล บุญจบ",
     "nickname": "ใบข้าว",
     "topic": "Limbus Company",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOwFbsT-V081qqUwOxGNCuflmJjh8YoR3Cj1vQQV6X1m0OM8f37hPwha9ktssl0wpnYDuWrcncUX53iYqR86-MC676ohOYNPzihJZGUQboKh0eKiWylXloqs4jvravMnkJOKotarhTmeVDyliZGXgc7=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -605,14 +636,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:28:58.673Z",
+    "warmupSchedule": ""
   },
   {
     "id": "33",
     "name": "ธีรวีร์ จรูญศรีโชติ",
     "nickname": "ชีส",
     "topic": "iDOLM@STER",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOrHC8260QnfLo4mH_xSzsi0kiNqlt6PBcP_EuQtchwrfHwc_VVcIqhMZ47B_3rtlVRbtS7sK-KZODNh1yvy_jBIRABeQKuwbXmindoO87D6vach6ZyvVBoi3Ab8FNqSh9lfWi7Dqakow08upoSk8m6=w1117-h1117-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczMdHvB484MRDYAMpkCJOS7UYId8F4qL-ME0M-E6PudiUSCG8kKGk9a2MQqXIfuzyb0q0_EUB5R0Vn4SPxAnIZVXRM22LkwuzbcAAGd81x6TnPHJopJHy7m91Dz5sQzidf8BqGsiDbu1A5d5b3vjdacQ=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -624,14 +656,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T15:02:38.836Z",
+    "warmupSchedule": ""
   },
   {
     "id": "34",
     "name": "พัทธ์ศีล ปุญศิริ",
     "nickname": "ศีล",
     "topic": "Puella Magi Madoka Magica",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczNsExsB9bFIa6TfpL3rK0jC1Guol2vzAnkBPppZ3oPHqoIC7f-5wjLr2uYqLTHe7IChk0BuGgc3neBbmhdsPoF73Yh5di1jQkoV2Zx6-S3tzAECRuPQ9BOyqjCNSU9KhJEBGS7otHrKFph-ntsG9LdN=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -643,14 +676,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:33:59.693Z",
+    "warmupSchedule": ""
   },
   {
     "id": "35",
     "name": "ชนชนก บุญจบ",
     "nickname": "ใบบัว",
     "topic": "Touhou Project",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOPRD6nf1stfpEOhHIvJzI8anF-ogXHWOY1ZemvZjLCMBvPP_KvNRObXfPpi7D_anhQnvainlbKiuqwuHRYFuwgp2OV8l4n8l5NNYL1i2MAy5IPd6iLztbuH_5-qK_JQ_eGJdV8wlH-rylFWWegGxa-=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -662,14 +696,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:28:46.540Z",
+    "warmupSchedule": ""
   },
   {
     "id": "36",
     "name": "ธนรัตน์ อ่วมจันทร์",
     "nickname": "ก้อง",
     "topic": "Genwit อัจฉริยะพันธุ์ใหม่",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPAYop_fmxOwzJFjttGq68NfJkMnPt1tGaBKJYtLz6Xb2RdfzZXNAT5KrxgIH0a_d3FBFF2YuzQkTRp__d4S9cslaiu0xGtBkxxCD2G14KTHe5bhSuJoJEiBsaaL0kMfqFzrb8vmJL8_TkTSWjaDyTC=w1125-h1157-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -681,14 +716,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:28:37.105Z",
+    "warmupSchedule": ""
   },
   {
     "id": "37",
     "name": "อภิภู ศุขเศงี่ยม",
     "nickname": "วิน",
     "topic": "Limbus Company",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPYEuW-SoLoEy-dyeyKzrBgand-g4ObHpn2eTXCSFuuDoKQlDbbG9f6l0Oq3qqQMOJPGLeaJzFRdMrD7ntdyp_SXSH5npczIPJxYv62lt_WZmOcnI8L_lexuAbfpx5e-WwDqXZp10n72S1VRdjbu6KC=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -700,14 +736,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:28:52.647Z",
+    "warmupSchedule": ""
   },
   {
     "id": "38",
     "name": "ณัฐวุฒิ ชิมาชิน",
     "nickname": "น็อต",
     "topic": "เกม Bully",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczPCiJCcIxzv9CVcFkL_XJv3OtGrAB0MHvTSI2MM1Ni4VCrlz40zdteGro9Y3bdFM4K7z47DQIrRYJI2bcnA5B-_Dd2z-hJUJLIglyRtPI7DEN8gvn6AgXEHiUFNZT_AXF8aSsrfMupU_SL1qJoLouF1=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -719,14 +756,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:29:19.280Z",
+    "warmupSchedule": ""
   },
   {
     "id": "39",
     "name": "แก้วกศิรา",
     "nickname": "แก้ว",
     "topic": "Harry Potter",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOG4qq1L4n-RoLPb6FVNx722A2HJ1cK-T7l2wWkE0pFt1QLbb0SWOT96JOR9XADEc1XrsV8uNnrIji-2BrGkHOd_DFOxAf0BZZlyFQf9ClTwXXHAX0FzjLMtM1THoXO6d4oFgHSYp0cY-_u_WkXMoL4=w1125-h1125-s-no-gm",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczONAeuDRL8UbeYhBd8CL9H0o_llS9pos7HTz3sn9GmnorHqosOpXMuNMkFV4K6sFuz-8ZcoKBMXjuVKvqisWkgM34wQtrx_RSf5N1dNE072yR9yuWxk7kos8fckpv4ZQIw8OOmKM_foPXNA1RDr3sTU=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -738,14 +776,15 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:03:09.787Z",
-    "updatedAt": "2026-11-01T15:03:09.787Z"
+    "updatedAt": "2026-11-18T07:29:13.498Z",
+    "warmupSchedule": ""
   },
   {
     "id": "40",
     "name": "ณัฐกมล มานะดี",
     "nickname": "นัทม่วง",
     "topic": "Iphone Series",
-    "image": "",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczME3p-4Yqx2ButNynZKTEovK311xKn5v07aCi1a9MI8GAAYw4R36lPEoLAV932nrB9ugbmbejFtMNzRIo2XQBupGO-Ge2kbF5EC-M5voSf3JRp_F3Zpji3KRadwzfMgL23yWXtCt3dVi0JwBd9vmvwl=w1125-h1125-s-no-gm?authuser=0",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -757,6 +796,7 @@
     "isPlaying": false,
     "waitingNextMatch": false,
     "createdAt": "2026-11-01T15:22:02.837Z",
-    "updatedAt": "2026-11-01T15:22:02.837Z"
+    "updatedAt": "2026-11-18T07:34:05.332Z",
+    "warmupSchedule": ""
   }
 ]
