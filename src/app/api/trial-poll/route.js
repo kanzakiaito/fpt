@@ -502,9 +502,13 @@ export async function POST(request) {
 
     // Update Candidate Details (Admin: description, videoUrl, scores, whatIfScore, warmupSchedule)
     if (body.action === "save_candidate_details" || body.action === "update_candidate_details") {
+      let currentPoll = await getKVData("fpt_trial_poll", readLocalPoll);
+      if (!Array.isArray(currentPoll) || currentPoll.length === 0) {
+        currentPoll = getDefaultPoll();
+      }
       const { id, name, nickname, description, videoUrl, scores, whatIfScore, warmupSchedule } = body;
       let found = false;
-      current = current.map((item) => {
+      let updatedPoll = currentPoll.map((item) => {
         const matchesId = id && String(item.id) === String(id);
         const matchesName = name && item.name && item.name.trim() === String(name).trim();
         const matchesNick = nickname && item.nickname && item.nickname.trim() === String(nickname).trim();
@@ -523,8 +527,8 @@ export async function POST(request) {
       });
 
       // Recalculate percent
-      current = computePollPercentages(current);
-      await saveKVData("fpt_trial_poll", current, writeLocalPoll);
+      updatedPoll = computePollPercentages(updatedPoll);
+      await saveKVData("fpt_trial_poll", updatedPoll, writeLocalPoll);
 
       // Also sync to fpt_trial contestants
       try {
@@ -556,7 +560,7 @@ export async function POST(request) {
 
       return NextResponse.json({
         success: true,
-        data: current,
+        data: updatedPoll,
         message: "บันทึกข้อมูลและคลิปของผู้เข้าแข่งขันเรียบร้อยแล้ว",
       });
     }
