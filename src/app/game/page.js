@@ -5121,17 +5121,82 @@ function RankClimbAnimationModal({
 }
 
 // ==========================================
+// 📺 3-SECOND QUESTION NUMBER BADGE (Slanted Cyan Style)
+// ==========================================
+function ThreeSecQuestionNumberBadge({ qNum, style = {} }) {
+  return (
+    <div
+      style={{
+        transform: "skewX(-16deg)",
+        background: "linear-gradient(135deg, rgba(8, 24, 52, 0.95) 0%, rgba(3, 10, 24, 0.98) 100%)",
+        border: "2px solid #00e5ff",
+        borderRadius: "8px",
+        padding: "0 18px",
+        height: "56px",
+        boxSizing: "border-box",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+        boxShadow: "0 0 16px rgba(0, 229, 255, 0.35), inset 0 0 10px rgba(0, 229, 255, 0.15)",
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          transform: "skewX(16deg)",
+          display: "flex",
+          alignItems: "baseline",
+          gap: "6px",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+            fontSize: "17px",
+            fontWeight: "700",
+            color: "rgba(255, 255, 255, 0.85)",
+          }}
+        >
+          ข้อ
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-orbitron), 'Orbitron', 'Kanit', sans-serif",
+            fontSize: "24px",
+            fontWeight: "900",
+            color: "#00e5ff",
+            textShadow: "0 0 12px rgba(0, 229, 255, 0.7)",
+            letterSpacing: "1px",
+            lineHeight: 1,
+          }}
+        >
+          {qNum}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
 // 📺 FANPANTAE BROADCAST TIMER BAR (3 วินาที)
 // ==========================================
 function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
-  const elapsed = Math.max(0, 3.0 - (timeLeft ?? 3.0));
+  const isCorrect = isRoundCorrect === true;
   const isWrong = isRoundCorrect === false;
+  // ถ้าตอบถูก ให้นาฬิการีเซ็ตกลับมาที่ 0
+  const elapsed = isCorrect ? 0.0 : Math.max(0, 3.0 - (timeLeft ?? 3.0));
 
   let currentSecond = "";
   let fillPercent = 0;
   let badgeState = "idle"; // "idle" | "blue" | "red"
 
-  if (isWrong) {
+  if (isCorrect) {
+    // รีเซ็ตหลอดและป้ายกลับมาที่เริ่มต้น 0
+    currentSecond = "";
+    fillPercent = 0;
+    badgeState = "idle";
+  } else if (isWrong) {
     currentSecond = "X";
     fillPercent = 100;
     badgeState = "red";
@@ -5875,6 +5940,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
       setScore((prev) => prev + 1);
       setIsRoundCorrect(true);
       setAnswerRevealed(true);
+      setTimeLeft(3.0);
 
       if (!revealOnly) {
         const isLastQ = currentQ + 1 >= endQ;
@@ -6078,16 +6144,37 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
 
       <div className="three-sec-main-area" style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
         {isVideo ? (
-          /* เคส 1: คำถามวิดีโอ (ก่อนกดเริ่มเล่น ยังไม่ต้องขึ้นอะไร พอเริ่มเล่นแสดงวิดีโอ + นาฬิกา 3 วิทางขวา - ไม่มีแถบคำถามรอง) */
+          /* เคส 1: คำถามวิดีโอ */
           !roundActive ? (
-            <div style={{ minHeight: "140px", display: "flex", alignItems: "center", justifyContent: "center" }} />
+            <div
+              className="three-sec-question-box placeholder-box"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "200px",
+                width: "100%",
+                maxWidth: "580px",
+                background: "rgba(255, 255, 255, 0.02)",
+                border: "2px dashed rgba(0, 229, 255, 0.25)",
+                borderRadius: "16px",
+                padding: "28px",
+                gap: "14px",
+              }}
+            >
+              <div style={{ fontSize: "44px" }}>🎬</div>
+              <ThreeSecQuestionNumberBadge qNum={qNum} />
+            </div>
           ) : (
             <div style={{ display: "flex", gap: "28px", width: "100%", maxWidth: "1160px", alignItems: "center", justifyContent: "center", flexWrap: "nowrap" }}>
               <div className="video-player-wrapper" style={{ flex: "1 1 auto", minWidth: 0, maxWidth: "680px", overflow: "hidden", borderRadius: "12px", background: "#000", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
                 <video ref={videoPlayerRef} playsInline controls style={{ width: "100%", maxHeight: "340px", display: "block" }} />
               </div>
 
-              <div style={{ flex: "0 0 auto", minWidth: "280px", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+              <div style={{ flex: "0 0 auto", minWidth: "280px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+                <ThreeSecQuestionNumberBadge qNum={qNum} style={{ marginBottom: "2px" }} />
+
                 {!revealOnly && (
                   <ThreeSecTimerBar
                     timeLeft={timeLeft}
@@ -6105,32 +6192,71 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
             </div>
           )
         ) : isAudio ? (
-          /* เคส 2: คำถามเสียง -> โผล่นาฬิกา 3 วิอยู่ตรงกลางโดด ๆ ไม่มีแถบคำถามรอง */
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", maxWidth: "1160px", minHeight: "180px", gap: "24px" }}>
-            {!revealOnly && (
-              <ThreeSecTimerBar
-                timeLeft={timeLeft}
-                isRoundCorrect={isRoundCorrect}
-              />
-            )}
+          /* เคส 2: คำถามเสียง */
+          !roundActive ? (
+            <div
+              className="three-sec-question-box placeholder-box"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "200px",
+                width: "100%",
+                maxWidth: "580px",
+                background: "rgba(255, 255, 255, 0.02)",
+                border: "2px dashed rgba(0, 229, 255, 0.25)",
+                borderRadius: "16px",
+                padding: "28px",
+                gap: "14px",
+              }}
+            >
+              <div style={{ fontSize: "44px" }}>🔊</div>
+              <ThreeSecQuestionNumberBadge qNum={qNum} />
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", maxWidth: "1160px", minHeight: "180px", gap: "16px" }}>
+              <ThreeSecQuestionNumberBadge qNum={qNum} style={{ marginBottom: "4px" }} />
 
-            {answerRevealed && (
-              <ThreeSecAnswerBadge
-                answer={q?.answer}
-                isRoundCorrect={isRoundCorrect}
-              />
-            )}
-          </div>
+              {!revealOnly && (
+                <ThreeSecTimerBar
+                  timeLeft={timeLeft}
+                  isRoundCorrect={isRoundCorrect}
+                />
+              )}
+
+              {answerRevealed && (
+                <ThreeSecAnswerBadge
+                  answer={q?.answer}
+                  isRoundCorrect={isRoundCorrect}
+                />
+              )}
+            </div>
+          )
         ) : hasImage ? (
           /* เคส 3: คำถามรูปภาพ */
           !roundActive ? (
-            <div className="three-sec-question-box placeholder-box" style={{
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "220px", width: "100%", maxWidth: "580px", background: "rgba(255, 255, 255, 0.02)", border: "2px dashed rgba(0, 229, 255, 0.25)", borderRadius: "16px", padding: "32px"
-            }}>
-              <div style={{ fontSize: "50px", marginBottom: "12px", animation: "pulse-glow 2s infinite" }}>
+            <div
+              className="three-sec-question-box placeholder-box"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "220px",
+                width: "100%",
+                maxWidth: "580px",
+                background: "rgba(255, 255, 255, 0.02)",
+                border: "2px dashed rgba(0, 229, 255, 0.25)",
+                borderRadius: "16px",
+                padding: "28px",
+                gap: "14px",
+              }}
+            >
+              <div style={{ fontSize: "46px", animation: "pulse-glow 2s infinite" }}>
                 🖼️
               </div>
-              <div style={{ fontSize: "22px", fontWeight: "800", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum}</div>
+              <ThreeSecQuestionNumberBadge qNum={qNum} />
             </div>
           ) : (
             <div style={{ display: "flex", gap: "32px", width: "100%", maxWidth: "1160px", alignItems: "center", justifyContent: "center", flexWrap: "nowrap" }}>
@@ -6162,8 +6288,10 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                 />
               </div>
 
-              {/* Right column: Timer & Revealed Answer */}
-              <div style={{ flex: "0 0 auto", minWidth: "280px", display: "flex", flexDirection: "column", alignItems: "center", gap: "18px" }}>
+              {/* Right column: Badge, Timer & Revealed Answer */}
+              <div style={{ flex: "0 0 auto", minWidth: "280px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+                <ThreeSecQuestionNumberBadge qNum={qNum} style={{ marginBottom: "2px" }} />
+
                 {!revealOnly && (
                   <ThreeSecTimerBar
                     timeLeft={timeLeft}
@@ -6208,55 +6336,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                 }}
               >
                 {/* Question Number Badge (Cyan style) */}
-                <div
-                  style={{
-                    transform: "skewX(-16deg)",
-                    background: "linear-gradient(135deg, rgba(8, 24, 52, 0.95) 0%, rgba(3, 10, 24, 0.98) 100%)",
-                    border: "2px solid #00e5ff",
-                    borderRadius: "8px",
-                    padding: "0 18px",
-                    height: "56px",
-                    boxSizing: "border-box",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    boxShadow: "0 0 16px rgba(0, 229, 255, 0.35), inset 0 0 10px rgba(0, 229, 255, 0.15)",
-                  }}
-                >
-                  <div
-                    style={{
-                      transform: "skewX(16deg)",
-                      display: "flex",
-                      alignItems: "baseline",
-                      gap: "6px",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                        fontSize: "17px",
-                        fontWeight: "700",
-                        color: "rgba(255, 255, 255, 0.85)",
-                      }}
-                    >
-                      ข้อ
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-orbitron), 'Orbitron', 'Kanit', sans-serif",
-                        fontSize: "24px",
-                        fontWeight: "900",
-                        color: "#00e5ff",
-                        textShadow: "0 0 12px rgba(0, 229, 255, 0.7)",
-                        letterSpacing: "1px",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {qNum}
-                    </span>
-                  </div>
-                </div>
+                <ThreeSecQuestionNumberBadge qNum={qNum} />
 
                 {/* Sub-Question Bar (displays question when roundActive, empty bar waiting for question) */}
                 <div
@@ -6926,7 +7006,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
           return (
             <div className={cls} key={i} id={`qaChoice${i}`}>
               <span className="qa-choice-letter">{letters[i]}</span>
-              <span>{choice}</span>
+              <span className="qa-choice-text">{choice}</span>
             </div>
           );
         })}
@@ -7644,7 +7724,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
                     {isPeeked && (
                       <>
                         <div
-                          className="attr-clue-shutter"
+                          className={`attr-clue-shutter ${isBonus && step === 1 ? "bonus-shutter-tease" : ""}`}
                           style={{ width: `${step === 1 ? 75 : 50}%` }}
                         >
                           <div className="attr-shutter-handle">
