@@ -259,6 +259,9 @@ export default function TrialAdminPage() {
         } else if (jsonPoll.showPollTable !== undefined) {
           setShowPollTable(Boolean(jsonPoll.showPollTable));
         }
+        if (jsonPoll.showTrialContestantsOnHome !== undefined) {
+          setShowTrialContestantsOnHome(Boolean(jsonPoll.showTrialContestantsOnHome));
+        }
         if (jsonPoll.hideTrialPollScoresDuringVote !== undefined) {
           setHideTrialPollScores(Boolean(jsonPoll.hideTrialPollScoresDuringVote));
         }
@@ -965,13 +968,21 @@ export default function TrialAdminPage() {
   const handleToggleTrialContestants = async (newStatus) => {
     const targetStatus = typeof newStatus === "boolean" ? newStatus : !showTrialContestantsOnHome;
     setTogglingTrialContestants(true);
+    setShowTrialContestantsOnHome(targetStatus);
     try {
-      const res = await fetch("/api/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "toggle_trial_contestants_on_home", showTrialContestantsOnHome: targetStatus }),
-      });
-      const data = await res.json();
+      const [resTrial, resSettings] = await Promise.all([
+        fetch("/api/trial-poll", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "toggle_trial_contestants_on_home", showTrialContestantsOnHome: targetStatus }),
+        }),
+        fetch("/api/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "toggle_trial_contestants_on_home", showTrialContestantsOnHome: targetStatus }),
+        }),
+      ]);
+      const data = await resTrial.json();
       if (data && data.success) {
         setShowTrialContestantsOnHome(data.showTrialContestantsOnHome);
         showToast(data.showTrialContestantsOnHome ? "🟢 เปลี่ยนหน้าแรก Trial เป็นหน้าข้อมูลผู้เข้าแข่งขันแล้ว" : "🔴 ปิดโหมดหน้าข้อมูลผู้เข้าแข่งขัน Trial แล้ว", "success");

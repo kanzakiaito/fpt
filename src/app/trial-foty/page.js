@@ -399,22 +399,26 @@ export default function TrialFOTYPage() {
             setActiveTableTab((prev) => (prev === "warmup" ? "standings" : prev));
           }
         }
+        let isTrialContestantsMode = false;
+        if (jsonPoll.showTrialContestantsOnHome !== undefined) {
+          isTrialContestantsMode = Boolean(jsonPoll.showTrialContestantsOnHome);
+          setShowTrialContestantsOnHome(isTrialContestantsMode);
+          try {
+            localStorage.setItem("fpt_trial_show_contestants", String(isTrialContestantsMode));
+          } catch (e) {}
+          if (isTrialContestantsMode) {
+            setActiveTableTab("poll");
+            setPollViewMode("cards");
+          }
+        }
         if (jsonPoll.showPollTable !== undefined || jsonPoll.showTrialPollTable !== undefined) {
           const isPollVis = Boolean(jsonPoll.showTrialPollTable !== undefined ? jsonPoll.showTrialPollTable : jsonPoll.showPollTable);
           setShowPollTable(isPollVis);
           try {
             localStorage.setItem("fpt_trial_show_poll_table", String(isPollVis));
           } catch (e) {}
-          if (!isPollVis && !jsonPoll.showTrialContestantsOnHome) {
+          if (!isPollVis && !isTrialContestantsMode) {
             setActiveTableTab((prev) => (prev === "poll" ? "standings" : prev));
-          }
-        }
-        if (jsonPoll.showTrialContestantsOnHome !== undefined) {
-          const isTrialContestantsMode = Boolean(jsonPoll.showTrialContestantsOnHome);
-          setShowTrialContestantsOnHome(isTrialContestantsMode);
-          if (isTrialContestantsMode) {
-            setActiveTableTab("poll");
-            setPollViewMode("cards");
           }
         }
         if (jsonPoll.trialSubtitle) {
@@ -445,11 +449,17 @@ export default function TrialFOTYPage() {
         const parsedP = JSON.parse(cachedP);
         if (Array.isArray(parsedP) && parsedP.length > 0) setPollList(parsedP);
       }
+      const cachedContestantsMode = localStorage.getItem("fpt_trial_show_contestants");
+      if (cachedContestantsMode === "true") {
+        setShowTrialContestantsOnHome(true);
+        setActiveTableTab("poll");
+        setPollViewMode("cards");
+      }
       const cachedShowPoll = localStorage.getItem("fpt_trial_show_poll_table");
       if (cachedShowPoll !== null) {
         const isPollVis = cachedShowPoll === "true";
         setShowPollTable(isPollVis);
-        if (!isPollVis) {
+        if (!isPollVis && cachedContestantsMode !== "true") {
           setActiveTableTab((prev) => (prev === "poll" ? "standings" : prev));
         }
       }
@@ -993,18 +1003,22 @@ export default function TrialFOTYPage() {
               margin: "0 0 8px 0",
             }}
           >
-            {activeTableTab === "standings" || (!showPollTable && activeTableTab === "poll")
-              ? "ตารางคะแนนการแข่งขัน งุ่นง่าน Of The Year 2026"
-              : activeTableTab === "warmup"
-                ? "ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)"
-                : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
+            {activeTableTab === "poll" && showTrialContestantsOnHome
+              ? "🎴 ข้อมูลและประวัติผู้เข้าแข่งขัน The Trial (งุ่นง่าน 2026)"
+              : activeTableTab === "standings"
+                ? "ตารางคะแนนการแข่งขัน งุ่นง่าน Of The Year 2026"
+                : activeTableTab === "warmup"
+                  ? "ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)"
+                  : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
           </h2>
           <p style={{ fontSize: "15px", color: "rgba(255, 255, 255, 0.65)", margin: 0 }}>
-            {activeTableTab === "standings" || (!showPollTable && activeTableTab === "poll")
-              ? "คะแนนสดอัปเดตแบบเรียลไทม์ 4 หมวดการแข่งขัน ตัดตัวผู้เข้าแข่งขัน 5 อันดับแรก"
-              : activeTableTab === "warmup"
-                ? "คะแนนจากการลงสนามแข่งในห้องเกม (/game) เต็ม 100 คะแนน คิดเป็นสัดส่วน 30% ของตารางโพลล์มหาชน"
-                : "อันดับความนิยมและผลสำรวจความคิดเห็นของแฟนพันธุ์แท้แห่งปี 2026"}
+            {activeTableTab === "poll" && showTrialContestantsOnHome
+              ? "ทำความรู้จัก 40 ผู้เข้าแข่งขัน พร้อมข้อมูลหัวข้อ คะแนนรอบอุ่นเครื่อง และคลิปวิดีโอแนะนำตัว"
+              : activeTableTab === "standings"
+                ? "คะแนนสดอัปเดตแบบเรียลไทม์ 4 หมวดการแข่งขัน ตัดตัวผู้เข้าแข่งขัน 5 อันดับแรก"
+                : activeTableTab === "warmup"
+                  ? "คะแนนจากการลงสนามแข่งในห้องเกม (/game) เต็ม 100 คะแนน คิดเป็นสัดส่วน 30% ของตารางโพลล์มหาชน"
+                  : "อันดับความนิยมและผลสำรวจความคิดเห็นของแฟนพันธุ์แท้แห่งปี 2026"}
           </p>
         </div>
 
@@ -1070,7 +1084,7 @@ export default function TrialFOTYPage() {
             </button>
           )}
 
-          {showPollTable && (
+          {canViewPoll && (
             <button
               type="button"
               onClick={() => setActiveTableTab("poll")}
@@ -1093,7 +1107,7 @@ export default function TrialFOTYPage() {
                 transition: "all 0.2s ease",
               }}
             >
-              {showTrialContestantsOnHome ? "🎴 ข้อมูลผู้เข้าแข่งขัน & โพลล์" : "📊 ตารางอันดับโพลล์ (Poll)"}
+              {showTrialContestantsOnHome ? "🎴 ข้อมูลผู้เข้าแข่งขัน (Profiles)" : "📊 ตารางอันดับโพลล์ (Poll)"}
             </button>
           )}
         </div>
@@ -3363,67 +3377,109 @@ export default function TrialFOTYPage() {
         )}
 
         {/* ========================================================
-            TAB 2: FAN POLL RANKINGS (Authentic 1:1 Matching page.js)
+            TAB 2: FAN POLL RANKINGS & CONTESTANT PROFILES
            ======================================================== */}
-        {activeTableTab === "poll" && showPollTable && (
+        {activeTableTab === "poll" && canViewPoll && (
           <div key="poll-tab-view" className="table-slide-down">
-            {/* Vote CTA Banner */}
-            <div
-              style={{
-                background: "linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 136, 0, 0.22) 100%)",
-                border: "2px solid #ffd700",
-                borderRadius: "14px",
-                padding: "16px 20px",
-                marginBottom: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: "14px",
-                boxShadow: "0 0 25px rgba(255, 215, 0, 0.25)",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <span style={{ fontSize: "28px" }}>🗳️</span>
-                <div>
-                  <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
-                    {votingOpen ? "🗳️ เปิดรับคะแนนโหวตโพลล์มหาชนแล้ว!" : "📊 สรุปผลคะแนนโพลล์มหาชนอย่างเป็นทางการ"}
-                  </div>
-                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
-                    {votingOpen
-                      ? "คะแนนโหวตทั้งหมดจะถูกส่งและเก็บรักษาอย่างปลอดภัยใน Google Spreadsheet โดยผลคะแนนโพลล์รวม (70% โหวต + 30% What If) จะถูกประมวลผลและเปิดเผยหลังปิดรับโหวต!"
-                      : "ร่วมส่งแรงใจและโหวตให้กับผู้เข้าแข่งขันคนโปรดของคุณใน Trial Fan of the Year 2026"}
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#fef08a", marginTop: "4px", fontWeight: "700" }}>
-                    ⚡ สูตรคำนวณคะแนนโพลล์: คะแนนโหวตมหาชน 70% + คะแนนรอบอุ่นเครื่อง (What If?) 30%
-                  </div>
-                </div>
-              </div>
-
-              <Link
-                href="/trial-foty/vote"
+            {/* Vote CTA or Contestant Profiles Banner */}
+            {votingOpen ? (
+              <div
                 style={{
-                  display: "inline-flex",
+                  background: "linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 136, 0, 0.22) 100%)",
+                  border: "2px solid #ffd700",
+                  borderRadius: "14px",
+                  padding: "16px 20px",
+                  marginBottom: "20px",
+                  display: "flex",
                   alignItems: "center",
-                  gap: "8px",
-                  padding: "10px 22px",
-                  borderRadius: "10px",
-                  background: votingOpen
-                    ? "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)"
-                    : "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
-                  color: votingOpen ? "#030812" : "#cbd5e1",
-                  border: votingOpen ? "none" : "1px solid rgba(255,255,255,0.2)",
-                  fontWeight: "900",
-                  fontSize: "14px",
-                  textDecoration: "none",
-                  boxShadow: votingOpen ? "0 0 20px rgba(255, 215, 0, 0.5)" : "none",
-                  transition: "transform 0.15s ease",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  boxShadow: "0 0 25px rgba(255, 215, 0, 0.25)",
                 }}
               >
-                <span>{votingOpen ? "กดที่นี่เพื่อไปหน้าโหวต" : "ระบบปิดรับโหวตแล้ว (ดูรายละเอียด)"}</span>
-                <span>➔</span>
-              </Link>
-            </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "28px" }}>🗳️</span>
+                  <div>
+                    <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
+                      🗳️ เปิดรับคะแนนโหวตโพลล์มหาชนแล้ว!
+                    </div>
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
+                      คะแนนโหวตทั้งหมดจะถูกส่งและเก็บรักษาอย่างปลอดภัยใน Google Spreadsheet โดยผลคะแนนโพลล์รวม (70% โหวต + 30% What If) จะถูกประมวลผลและเปิดเผยหลังปิดรับโหวต!
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#fef08a", marginTop: "4px", fontWeight: "700" }}>
+                      ⚡ สูตรคำนวณคะแนนโพลล์: คะแนนโหวตมหาชน 70% + คะแนนรอบอุ่นเครื่อง (What If?) 30%
+                    </div>
+                  </div>
+                </div>
+
+                <Link
+                  href="/trial-foty/vote"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "10px 22px",
+                    borderRadius: "10px",
+                    background: "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)",
+                    color: "#030812",
+                    fontWeight: "900",
+                    fontSize: "14px",
+                    textDecoration: "none",
+                    boxShadow: "0 0 20px rgba(255, 215, 0, 0.5)",
+                    transition: "transform 0.15s ease",
+                  }}
+                >
+                  <span>กดที่นี่เพื่อไปหน้าโหวต</span>
+                  <span>➔</span>
+                </Link>
+              </div>
+            ) : (
+              <div
+                style={{
+                  background: "linear-gradient(135deg, rgba(0, 229, 255, 0.12) 0%, rgba(14, 165, 233, 0.18) 100%)",
+                  border: "2px solid rgba(0, 229, 255, 0.45)",
+                  borderRadius: "14px",
+                  padding: "16px 20px",
+                  marginBottom: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  boxShadow: "0 0 25px rgba(0, 229, 255, 0.15)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "28px" }}>🎴</span>
+                  <div>
+                    <div style={{ fontSize: "16px", fontWeight: "900", color: "#00e5ff" }}>
+                      ข้อมูลและทำความรู้จัก 40 ผู้เข้าแข่งขัน The Trial (งุ่นง่าน 2026)
+                    </div>
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)" }}>
+                      คลิกที่การ์ดผู้เข้าแข่งขันเพื่อดูประวัติ ข้อมูลคะแนนรอบอุ่นเครื่อง (What If?) และรับชมคลิปวิดีโอแนะนำตัว
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#67e8f9", marginTop: "4px", fontWeight: "700" }}>
+                      🎬 มีคลิปแนะนำตัว & ข้อมูลครบถ้วน
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: "10px",
+                    background: "rgba(0, 229, 255, 0.15)",
+                    border: "1px solid rgba(0, 229, 255, 0.4)",
+                    color: "#00e5ff",
+                    fontWeight: "800",
+                    fontSize: "13px",
+                  }}
+                >
+                  👁️ โหมดข้อมูลผู้เข้าแข่งขัน
+                </div>
+              </div>
+            )}
 
             {/* Spoiler Shield Alert Banner */}
             {isScoreHidden && (
@@ -3616,12 +3672,14 @@ export default function TrialFOTYPage() {
                             borderRadius: "20px",
                             fontSize: "12px",
                             fontWeight: "900",
-                            background: isTop5 ? "linear-gradient(90deg, #ffd700, #ff9900)" : "rgba(0, 229, 255, 0.15)",
-                            color: isTop5 ? "#030812" : "#67e8f9",
-                            border: isTop5 ? "none" : "1px solid rgba(0, 229, 255, 0.4)",
+                            background: (votingOpen && isTop5) ? "linear-gradient(90deg, #ffd700, #ff9900)" : "rgba(0, 229, 255, 0.15)",
+                            color: (votingOpen && isTop5) ? "#030812" : "#67e8f9",
+                            border: (votingOpen && isTop5) ? "none" : "1px solid rgba(0, 229, 255, 0.4)",
                           }}
                         >
-                          {isScoreHidden ? "🛡️ ซ่อนอันดับ" : `#${item.pollRank} ${isTop5 ? "⭐ Top 5" : ""}`}
+                          {votingOpen
+                            ? (isScoreHidden ? "🛡️ ซ่อนอันดับ" : `#${item.pollRank} ${isTop5 ? "⭐ Top 5" : ""}`)
+                            : `ลำดับที่ #${item.id || index + 1}`}
                         </span>
                         {hasVideo && (
                           <span
@@ -3714,10 +3772,14 @@ export default function TrialFOTYPage() {
                       {/* Score / Percent */}
                       <div style={{ marginTop: "auto", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.55)" }}>
-                          {item.whatIfScore ? `What If: ${item.whatIfScore}` : "สัดส่วนโพลล์"}
+                          {votingOpen
+                            ? "สัดส่วนโพลล์"
+                            : (itemTotalScore > 0 ? "คะแนน What If" : "สถานะ")}
                         </span>
                         <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700" }}>
-                          {(isScoreHidden || votingOpen) ? "🔒 รอสรุปผล" : item.percent}
+                          {votingOpen
+                            ? (isScoreHidden ? "🔒 รอสรุปผล" : item.percent)
+                            : (itemTotalScore > 0 ? `${itemTotalScore} คะแนน` : "พร้อมแข่งขัน")}
                         </span>
                       </div>
 
