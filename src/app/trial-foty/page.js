@@ -688,7 +688,7 @@ export default function TrialFOTYPage() {
           1. TOP NAVIGATION BAR (Mobile Responsive)
          ======================================================== */}
       <TrialNavbar
-        active="home"
+        active="standings"
         votingOpen={votingOpen}
         onStandingsClick={() => {
           setActiveTableTab("standings");

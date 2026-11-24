@@ -751,7 +751,7 @@ export default function BallDrawPage() {
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
           <Link
             href="/"
             style={{
@@ -764,36 +764,68 @@ export default function BallDrawPage() {
               border: "1px solid rgba(0, 229, 255, 0.3)"
             }}
           >
-            🏠 หน้าหลัก
+            🏠 หน้าแรก
           </Link>
           <Link
             href="/history"
             style={{
               padding: "6px 14px",
               borderRadius: "8px",
-              background: "rgba(255, 215, 0, 0.15)",
+              background: "rgba(255, 215, 0, 0.12)",
               color: "#ffd700",
               fontSize: "13px",
               textDecoration: "none",
-              border: "1px solid rgba(255, 215, 0, 0.4)",
+              border: "1px solid rgba(255, 215, 0, 0.35)",
               fontWeight: "700"
             }}
           >
             🏆 ทำเนียบแชมป์
           </Link>
           <Link
-            href="/game"
+            href="/tournament"
             style={{
               padding: "6px 14px",
               borderRadius: "8px",
-              background: "rgba(0, 180, 216, 0.15)",
+              background: "rgba(0, 229, 255, 0.1)",
               color: "#00e5ff",
               fontSize: "13px",
               textDecoration: "none",
-              border: "1px solid rgba(0, 229, 255, 0.4)"
+              border: "1px solid rgba(0, 229, 255, 0.3)",
+              fontWeight: "700"
             }}
           >
-            🎮 ไปที่หน้าเกม
+            ⚔️ ทัวร์นาเมนต์
+          </Link>
+          <Link
+            href="/draw"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(0, 229, 255, 0.25)",
+              border: "1.5px solid #00e5ff",
+              color: "#ffffff",
+              fontSize: "13px",
+              fontWeight: "800",
+              textDecoration: "none",
+              boxShadow: "0 0 12px rgba(0, 229, 255, 0.4)",
+            }}
+          >
+            🔮 จำลองจับลูกบอล
+          </Link>
+          <Link
+            href="/trial-foty"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255, 170, 0, 0.12)",
+              border: "1px solid rgba(255, 170, 0, 0.35)",
+              color: "#ffaa00",
+              fontSize: "13px",
+              fontWeight: "700",
+              textDecoration: "none"
+            }}
+          >
+            🔥 งุ่นง่านแห่งปี
           </Link>
           <Link
             href="/admin"

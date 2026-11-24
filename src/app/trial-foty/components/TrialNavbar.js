@@ -175,7 +175,7 @@ export default function TrialNavbar({
         {/* Desktop Navigation Links (Visible on >= 880px) */}
         <div className="trial-desktop-nav" style={{ alignItems: "center", gap: "8px" }}>
           {navLinks.map((item) => {
-            const isActive = active === item.id;
+            const isActive = active === item.id || (item.id === "standings" && (active === "home" || active === "standings" || !active));
 
             if (item.special) {
               return (
@@ -340,7 +340,7 @@ export default function TrialNavbar({
           </div>
 
           {navLinks.map((item) => {
-            const isActive = active === item.id;
+            const isActive = active === item.id || (item.id === "standings" && (active === "home" || active === "standings" || !active));
 
             return (
               <Link

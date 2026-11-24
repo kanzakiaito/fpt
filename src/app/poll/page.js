@@ -1061,6 +1061,24 @@ export default function PollPage() {
               🗳️ โพลล์แห่งปี
             </Link>
             <Link
+              href="/trial-foty"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#ffaa00",
+                fontWeight: "700",
+                fontSize: "14px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                background: "rgba(255, 170, 0, 0.12)",
+                border: "1px solid rgba(255, 170, 0, 0.35)",
+              }}
+            >
+              <span>🔥</span> งุ่นง่านแห่งปี
+            </Link>
+            <Link
               href="/admin"
               style={{
                 padding: "8px 14px",
