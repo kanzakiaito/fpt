@@ -911,6 +911,24 @@ export default function HistoryClient({ isSecretFoty = false }) {
               </Link>
             )}
             <Link
+              href="/trial-foty"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#ffaa00",
+                fontWeight: "700",
+                fontSize: "14px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                background: "rgba(255, 170, 0, 0.12)",
+                border: "1px solid rgba(255, 170, 0, 0.35)",
+              }}
+            >
+              <span>🔥</span> งุ่นง่านแห่งปี
+            </Link>
+            <Link
               href="/admin"
               style={{
                 padding: "8px 16px",
@@ -1080,6 +1098,25 @@ export default function HistoryClient({ isSecretFoty = false }) {
                 <span style={{ fontSize: "16px" }}>🗳️</span> โพลล์แห่งปี (/poll)
               </Link>
             )}
+            <Link
+              href="/trial-foty"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "linear-gradient(90deg, rgba(255, 170, 0, 0.2) 0%, rgba(255, 136, 0, 0.1) 100%)",
+                border: "1px solid rgba(255, 170, 0, 0.4)",
+                color: "#ffaa00",
+                fontWeight: "800",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>🔥</span> งุ่นง่านแห่งปี (/trial-foty)
+            </Link>
             <Link
               href="/admin"
               onClick={() => setMobileMenuOpen(false)}

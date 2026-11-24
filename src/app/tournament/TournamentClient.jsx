@@ -770,13 +770,16 @@ export default function TournamentClient({
               style={{
                 padding: "8px 16px",
                 borderRadius: "6px",
-                color: "#00e5ff",
-                fontWeight: "700",
+                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.25) 0%, rgba(0, 160, 255, 0.15) 100%)",
+                border: "1.5px solid #00e5ff",
+                color: "#ffffff",
+                fontWeight: "800",
                 fontSize: "14px",
                 textDecoration: "none",
                 display: "flex",
                 alignItems: "center",
                 gap: "5px",
+                boxShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
               }}
             >
               <span>⚔️</span> ทัวร์นาเมนต์
@@ -793,6 +796,24 @@ export default function TournamentClient({
               }}
             >
               จำลองจับลูกบอล
+            </Link>
+            <Link
+              href="/trial-foty"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#ffaa00",
+                fontWeight: "700",
+                fontSize: "14px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                background: "rgba(255, 170, 0, 0.12)",
+                border: "1px solid rgba(255, 170, 0, 0.35)",
+              }}
+            >
+              <span>🔥</span> งุ่นง่านแห่งปี
             </Link>
             <Link
               href="/admin/tournament"
@@ -890,15 +911,16 @@ export default function TournamentClient({
               style={{
                 padding: "11px 16px",
                 borderRadius: "10px",
-                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)",
-                border: "1px solid rgba(0, 229, 255, 0.4)",
-                color: "#00e5ff",
+                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.25) 0%, rgba(59, 130, 246, 0.15) 100%)",
+                border: "1.5px solid #00e5ff",
+                color: "#ffffff",
                 fontWeight: "800",
                 fontSize: "15px",
                 textDecoration: "none",
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
+                boxShadow: "0 0 12px rgba(0, 229, 255, 0.35)",
               }}
             >
               <span style={{ fontSize: "16px" }}>⚔️</span> ทัวร์นาเมนต์ (Tournament)
@@ -921,6 +943,25 @@ export default function TournamentClient({
               }}
             >
               <span style={{ fontSize: "16px" }}>🎱</span> จำลองจับลูกบอล
+            </Link>
+            <Link
+              href="/trial-foty"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "linear-gradient(90deg, rgba(255, 170, 0, 0.2) 0%, rgba(255, 136, 0, 0.1) 100%)",
+                border: "1px solid rgba(255, 170, 0, 0.4)",
+                color: "#ffaa00",
+                fontWeight: "800",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>🔥</span> งุ่นง่านแห่งปี (/trial-foty)
             </Link>
             <Link
               href="/admin/tournament"
